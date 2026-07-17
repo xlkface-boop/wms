@@ -3,101 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Menu Principal</title>
+    <title>WMS Transpetro - Menu Principal</title>
     <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
-        
-        body { 
-            background-color: #f4f6f9; 
-            display: flex; 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            /* Mantendo o padrão visual corporativo escuro */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
             flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            padding: 20px; 
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        
-        .menu-container { 
-            background: #ffffff; 
-            padding: 35px; 
-            border-radius: 16px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center; 
+
+        .menu-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            margin-top: auto;
+            margin-bottom: auto;
         }
-        
+
         .logo-sap { 
             font-size: 26px; 
             font-weight: 700; 
-            color: #0056b3; 
+            color: #ffffff; 
             margin-bottom: 6px; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         
         .sub-title { 
             font-size: 14px; 
-            color: #718096; 
+            color: #cbd5e0; 
             margin-bottom: 25px; 
         }
+
+        /* Badge de Perfil Estilizada */
+        .badge-perfil { 
+            font-size: 11px; 
+            font-weight: bold; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            display: inline-block; 
+            margin-bottom: 25px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         
+        .perfil-adm { 
+            background-color: #d1fae5; 
+            color: #065f46; 
+            border: 1px solid #a7f3d0;
+        }
+        
+        .perfil-ope { 
+            background-color: #fef3c7; 
+            color: #92400e; 
+            border: 1px solid #fde68a;
+        }
+
+        /* Botões Padrão do Menu */
         .btn-menu { 
             display: block; 
             width: 100%; 
-            background-color: #0056b3; 
+            background: linear-gradient(135deg, #0056b3 0%, #003366 100%);
             color: white; 
             text-decoration: none; 
             padding: 16px; 
-            margin-bottom: 14px; 
+            margin-bottom: 15px; 
             border-radius: 8px; 
             font-size: 16px; 
             font-weight: bold; 
             transition: 0.2s; 
             text-align: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
         
         .btn-menu:hover { 
-            background-color: #004085; 
             transform: translateY(-2px); 
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
         }
         
-        /* Botão exclusivo do Admin */
+        /* Botão exclusivo do Admin (Verde) */
         .btn-carga { 
-            background-color: #28a745; 
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+            border: 1px solid #166534;
         }
         
         .btn-carga:hover { 
-            background-color: #218838; 
-        }
-        
-        .badge-perfil { 
-            font-size: 11px; 
-            font-weight: bold; 
-            padding: 5px 12px; 
-            border-radius: 20px; 
-            display: inline-block; 
-            margin-bottom: 20px; 
-        }
-        
-        .perfil-adm { 
-            background-color: #e2f0d9; 
-            color: #385723; 
-            border: 1px solid #c5e0b4;
-        }
-        
-        .perfil-ope { 
-            background-color: #fff2cc; 
-            color: #7f6000; 
-            border: 1px solid #ffe599;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
         }
         
         .btn-sair { 
             font-size: 14px; 
-            color: #e53e3e; 
+            color: #feb2b2; 
             text-decoration: none; 
             display: inline-block; 
             margin-top: 15px; 
@@ -106,6 +114,18 @@
         
         .btn-sair:hover {
             text-decoration: underline;
+            color: #ffffff;
+        }
+
+        .direitos-box {
+            max-width: 500px; 
+            text-align: center; 
+            padding: 15px; 
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            width: 100%;
+            margin-top: auto;
         }
     </style>
 </head>
@@ -118,7 +138,7 @@
     <!-- Identificador de Perfil Dinâmico -->
     <div id="area-perfil"></div>
 
-    <!-- Botões de Navegação -->
+    <!-- Botões de Navegação (Ainda sem destino criado) -->
     <a href="consulta.html" class="btn-menu">🔍 Consulta Material / Endereço</a>
     <a href="painel.html" class="btn-menu">📋 Reservas Abertas & Histórico</a>
     
@@ -129,11 +149,11 @@
 </div>
 
 <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-<div style="max-width: 500px; margin: 40px auto 10px auto; text-align: center; padding: 15px; border-top: 1px solid #e2e8f0;">
-    <p style="font-size: 11px; line-height: 1.6; color: #718096;">
+<div class="direitos-box">
+    <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
         &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-        Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #4a5568;">Dário João Torres</strong>.<br>
-        <span style="color: #dc3545; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> A reprodução, cópia, modificação, comercialização ou uso deste sistema sem a autorização prévia e expressa do autor é estritamente proibida e configura crime de violação de direito autoral (Lei nº 9.610/98), sujeitando os infratores a sanções civis e criminais.
+        Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
+        <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> Uso autorizado apenas para e-mails institucionais da Transpetro. A reprodução ou uso não autorizado configura violação de direito autoral.
     </p>
 </div>
 
@@ -148,13 +168,13 @@
     const areaPerfil = document.getElementById('area-perfil');
     const btnCarga = document.getElementById('btn-carga-dados');
 
-    // Validação de permissões em tempo de execução
+    // Validação de permissões baseada no login
     if (perfilLogado === 'ADMIN') {
-        areaPerfil.innerHTML = '<span class="badge-perfil perfil-adm">👑 PERFIL: ADMINISTRADOR ÚNICO</span>';
-        btnCarga.style.display = "block"; // Libera o acesso para você alimentar o sistema
+        areaPerfil.innerHTML = '<span class="badge-perfil perfil-adm">👑 ADMINISTRADOR SUPREMO</span>';
+        btnCarga.style.display = "block"; // Libera o botão verde apenas para você
     } else {
-        areaPerfil.innerHTML = '<span class="badge-perfil perfil-ope">📋 PERFIL: OPERADOR (APENAS LEITURA)</span>';
-        btnCarga.style.display = "none";  // Garante que o operador não veja o botão de carga
+        areaPerfil.innerHTML = '<span class="badge-perfil perfil-ope">📋 OPERADOR DE PÁTIO</span>';
+        btnCarga.style.display = "none";  // Esconde o botão verde para os outros
     }
 </script>
 
