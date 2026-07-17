@@ -13,29 +13,47 @@
         }
 
         body {
-            background-color: #f4f6f9;
+            /* Aplica a sua imagem de capa no fundo de forma responsiva */
+            background: url('capa.jfif') no-repeat center center fixed;
+            background-size: cover;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-between; /* Empurra o rodapé para a base */
             align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
 
+        /* Espaçador superior invisível para centralizar perfeitamente o card */
+        body::before {
+            content: "";
+            display: block;
+            flex-grow: 1;
+        }
+
         .login-container {
-            background: #ffffff;
+            /* Efeito Vidro Fosco Avançado */
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 35px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             width: 100%;
             max-width: 380px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
         }
 
         h2 {
             text-align: center;
-            color: #0056b3;
+            color: #ffffff; /* Letras brancas para destacar no fundo escuro */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             margin-bottom: 25px;
             font-size: 22px;
             font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .form-group {
@@ -48,26 +66,31 @@
         label {
             font-weight: 600;
             font-size: 13px;
-            color: #4a5568;
+            color: #e2e8f0; /* Tom cinza claro legível */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.9); /* Fundo sólido nos campos para leitura perfeita */
+            border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 8px;
             font-size: 15px;
             outline: none;
+            color: #1a202c;
             transition: 0.2s;
+            font-weight: 500;
         }
 
         input:focus {
-            border-color: #0056b3;
-            background-color: #fff;
+            border-color: #ffd700; /* Destaque dourado conversando com os reflexos da imagem */
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            background: #ffffff;
         }
 
         button {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #0056b3 0%, #003366 100%);
             color: white;
             border: none;
             padding: 14px;
@@ -78,23 +101,53 @@
             width: 100%;
             margin-top: 10px;
             transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
         button:hover {
-            background-color: #004085;
+            background: linear-gradient(135deg, #004085 0%, #002244 100%);
+            transform: translateY(-1px);
         }
 
         .alternar-link {
             text-align: center;
             margin-top: 18px;
             font-size: 13px;
-            color: #718096;
+            color: #cbd5e0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
             cursor: pointer;
         }
 
         .alternar-link:hover {
-            color: #0056b3;
+            color: #ffffff;
             text-decoration: underline;
+        }
+
+        .alerta-erro {
+            display: none;
+            background-color: #fff5f5;
+            border-left: 4px solid #c53030;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Rodapé Adaptado para Fundo Escuro */
+        .direitos-box {
+            max-width: 500px; 
+            text-align: center; 
+            padding: 15px; 
+            background: rgba(0, 0, 0, 0.6); /* Fundo escuro atrás do texto para garantir leitura total */
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: auto; /* Empurra para o fim absoluto */
+            width: 100%;
         }
     </style>
 </head>
@@ -103,11 +156,13 @@
 <div class="login-container">
     <h2 id="titulo-tela">Acessar WMS</h2>
     
+    <!-- Caixa de Erro Corporativo -->
+    <div id="msg-erro" class="alerta-erro"></div>
+    
     <form id="formAuth" onsubmit="tratarAutenticacao(event)">
         <div class="form-group">
-            <label for="email">E-mail:</label>
-            <!-- Mude o value abaixo para o e-mail que você quer usar como o seu ADM definitivo -->
-            <input type="email" id="email" required placeholder="seu-email@empresa.com" value="admin@wms.com">
+            <label for="email">E-mail Corporativo:</label>
+            <input type="email" id="email" required placeholder="seu-usuario@transpetro.com.br" value="dario.torres@transpetro.com.br">
         </div>
         <div class="form-group">
             <label for="senha">Senha:</label>
@@ -119,14 +174,23 @@
     </form>
 </div>
 
+<!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
+<div class="direitos-box">
+    <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0;">
+        &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+        Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
+        <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> A reprodução, cópia, modificação, comercialização ou uso deste sistema sem a autorização prévia e expressa do autor é estritamente proibida e configura crime de violação de direito autoral (Lei nº 9.610/98), sujeitando os infratores a sanções civis e criminais.
+    </p>
+</div>
+
 <script>
     let modoLogin = true;
-
-    // Coloque aqui exatamente o e-mail que você vai usar. Só ele ganha a coroa de ADM.
-    const EMAIL_ADMIN_SUPREMO = "admin@wms.com"; 
+    const EMAIL_ADMIN_SUPREMO = "dario.torres@transpetro.com.br"; 
+    const DOMINIO_PERMITIDO = "@transpetro.com.br";
 
     function alternarModo() {
         modoLogin = !modoLogin;
+        document.getElementById('msg-erro').style.display = "none";
         document.getElementById('titulo-tela').innerText = modoLogin ? "Acessar WMS" : "Criar Nova Conta";
         document.getElementById('btn-acao').innerText = modoLogin ? "Entrar no Sistema" : "Registrar Conta";
         document.getElementById('btn-alternar').innerText = modoLogin ? "Não tem conta? Criar conta simples" : "Já tem uma conta? Fazer Login";
@@ -135,9 +199,21 @@
     function tratarAutenticacao(e) {
         e.preventDefault();
         const emailDigitado = document.getElementById('email').value.trim().toLowerCase();
+        const erroBox = document.getElementById('msg-erro');
+        
+        erroBox.style.display = "none";
+
+        // Trava Rigorosa de Domínio
+        if (!emailDigitado.endsWith(DOMINIO_PERMITIDO)) {
+            erroBox.innerText = `⚠️ Acesso negado! Use apenas e-mails institucionais com final ${DOMINIO_PERMITIDO}.`;
+            erroBox.style.display = "block";
+            
+            console.warn(`🚨 LOG AUDITORIA: Invasão barrada de domínio externo: ${emailDigitado}`);
+            alert(`🛑 Domínio Inválido!\nUma notificação de segurança foi disparada para o painel do Administrador Dário Torres contendo os seus dados.`);
+            return;
+        }
         
         if (modoLogin) {
-            // Se for o seu e-mail, grava no navegador a tag ADMIN
             if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
                 localStorage.setItem('wms_perfil', 'ADMIN');
                 alert("🔓 Acesso liberado! Perfil: Administrador Supremo.");
@@ -145,10 +221,9 @@
                 localStorage.setItem('wms_perfil', 'OPERADOR');
                 alert("📋 Acesso liberado! Perfil: Operador Pátio.");
             }
-            // Vai para a tela do menu principal
             window.location.href = "menu.html";
         } else {
-            alert("Conta criada com sucesso! Agora basta fazer o login.");
+            alert("Conta corporativa registrada com sucesso!");
             alternarModo();
         }
     }
