@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS Inteligente - Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 380px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #0056b3;
+            background-color: #fff;
+        }
+
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: #004085;
+        }
+
+        .alternar-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #718096;
+            cursor: pointer;
+        }
+
+        .alternar-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2 id="titulo-tela">Acessar WMS</h2>
+    
+    <form id="formAuth" onsubmit="tratarAutenticacao(event)">
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <!-- Mude o value abaixo para o e-mail que você quer usar como o seu ADM definitivo -->
+            <input type="email" id="email" required placeholder="seu-email@empresa.com" value="admin@wms.com">
+        </div>
+        <div class="form-group">
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" required placeholder="••••••••">
+        </div>
+        
+        <button type="submit" id="btn-acao">Entrar no Sistema</button>
+        <div class="alternar-link" id="btn-alternar" onclick="alternarModo()">Não tem conta? Criar conta simples</div>
+    </form>
+</div>
+
+<script>
+    let modoLogin = true;
+
+    // Coloque aqui exatamente o e-mail que você vai usar. Só ele ganha a coroa de ADM.
+    const EMAIL_ADMIN_SUPREMO = "admin@wms.com"; 
+
+    function alternarModo() {
+        modoLogin = !modoLogin;
+        document.getElementById('titulo-tela').innerText = modoLogin ? "Acessar WMS" : "Criar Nova Conta";
+        document.getElementById('btn-acao').innerText = modoLogin ? "Entrar no Sistema" : "Registrar Conta";
+        document.getElementById('btn-alternar').innerText = modoLogin ? "Não tem conta? Criar conta simples" : "Já tem uma conta? Fazer Login";
+    }
+
+    function tratarAutenticacao(e) {
+        e.preventDefault();
+        const emailDigitado = document.getElementById('email').value.trim().toLowerCase();
+        
+        if (modoLogin) {
+            // Se for o seu e-mail, grava no navegador a tag ADMIN
+            if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
+                localStorage.setItem('wms_perfil', 'ADMIN');
+                alert("🔓 Acesso liberado! Perfil: Administrador Supremo.");
+            } else {
+                localStorage.setItem('wms_perfil', 'OPERADOR');
+                alert("📋 Acesso liberado! Perfil: Operador Pátio.");
+            }
+            // Vai para a tela do menu principal
+            window.location.href = "menu.html";
+        } else {
+            alert("Conta criada com sucesso! Agora basta fazer o login.");
+            alternarModo();
+        }
+    }
+</script>
+
+</body>
+</html>
