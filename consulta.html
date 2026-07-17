@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Consulta por NM</title>
+    <title>WMS Inteligente - Consulta Avançada (MMBE)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -19,13 +19,13 @@
 
         .main-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1300px; /* Layout ligeiramente mais largo */
             margin-top: 20px;
             margin-bottom: 30px;
         }
 
-        /* Card de Busca (Glassmorphism) */
-        .busca-container {
+        /* Card de Busca Avançado (MMBE) */
+        .busca-avancada-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -34,16 +34,15 @@
             border-radius: 12px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
         }
 
-        .header-group {
+        .header-MMBE {
             display: flex;
-            flex-direction: column;
-            margin-right: auto;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
         }
 
         h2 {
@@ -52,52 +51,56 @@
             font-weight: 700;
         }
 
-        .sub-critério {
-            color: #a0aec0;
-            font-size: 13px;
-            margin-top: 2px;
-        }
-
-        .busca-input {
-            flex-grow: 1;
-            padding: 15px 20px;
-            background: #ffffff;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600; /* NM em negrito para facilitar leitura */
-            outline: none;
-            color: #1a202c;
-            min-width: 300px;
-            transition: 0.2s;
-        }
-
-        .busca-input:focus {
-            border-color: #ffd700; /* Destaque dourado */
-            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
-        }
-
-        /* Indicador de Busca Ativa */
-        .busca-input::placeholder {
-            color: #718096;
-            font-weight: 400;
-        }
-
         .btn-voltar {
-            padding: 14px 20px;
+            padding: 10px 18px;
             background: rgba(255, 255, 255, 0.05);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 8px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             transition: 0.2s;
         }
 
-        .btn-voltar:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-2px);
+        .btn-voltar:hover { background: rgba(255, 255, 255, 0.15); }
+
+        /* Grade de Filtros */
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .filtro-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filtro-group label {
+            color: #cbd5e0;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .busca-input {
+            width: 100%;
+            padding: 14px;
+            background: #ffffff;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            color: #1a202c;
+            transition: 0.2s;
+        }
+
+        .busca-input:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
         /* Tabela de Dados Operacionais */
@@ -115,7 +118,7 @@
             border-collapse: collapse;
             color: #ffffff;
             font-size: 14px;
-            min-width: 600px; /* Garante estrutura em telas pequenas */
+            min-width: 900px; /* Estrutura mínima */
         }
 
         th {
@@ -129,12 +132,19 @@
             font-size: 12px;
         }
 
-        /* Coluna NM em destaque */
+        /* Chave Principal (NM) */
         th:first-child, td:first-child {
-            width: 150px;
+            width: 130px;
             font-weight: 700;
-            color: #ffd700; /* NM em Dourado na tabela */
-            padding-left: 25px;
+            color: #ffd700;
+            padding-left: 20px;
+        }
+
+        /* Coluna Depósito */
+        th:nth-child(2), td:nth-child(2) {
+            width: 110px;
+            color: #a0aec0;
+            font-weight: 600;
         }
 
         td {
@@ -142,18 +152,14 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.03); }
 
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        /* Estilos de Status Operacionais */
-        .saldo-bom { color: #68d391; font-weight: bold; } /* Verde */
-        .saldo-baixo { color: #f6ad55; font-weight: bold; } /* Laranja */
-        .saldo-zero { color: #fc8181; font-weight: bold; text-decoration: line-through; } /* Vermelho */
+        /* Estilos Operacionais */
+        .saldo-bom { color: #68d391; font-weight: bold; }
+        .saldo-baixo { color: #f6ad55; font-weight: bold; }
+        .saldo-zero { color: #fc8181; font-weight: bold; text-decoration: line-through; }
+        .ende-especial { color: #81e6d9; font-style: italic; }
 
         .direitos-box {
             max-width: 500px; 
@@ -170,62 +176,89 @@
 <body>
 
     <div class="main-container">
-        <!-- Barra Superior de Busca Focada no NM -->
-        <div class="busca-container">
-            <div class="header-group">
-                <h2>Consulta de Saldo</h2>
-                <span class="sub-critério">Critério principal: Número de Material (NM SAP)</span>
+        <!-- Painel de Busca Avançada (Filtros MMBE) -->
+        <div class="busca-avancada-container">
+            <div class="header-MMBE">
+                <h2>Consulta de Estoque (MMBE)</h2>
+                <a href="menu.html" class="btn-voltar">⬅ Voltar ao Menu</a>
             </div>
             
-            <!-- Input otimizado para o NM -->
-            <input type="text" id="inputNM" class="busca-input" placeholder="Digite o NM exato (ex: 1000142)..." onkeyup="filtrarPorNM()" inputmode="numeric">
-            
-            <a href="menu.html" class="btn-voltar">⬅ Voltar</a>
+            <div class="filtros-grid">
+                <!-- Filtro 1: NM Exato (Prioridade SAP) -->
+                <div class="filtro-group">
+                    <label for="filtroNM">Número de Material (NM SAP)</label>
+                    <input type="text" id="filtroNM" class="busca-input" placeholder="Digite o NM exato..." onkeyup="executarFiltros()" inputmode="numeric">
+                </div>
+                
+                <!-- Filtro 2: Descrição (*Contém*) -->
+                <div class="filtro-group">
+                    <label for="filtroDesc">Descrição do Produto (*Exemplo*)</label>
+                    <input type="text" id="filtroDesc" class="busca-input" placeholder="Buscar na descrição..." onkeyup="executarFiltros()">
+                </div>
+                
+                <!-- Filtro 3: Depósito / Local (Lista Rápida) -->
+                <div class="filtro-group">
+                    <label for="filtroDepo">Depósito / Área</label>
+                    <input type="text" id="filtroDepo" class="busca-input" placeholder="Ex: DP01, PÁTIO..." onkeyup="executarFiltros()">
+                </div>
+            </div>
         </div>
 
-        <!-- Tabela de Dados (Simulando a estrutura da planilha) -->
+        <!-- Tabela de Dados (Simulando estrutura da MMBE) -->
         <div class="tabela-container">
             <table id="tabelaDados">
                 <thead>
                     <tr>
-                        <th>NM (SAP)</th> <!-- Coluna Chave -->
-                        <th>Descrição do Material</th>
+                        <th>NM (SAP)</th>
+                        <th>Depósito</th> <!-- Nova Coluna Chave -->
+                        <th>Descrição Operacional</th>
                         <th>Endereço Física</th>
                         <th>Saldo Atual</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabela">
-                    <!-- Dados Mockados para Validação (O Firebase preencherá aqui) -->
-                    <!-- O NM deve estar SEMPRE na primeira coluna (td:first-child) -->
+                    <!-- Dados Mockados (Firebase preencherá aqui) -->
                     <tr>
                         <td>1000142</td>
-                        <td>VALVULA GLOBO FLUÍDOS 3 POL</td>
+                        <td>DP01</td>
+                        <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
                         <td>P01-B03-C02</td>
                         <td class="saldo-bom">45 UN</td>
                     </tr>
                     <tr>
                         <td>2000551</td>
-                        <td>MANOMETRO PRESSAO FLANGEADO 1/2 NPT</td>
+                        <td>DP01</td>
+                        <td>MANOMETRO PRESSAO FLANGEADO 1/2 NPT BRASS</td>
                         <td>P02-A01-C01</td>
                         <td class="saldo-baixo">12 UN</td>
                     </tr>
                     <tr>
                         <td>3000889</td>
-                        <td>TUBO ACO CARBONO SCH40 6 POL x 6M</td>
-                        <td>RECEBIMENTO_DARIO</td>
+                        <td>PÁTIO A</td>
+                        <td>TUBO ACO CARBONO SCH40 6 POL x 6M SEM COSTURA</td>
+                        <td class="ende-especial">RECEBIMENTO_DARIO</td>
                         <td class="saldo-zero">0 UN</td>
                     </tr>
                     <tr>
                         <td>4001223</td>
-                        <td>BOMBA CENTRIFUGA HIDRÁULICA 5CV</td>
-                        <td>PAV_EXTERNO_01</td>
+                        <td>EXTERNO</td>
+                        <td>BOMBA CENTRIFUGA HIDRÁULICA 5CV MOTOR WEG</td>
+                        <td>PAV_EXT_01</td>
                         <td class="saldo-bom">3 UN</td>
                     </tr>
                      <tr>
-                        <td>1000142</td> <!-- NM Duplicado em endereço diferente -->
-                        <td>VALVULA GLOBO FLUÍDOS 3 POL</td>
-                        <td>P01-B03-C03</td> <!-- Outra prateleira -->
+                        <td>1000142</td>
+                        <td>DP02</td> <!-- Mesmo NM, Depósito diferente -->
+                        <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
+                        <td>P03-A01-C01</td>
                         <td class="saldo-bom">10 UN</td>
+                    </tr>
+                    <tr>
+                        <td>5000999</td>
+                        <td>DP01</td>
+                        <td>GRAXA LUBRIFICANTE INDUSTRIAL *EXEMPLO* GAUGE 50KG</td>
+                        <td>P01-A01-C01</td>
+                        <td class="saldo-bom">20 KG</td>
                     </tr>
                 </tbody>
             </table>
@@ -237,7 +270,7 @@
         <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
             &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
             Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
-            <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> Uso autorizado apenas para e-mails institucionais da Transpetro. A reprodução configura violação de direito autoral.
+            A reprodução ou uso não autorizado configura violação de direito autoral.
         </p>
     </div>
 
@@ -248,27 +281,37 @@
         }
 
         /**
-         * Função de Filtro Otimizada para NM
-         * Foca a busca exclusivamente na primeira coluna da tabela.
+         * Função Mestre de Filtros (MMBE)
+         * Cruza as três informações simultaneamente.
          */
-        function filtrarPorNM() {
-            const inputNM = document.getElementById('inputNM');
-            const filtro = inputNM.value.trim().toUpperCase(); // Remove espaços e padroniza
+        function executarFiltros() {
+            // Pega os valores dos três campos
+            const fNM = document.getElementById('filtroNM').value.trim().toUpperCase();
+            const fDesc = document.getElementById('filtroDesc').value.trim().toUpperCase();
+            const fDepo = document.getElementById('filtroDepo').value.trim().toUpperCase();
+
             const tabela = document.getElementById('tabelaDados');
             const linhas = tabela.getElementsByTagName('tr');
 
-            // Começa do índice 1 para pular o cabeçalho (th)
+            // Varre a tabela (pula cabeçalho)
             for (let i = 1; i < linhas.length; i++) {
-                const celulaNM = linhas[i].getElementsByTagName('td')[0]; // Pega APENAS a primeira célula (NM)
+                const celulas = linhas[i].getElementsByTagName('td');
                 
-                if (celulaNM) {
-                    const textoNM = celulaNM.textContent || celulaNM.innerText;
-                    
-                    // Verifica se o texto digitado está contido no NM da linha
-                    if (textoNM.toUpperCase().indexOf(filtro) > -1) {
-                        linhas[i].style.display = ""; // Mostra a linha
+                if (celulas.length >= 3) {
+                    // Mapeia as colunas operacionais
+                    const txtNM = celulas[0].textContent || celulas[0].innerText;
+                    const txtDepo = celulas[1].textContent || celulas[1].innerText;
+                    const txtDesc = celulas[2].textContent || celulas[2].innerText;
+
+                    // Lógica SAP: A linha só aparece se bater TODOS os filtros ativos
+                    const bateNM = fNM === "" || txtNM.toUpperCase().indexOf(fNM) > -1;
+                    const bateDepo = fDepo === "" || txtDepo.toUpperCase().indexOf(fDepo) > -1;
+                    const bateDesc = fDesc === "" || txtDesc.toUpperCase().indexOf(fDesc) > -1;
+
+                    if (bateNM && bateDepo && bateDesc) {
+                        linhas[i].style.display = ""; // Mostra
                     } else {
-                        linhas[i].style.display = "none"; // Esconde a linha
+                        linhas[i].style.display = "none"; // Esconde
                     }
                 }
             }
