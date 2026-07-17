@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Transpetro - Login</title>
+    <title>WMS Transpetro - Login / Cadastro</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            /* Fundo Degradê Corporativo - Alta performance e leitura perfeita */
+            /* Fundo Degradê Corporativo com Fallback para Imagem */
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('capa.jfif');
-            /* A linha acima tenta carregar a imagem 'capa.jfif'. Se ela não existir, o degradê escuro assume. 👍 */
-            
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -34,8 +32,9 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
             width: 100%;
             max-width: 380px;
-            margin-top: auto; /* Centraliza verticalmente */
+            margin-top: auto;
             margin-bottom: auto;
+            transition: all 0.3s ease;
         }
 
         h2 {
@@ -89,11 +88,27 @@
             width: 100%;
             margin-top: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: 0.1s;
+            transition: all 0.1s;
         }
 
         button:active {
             transform: scale(0.98);
+        }
+
+        /* Link para alternar entre Login e Cadastro */
+        .alternar-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #e2e8f0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .alternar-link:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
 
         .direitos-box {
@@ -111,7 +126,7 @@
 <body>
 
 <div class="login-container">
-    <h2>Acessar WMS</h2>
+    <h2 id="titulo-tela">Acessar WMS</h2>
     <form id="formAuth" onsubmit="tratarAutenticacao(event)">
         <div class="form-group">
             <label for="email">E-mail Corporativo:</label>
@@ -121,7 +136,19 @@
             <label for="senha">Senha:</label>
             <input type="password" id="senha" required placeholder="••••••••">
         </div>
-        <button type="submit">Entrar no Sistema</button>
+        
+        <!-- Campo opcional para confirmação de senha no modo cadastro -->
+        <div class="form-group" id="confirmar-senha-group" style="display: none;">
+            <label for="confirmar-senha">Confirmar Senha:</label>
+            <input type="password" id="confirmar-senha" placeholder="••••••••">
+        </div>
+
+        <button type="submit" id="btn-acao">Entrar no Sistema</button>
+        
+        <!-- Botão/Link para alternar -->
+        <div class="alternar-link" id="btn-alternar" onclick="alternarModo()">
+            Não tem conta? Criar conta simples
+        </div>
     </form>
 </div>
 
@@ -135,32 +162,81 @@
 </div>
 
 <script>
+    let modoLogin = true; // Controla se estamos no modo Login ou Cadastro
     const DOMINIO_PERMITIDO = "@transpetro.com.br";
     // Mude para o seu e-mail administrativo oficial
     const EMAIL_ADMIN_SUPREMO = "dario.torres@transpetro.com.br";
 
+    function alternarModo() {
+        modoLogin = !modoLogin; // Inverte o estado
+        
+        // Referências dos elementos
+        const tituloTela = document.getElementById('titulo-tela');
+        const btnAcao = document.getElementById('btn-acao');
+        const btnAlternar = document.getElementById('btn-alternar');
+        const confirmarSenhaGroup = document.getElementById('confirmar-senha-group');
+        const confirmarSenhaInput = document.getElementById('confirmar-senha');
+
+        if (modoLogin) {
+            // Modo Login
+            tituloTela.innerText = "Acessar WMS";
+            btnAcao.innerText = "Entrar no Sistema";
+            btnAlternar.innerText = "Não tem conta? Criar conta simples";
+            confirmarSenhaGroup.style.display = "none";
+            confirmarSenhaInput.required = false;
+        } else {
+            // Modo Cadastro
+            tituloTela.innerText = "Criar Nova Conta";
+            btnAcao.innerText = "Registrar Conta";
+            btnAlternar.innerText = "Já tem uma conta? Fazer Login";
+            confirmarSenhaGroup.style.display = "flex";
+            confirmarSenhaInput.required = true;
+        }
+    }
+
     function tratarAutenticacao(e) {
         e.preventDefault();
-        const emailDigitado = document.getElementById('email').value.trim().toLowerCase();
+        
+        const emailInput = document.getElementById('email');
+        const emailDigitado = emailInput.value.trim().toLowerCase();
+        const senhaDigitada = document.getElementById('senha').value;
+        const confirmarSenhaInput = document.getElementById('confirmar-senha');
+        const confirmarSenhaDigitada = confirmarSenhaInput.value;
         
         // Trava Rigorosa de Domínio Transpetro
         if (!emailDigitado.endsWith(DOMINIO_PERMITIDO)) {
             alert(`🛑 Acesso Negado!\n\nEste sistema é restrito. Use apenas e-mails corporativos válidos do domínio ${DOMINIO_PERMITIDO}.`);
-            console.warn(`🚨 LOG SEGURANÇA: Tentativa de login com domínio inválido: ${emailDigitado}`);
-            // (Futuro: Firebase disparará alerta pro ADM aqui)
+            console.warn(`🚨 LOG SEGURANÇA: Tentativa com domínio inválido: ${emailDigitado}`);
             return;
         }
-        
-        // Lógica de Perfil (Admin vs Operador)
-        if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
-            localStorage.setItem('wms_perfil', 'ADMIN');
-            alert("🔓 Bem-vindo, Dário! Acesso de Administrador liberado.");
+
+        if (modoLogin) {
+            // --- Lógica de Login ---
+            if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
+                localStorage.setItem('wms_perfil', 'ADMIN');
+                alert("🔓 Bem-vindo, Dário! Acesso de Administrador liberado.");
+            } else {
+                // (Futuro: Firebase verificará e-mail e senha aqui)
+                localStorage.setItem('wms_perfil', 'OPERADOR');
+                alert("📋 Login realizado. Perfil: Operador de Pátio.");
+            }
+            window.location.href = "menu.html";
+
         } else {
-            localStorage.setItem('wms_perfil', 'OPERADOR');
-            alert("📋 Login realizado. Perfil: Operador de Pátio.");
+            // --- Lógica de Cadastro ---
+            // Verifica se as senhas coincidem
+            if (senhaDigitada !== confirmarSenhaDigitada) {
+                alert("🛑 Erro no Cadastro!\nAs senhas digitadas não coincidem. Tente novamente.");
+                confirmarSenhaInput.value = ""; // Limpa o campo de confirmação
+                confirmarSenhaInput.focus();
+                return;
+            }
+
+            // (Futuro: Firebase salvará o novo usuário aqui)
+            alert(`✅ Conta pré-registrada com sucesso para: ${emailDigitado}!\n\nAgora você pode fazer o login.`);
+            alternarModo(); // Volta para o modo login após cadastro
+            emailInput.focus();
         }
-        
-        window.location.href = "menu.html";
     }
 </script>
 
