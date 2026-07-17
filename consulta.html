@@ -19,7 +19,7 @@
 
         .main-container {
             width: 100%;
-            max-width: 1300px; /* Layout ligeiramente mais largo */
+            max-width: 1300px;
             margin-top: 20px;
             margin-bottom: 30px;
         }
@@ -102,6 +102,22 @@
             border-color: #ffd700;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
+        
+        /* Estilo para erro no depósito */
+        .busca-input.erro-input {
+            border-color: #fc8181;
+            background-color: #fff5f5;
+            box-shadow: 0 0 10px rgba(252, 129, 129, 0.4);
+        }
+
+        /* Alerta de erro dinâmico */
+        .alerta-erro-deposito {
+            display: none;
+            color: #fc8181;
+            font-size: 11px;
+            margin-top: -3px;
+            font-weight: 600;
+        }
 
         /* Tabela de Dados Operacionais */
         .tabela-container {
@@ -118,7 +134,7 @@
             border-collapse: collapse;
             color: #ffffff;
             font-size: 14px;
-            min-width: 900px; /* Estrutura mínima */
+            min-width: 900px;
         }
 
         th {
@@ -132,20 +148,9 @@
             font-size: 12px;
         }
 
-        /* Chave Principal (NM) */
-        th:first-child, td:first-child {
-            width: 130px;
-            font-weight: 700;
-            color: #ffd700;
-            padding-left: 20px;
-        }
-
-        /* Coluna Depósito */
-        th:nth-child(2), td:nth-child(2) {
-            width: 110px;
-            color: #a0aec0;
-            font-weight: 600;
-        }
+        /* Colunas Chave */
+        th:first-child, td:first-child { width: 130px; font-weight: 700; color: #ffd700; padding-left: 20px; }
+        th:nth-child(2), td:nth-child(2) { width: 110px; color: #a0aec0; font-weight: 600; }
 
         td {
             padding: 18px 15px;
@@ -157,9 +162,10 @@
 
         /* Estilos Operacionais */
         .saldo-bom { color: #68d391; font-weight: bold; }
-        .saldo-baixo { color: #f6ad55; font-weight: bold; }
         .saldo-zero { color: #fc8181; font-weight: bold; text-decoration: line-through; }
-        .ende-especial { color: #81e6d9; font-style: italic; }
+        
+        /* Endereço Vazio (Aguardando Planilha) */
+        .ende-vazio { color: #718096; font-style: italic; font-size: 13px; }
 
         .direitos-box {
             max-width: 500px; 
@@ -176,30 +182,29 @@
 <body>
 
     <div class="main-container">
-        <!-- Painel de Busca Avançada (Filtros MMBE) -->
+        <!-- Painel de Busca Avançada -->
         <div class="busca-avancada-container">
             <div class="header-MMBE">
                 <h2>Consulta de Estoque (MMBE)</h2>
-                <a href="menu.html" class="btn-voltar">⬅ Voltar ao Menu</a>
+                <a href="menu.html" class="btn-voltar">⬅ Voltar</a>
             </div>
             
             <div class="filtros-grid">
-                <!-- Filtro 1: NM Exato (Prioridade SAP) -->
                 <div class="filtro-group">
-                    <label for="filtroNM">Número de Material (NM SAP)</label>
-                    <input type="text" id="filtroNM" class="busca-input" placeholder="Digite o NM exato..." onkeyup="executarFiltros()" inputmode="numeric">
+                    <label>NM (SAP)</label>
+                    <input type="text" id="filtroNM" class="busca-input" placeholder="Digite o NM..." onkeyup="executarFiltros()" inputmode="numeric">
                 </div>
                 
-                <!-- Filtro 2: Descrição (*Contém*) -->
                 <div class="filtro-group">
-                    <label for="filtroDesc">Descrição do Produto (*Exemplo*)</label>
+                    <label>Descrição (*Contém*)</label>
                     <input type="text" id="filtroDesc" class="busca-input" placeholder="Buscar na descrição..." onkeyup="executarFiltros()">
                 </div>
                 
-                <!-- Filtro 3: Depósito / Local (Lista Rápida) -->
                 <div class="filtro-group">
-                    <label for="filtroDepo">Depósito / Área</label>
-                    <input type="text" id="filtroDepo" class="busca-input" placeholder="Ex: DP01, PÁTIO..." onkeyup="executarFiltros()">
+                    <label>Depósito (DP01-DP05, DPA1-DPA2)</label>
+                    <!-- Validação de depósito acontece no 'onblur' e 'onkeyup' -->
+                    <input type="text" id="filtroDepo" class="busca-input" placeholder="Ex: DP01..." onblur="validarDepósito(this)" onkeyup="executarFiltros()">
+                    <span id="erroDepo" class="alerta-erro-deposito">⚠️ Depósito inválido para este centro.</span>
                 </div>
             </div>
         </div>
@@ -210,55 +215,41 @@
                 <thead>
                     <tr>
                         <th>NM (SAP)</th>
-                        <th>Depósito</th> <!-- Nova Coluna Chave -->
+                        <th>Depósito</th>
                         <th>Descrição Operacional</th>
-                        <th>Endereço Física</th>
+                        <th>Endereço Física</th> <!-- Vazio conforme solicitado -->
                         <th>Saldo Atual</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabela">
-                    <!-- Dados Mockados (Firebase preencherá aqui) -->
+                    <!-- Dados Mockados (Firebase + Planilhas preencherão o endereço) -->
                     <tr>
                         <td>1000142</td>
                         <td>DP01</td>
                         <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                        <td>P01-B03-C02</td>
+                        <td class="ende-vazio">-- aguardando planilha --</td> <!-- Vazio -->
                         <td class="saldo-bom">45 UN</td>
                     </tr>
                     <tr>
                         <td>2000551</td>
-                        <td>DP01</td>
-                        <td>MANOMETRO PRESSAO FLANGEADO 1/2 NPT BRASS</td>
-                        <td>P02-A01-C01</td>
-                        <td class="saldo-baixo">12 UN</td>
+                        <td>DP03</td>
+                        <td>MANOMETRO PRESSAO FLANGEADO 1/2 NPT</td>
+                        <td class="ende-vazio">-- aguardando planilha --</td>
+                        <td class="saldo-bom">12 UN</td>
                     </tr>
                     <tr>
-                        <td>3000889</td>
-                        <td>PÁTIO A</td>
-                        <td>TUBO ACO CARBONO SCH40 6 POL x 6M SEM COSTURA</td>
-                        <td class="ende-especial">RECEBIMENTO_DARIO</td>
-                        <td class="saldo-zero">0 UN</td>
-                    </tr>
-                    <tr>
-                        <td>4001223</td>
-                        <td>EXTERNO</td>
-                        <td>BOMBA CENTRIFUGA HIDRÁULICA 5CV MOTOR WEG</td>
-                        <td>PAV_EXT_01</td>
-                        <td class="saldo-bom">3 UN</td>
-                    </tr>
-                     <tr>
                         <td>1000142</td>
-                        <td>DP02</td> <!-- Mesmo NM, Depósito diferente -->
+                        <td>DP02</td> <!-- NM Duplicado em Depósito diferente -->
                         <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                        <td>P03-A01-C01</td>
+                        <td class="ende-vazio">-- aguardando planilha --</td>
                         <td class="saldo-bom">10 UN</td>
                     </tr>
                     <tr>
-                        <td>5000999</td>
-                        <td>DP01</td>
-                        <td>GRAXA LUBRIFICANTE INDUSTRIAL *EXEMPLO* GAUGE 50KG</td>
-                        <td>P01-A01-C01</td>
-                        <td class="saldo-bom">20 KG</td>
+                        <td>3000889</td>
+                        <td>DPA1</td>
+                        <td>TUBO ACO CARBONO SCH40 6 POL x 6M SEM COSTURA</td>
+                        <td class="ende-vazio">-- aguardando planilha --</td>
+                        <td class="saldo-zero">0 UN</td>
                     </tr>
                 </tbody>
             </table>
@@ -280,38 +271,65 @@
             window.location.href = "index.html";
         }
 
+        // Regra de Negócio: Lista de Depósitos Autorizados
+        const DEPOSITOS_VALIDOS = ['DP01', 'DP02', 'DP03', 'DP04', 'DP05', 'DPA1', 'DPA2'];
+
+        /**
+         * Função de Validação do Depósito (onblur)
+         * Verifica se o que foi digitado é permitido.
+         */
+        function validarDepósito(input) {
+            const valor = input.value.trim().toUpperCase();
+            const erroSpan = document.getElementById('erroDepo');
+
+            if (valor !== "" && !DEPOSITOS_VALIDOS.includes(valor)) {
+                // Depósito Inválido: Aplica erro visual e impede filtro
+                input.classList.add('erro-input');
+                erroSpan.style.display = "block";
+                return false; 
+            } else {
+                // Depósito Válido ou Vazio: Remove erro
+                input.classList.remove('erro-input');
+                erroSpan.style.display = "none";
+                return true;
+            }
+        }
+
         /**
          * Função Mestre de Filtros (MMBE)
-         * Cruza as três informações simultaneamente.
+         * Cruza as três informações simultaneamente, validando o depósito.
          */
         function executarFiltros() {
-            // Pega os valores dos três campos
+            const inputDepo = document.getElementById('filtroDepo');
+            
+            // Primeiro, verifica se o depósito digitado é válido antes de filtrar
+            if (!validarDepósito(inputDepo)) {
+                return; // Bloqueia a execução do filtro se o depósito for inválido
+            }
+
             const fNM = document.getElementById('filtroNM').value.trim().toUpperCase();
             const fDesc = document.getElementById('filtroDesc').value.trim().toUpperCase();
-            const fDepo = document.getElementById('filtroDepo').value.trim().toUpperCase();
+            const fDepo = inputDepo.value.trim().toUpperCase();
 
             const tabela = document.getElementById('tabelaDados');
             const linhas = tabela.getElementsByTagName('tr');
 
-            // Varre a tabela (pula cabeçalho)
             for (let i = 1; i < linhas.length; i++) {
                 const celulas = linhas[i].getElementsByTagName('td');
                 
                 if (celulas.length >= 3) {
-                    // Mapeia as colunas operacionais
                     const txtNM = celulas[0].textContent || celulas[0].innerText;
                     const txtDepo = celulas[1].textContent || celulas[1].innerText;
                     const txtDesc = celulas[2].textContent || celulas[2].innerText;
 
-                    // Lógica SAP: A linha só aparece se bater TODOS os filtros ativos
                     const bateNM = fNM === "" || txtNM.toUpperCase().indexOf(fNM) > -1;
                     const bateDepo = fDepo === "" || txtDepo.toUpperCase().indexOf(fDepo) > -1;
                     const bateDesc = fDesc === "" || txtDesc.toUpperCase().indexOf(fDesc) > -1;
 
                     if (bateNM && bateDepo && bateDesc) {
-                        linhas[i].style.display = ""; // Mostra
+                        linhas[i].style.display = "";
                     } else {
-                        linhas[i].style.display = "none"; // Esconde
+                        linhas[i].style.display = "none";
                     }
                 }
             }
