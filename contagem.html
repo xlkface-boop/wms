@@ -37,7 +37,7 @@
             padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #ffd700;
         }
 
-        /* 🆕 CABEÇALHO DA CONTAGEM: SEM O "X", MAS CENTRALIZADO NO MEIO */
+        /* CABEÇALHO DA CONTAGEM: CENTRALIZADO */
         .header-contagem-box {
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 15px;
@@ -59,7 +59,7 @@
         .desc-material { color: #ffffff; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
 
         .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-        .loc-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; }
+        .loc-grid .loc-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; }
         .loc-titulo { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
         .loc-valor { font-size: 14px; color: #60a5fa; font-weight: bold; margin-top: 2px; }
 
@@ -86,12 +86,11 @@
         <div class="inventario-container">
             <div class="progresso-box" id="qtdProgresso">1 / 2</div>
 
-            <!-- Cabeçalho Centralizado Sem Botão de Sair -->
             <div class="header-contagem-box">
                 <h3>Ajuste de Estoque</h3>
             </div>
 
-            <form id="formFilaInventario" onsubmit="proximoItem(event)">
+            <form id="formFilaInventario" onsubmit="proximoItem(event)" autocomplete="off">
                 <div class="item-focado">
                     <span class="nm-label">Número de Material (NM)</span>
                     <div class="nm-titulo" id="lblNM">1000142</div>
@@ -110,13 +109,14 @@
                 </div>
 
                 <label class="label-input">Quantidade Física Encontrada no Local:</label>
-                <input type="number" id="txtQtd" class="input-qtd" placeholder="0" required min="0" inputmode="numeric" autofocus>
+                <input type="number" id="txtQtd" class="input-qtd" placeholder="0" required min="0" inputmode="numeric" autofocus autocomplete="new-password">
 
                 <button type="submit" class="btn-proximo">💾 Confirmar e Avançar ➔</button>
             </form>
         </div>
     </div>
 
+    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
     <div class="direitos-box">
         <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
     </div>
@@ -128,15 +128,26 @@
         ];
         let indiceAtual = 0;
 
-        history.pushState(null, null, location.href);
+        // 🔥 VALIDAÇÃO DE ENTRADA E CAPTURA DE "VOLTAR" VIA PAGESHOW
+        window.addEventListener('pageshow', function() {
+            const perfilLogado = localStorage.getItem('wms_perfil');
+            if (!perfilLogado) {
+                window.location.replace("index.html");
+                return;
+            }
+            
+            // Força o estado fictício no histórico para interceptar o botão Voltar
+            history.pushState(null, null, location.href);
+        });
+
+        // Intercepta a tentativa de voltar do usuário
         window.onpopstate = function () { 
             history.go(1); 
-            // Alerta moderno ao tentar voltar a página no navegador
             Swal.fire({
                 icon: 'lock',
                 title: 'Ação Bloqueada!',
-                text: 'O inventário é obrigatório e precisa ser concluído.',
-                confirmButtonColor: '#ea580c', // Laranja que combina com o fluxo de contagem
+                text: 'O inventário é obrigatório e precisa ser concluído até o final.',
+                confirmButtonColor: '#ea580c',
                 confirmButtonText: 'Continuar Contagem'
             });
         };
@@ -158,15 +169,15 @@
             if (indiceAtual < filaMateriais.length) { 
                 carregarItem(); 
             } else { 
-                // Alerta moderno de finalização de inventário
                 Swal.fire({
                     icon: 'success',
                     title: 'Inventário Concluído!',
                     text: 'Todas as contagens foram registradas com sucesso.',
-                    confirmButtonColor: '#16a34a', // Verde sucesso do botão confirmar
+                    confirmButtonColor: '#16a34a',
                     confirmButtonText: 'Voltar ao Menu'
                 }).then(() => {
-                    window.location.href = "menu.html";
+                    // Substitui a rota para não permitir voltar para a contagem finalizada
+                    window.location.replace("menu.html");
                 });
             }
         }
@@ -176,12 +187,10 @@
 
         function resetarCronometroSessao() {
             clearTimeout(cronometroInatividade);
-            // 5 minutos convertidos para milissegundos
             cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
         }
 
-        function executarBloqueioPorInatividade() {
-            // Apaga as permissões locais instantaneamente
+        function ejecutarBloqueioPorInatividade() {
             localStorage.clear();
             
             Swal.fire({
@@ -192,20 +201,21 @@
                 confirmButtonText: 'Efetuar Login Novamente',
                 allowOutsideClick: false
             }).then(() => {
-                window.location.href = "index.html"; // Chuta o usuário para fora
+                window.location.replace("index.html"); 
             });
         }
 
-        // Configura inicialização combinada e os listeners de movimentação
-        window.onload = function() {
+        // Configuração de carregamento inicial e monitoramento
+        window.addEventListener('load', function() {
             carregarItem();
             resetarCronometroSessao();
-        };
-        document.onmousemove = resetarCronometroSessao;
-        document.onkeypress = resetarCronometroSessao;
-        document.onclick = resetarCronometroSessao;
-        document.onscroll = resetarCronometroSessao;
-        document.ontouchstart = resetarCronometroSessao;
+        });
+        
+        document.addEventListener('mousemove', resetarCronometroSessao);
+        document.addEventListener('keypress', resetarCronometroSessao);
+        document.addEventListener('click', resetarCronometroSessao);
+        document.addEventListener('scroll', resetarCronometroSessao);
+        document.addEventListener('touchstart', resetarCronometroSessao);
     </script>
 </body>
 </html>
