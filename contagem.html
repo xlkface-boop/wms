@@ -9,76 +9,78 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-   body {
-    /* 🖼️ SUA NOVA IMAGEM DE FUNDO CLARA PARA TODO O SISTEMA */
-    background: url('https://i.imgur.com/Gep2VOn.jpeg') no-repeat center center fixed;
-    background-size: cover;
-    color: #1e293b; /* Garante que os textos fiquem escuros e legíveis no fundo claro */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
+        body {
+            /* 🖼️ SUA NOVA IMAGEM DE FUNDO CLARA PARA TODO O SISTEMA */
+            background: url('https://i.imgur.com/Gep2VOn.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            color: #1e293b; /* Garante que os textos fiquem escuros e legíveis no fundo claro */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
         .main-container { width: 100%; max-width: 500px; margin-top: 10px; margin-bottom: 30px; }
 
         .trava-alerta {
-            background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5;
+            background: rgba(239, 68, 68, 0.9); border: 1px solid #ef4444; color: #ffffff;
             padding: 12px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .inventario-container {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15); padding: 25px; border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); position: relative;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 0, 0, 0.08); padding: 25px; border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08); position: relative;
         }
 
         .progresso-box {
-            position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.1);
+            position: absolute; top: 25px; right: 25px; background: #1e293b;
             padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #ffd700;
         }
 
         /* CABEÇALHO DA CONTAGEM: CENTRALIZADO */
         .header-contagem-box {
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
             padding-bottom: 15px;
             margin-bottom: 25px;
             text-align: center;
         }
         
         .header-contagem-box h3 {
-            color: #ffffff; font-size: 20px; font-weight: 700;
+            color: #0f172a; font-size: 20px; font-weight: 700;
         }
 
         .item-focado {
-            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #f1f5f9; border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 5px solid #ea580c;
         }
 
-        .nm-label { font-size: 12px; color: #a0aec0; text-transform: uppercase; font-weight: bold; }
-        .nm-titulo { color: #ffd700; font-size: 24px; font-weight: 800; margin-bottom: 10px; }
-        .desc-material { color: #ffffff; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .nm-label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold; }
+        .nm-titulo { color: #c2410c; font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+        .desc-material { color: #334155; font-size: 16px; line-height: 1.5; margin-bottom: 20px; font-weight: 500; }
 
-        .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-        .loc-grid .loc-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; }
-        .loc-titulo { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
-        .loc-valor { font-size: 14px; color: #60a5fa; font-weight: bold; margin-top: 2px; }
+        .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 15px; }
+        .loc-grid .loc-box { background: rgba(0,0,0,0.03); padding: 10px; border-radius: 6px; }
+        .loc-titulo { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
+        .loc-valor { font-size: 14px; color: #1d4ed8; font-weight: bold; margin-top: 2px; }
 
-        .label-input { display: block; font-size: 13px; color: #cbd5e0; margin-bottom: 8px; font-weight: 600; }
+        .label-input { display: block; font-size: 13px; color: #334155; margin-bottom: 8px; font-weight: 600; }
         .input-qtd {
-            width: 100%; padding: 16px; background: #ffffff; border: 2px solid transparent; border-radius: 8px;
+            width: 100%; padding: 16px; background: #ffffff; border: 2px solid #cbd5e1; border-radius: 8px;
             font-size: 20px; font-weight: bold; outline: none; color: #1a202c; text-align: center; margin-bottom: 20px;
         }
-        .input-qtd:focus { border-color: #ea580c; box-shadow: 0 0 15px rgba(234, 88, 12, 0.3); }
+        .input-qtd:focus { border-color: #ea580c; box-shadow: 0 0 15px rgba(234, 88, 12, 0.2); }
 
         .btn-proximo {
             width: 100%; padding: 16px; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
             color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
         }
 
-        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: auto; }
+        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0,0,0,0.05); border-radius: 8px; width: 100%; margin-top: auto; }
     </style>
 </head>
 <body>
@@ -121,7 +123,7 @@
 
     <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
     <div class="direitos-box">
-        <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
+        <p style="font-size: 11px; color: #334155;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
     </div>
 
     <script>
@@ -193,7 +195,7 @@
             cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
         }
 
-        function ejecutarBloqueioPorInatividade() {
+        function executarBloqueioPorInatividade() {
             localStorage.clear();
             
             Swal.fire({
