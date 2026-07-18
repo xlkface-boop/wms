@@ -272,9 +272,19 @@
                     }
                     window.location.href = "menu.html";
                 })
-                .catch((error) => {
-                    console.error("Erro de Autenticação:", error.code);
-                    alert("🛑 Erro de Acesso!\nE-mail ou Senha incorretos. Por favor, tente novamente.");
+               .catch((error) => {
+    console.error("Erro de Autenticação:", error.code);
+    
+    // O bloco novo entra exatamente aqui:
+    Swal.fire({
+        icon: 'error',
+        title: 'Erro de Acesso!',
+        text: 'E-mail ou Senha incorretos. Por favor, tente novamente.',
+        confirmButtonColor: '#005c53',
+        confirmButtonText: 'Entrar Novamente'
+    });
+});
+                   
                 });
 
         } else {
