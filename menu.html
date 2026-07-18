@@ -3,224 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Menu Principal</title>
-    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <title>WMS Inteligente - Painel de Controle</title>
+    <!-- SweetAlert2 para Alertas e Assinatura Digital -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO
+        (function() {
+            const perfilLogado = localStorage.getItem('wms_perfil');
+            if (!perfilLogado) {
+                window.location.replace("index.html");
+            }
+        })();
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
+        
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* 🍔 TOPBAR (Para mobile e acionamento do menu) */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: #1e293b;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .btn-menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        .logo-sistema {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* 🗂️ MENU LATERAL RETRÁTIL (Estilo Sidebar GitHub/Painel Profissional) */
+        .sidebar {
+            position: fixed;
+            top: 60px; left: -280px;
+            width: 280px; height: calc(100vh - 60px);
+            background: #0f172a;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 20px 10px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            justify-content: space-between;
         }
 
-        .menu-container {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
+        .sidebar.aberta { left: 0; }
 
-        h2 {
-            color: #ffffff;
-            font-size: 26px;
+        .menu-grupo { display: flex; flex-direction: column; gap: 8px; }
+        .menu-titulo-setor {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #64748b;
             font-weight: 700;
+            padding-left: 10px;
+            margin-top: 15px;
             margin-bottom: 5px;
         }
 
-        .sub-title {
-            color: #a0aec0;
-            font-size: 14px;
-            margin-bottom: 25px;
-            display: block;
-        }
-
-        .perfil-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.4);
-            color: #ffd700;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 30px;
-        }
-
-        /* Botões do Menu */
-        .btn-menu {
+        .menu-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 16px;
-            margin-bottom: 15px;
-            border-radius: 10px;
+            gap: 12px;
+            padding: 12px 15px;
+            color: #cbd5e1;
             text-decoration: none;
-            font-size: 15px;
-            font-weight: 600;
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-            transition: 0.2s ease;
-            cursor: pointer;
-        }
-
-        .btn-menu:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-        }
-
-        .btn-menu:active {
-            transform: translateY(0);
-        }
-
-        /* Cores Identificadoras de Fluxo */
-        .btn-azul { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
-        .btn-laranja { background: linear-gradient(135deg, #c2410c, #ea580c); }
-        .btn-roxo { background: linear-gradient(135deg, #6d28d9, #7c3aed); }
-        .btn-verde { background: linear-gradient(135deg, #15803d, #16a34a); }
-
-        .btn-sair {
-            display: inline-block;
-            margin-top: 25px;
-            color: #fca5a5;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-        .btn-sair:hover { color: #ef4444; }
-
-        .direitos-box {
-            max-width: 400px; 
-            text-align: center; 
-            padding: 15px; 
-            background: rgba(0, 0, 0, 0.6); 
             border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background: none;
+            border: none;
             width: 100%;
-            margin-top: 25px;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
         }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .menu-item.admin-only { border-left: 3px solid #ffd700; }
+
+        /* 📺 ÁREA DE CONTEÚDO MAXIMIZADA (TELA INTEIRA OTIMIZADA) */
+        .conteudo-principal {
+            margin-top: 60px;
+            padding: 30px;
+            width: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        @media(min-width: 1024px) {
+            .sidebar { left: 0; }
+            .conteudo-principal { margin-left: 280px; }
+            .btn-menu-toggle { display: none; }
+        }
+
+        /* COMPONENTES DE TELA */
+        .modulo-tela { display: none; }
+        .modulo-tela.ativo { display: block; }
+
+        .card-expandido {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        h2 { font-size: 24px; margin-bottom: 20px; color: white; }
+        p { color: #94a3b8; font-size: 14px; line-height: 1.6; }
+
+        /* ALERTAS INTERNOS */
+        .alerta-operacional {
+            background: rgba(234, 88, 12, 0.15);
+            border: 1px solid #ea580c;
+            color: #ffedd5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* TABELAS LARGAS */
+        .tabela-wrapper { overflow-x: auto; margin-top: 15px; background: #0f172a; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { padding: 14px; background: #0f172a; color: #94a3b8; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; }
+
+        .btn-acao {
+            background: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 6px;
+            font-weight: 600; cursor: pointer; font-size: 13px; transition: 0.2s;
+        }
+        .btn-acao:hover { background: #1d4ed8; }
+        .btn-laranja { background: #ea580c; } .btn-laranja:hover { background: #c2410c; }
+
+        /* INPUTS */
+        .campo-grupo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; width: 100%; max-width: 400px; }
+        label { font-size: 13px; color: #cbd5e1; font-weight: 600; }
+        select, input { background: #0f172a; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; color: white; font-size: 14px; }
+        select:focus, input:focus { border-color: #2563eb; outline: none; }
+
+        .canvas-assinatura { border: 2px dashed rgba(255,255,255,0.3); background: #0f172a; border-radius: 6px; cursor: crosshair; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="menu-container">
-        <h2>WMS Inteligente</h2>
-        <span class="sub-title">Painel de Controle de Fluxo</span>
-        
-        <!-- Identificador de Perfil Dinâmico -->
-        <div class="perfil-badge" id="txtPerfil">Carregando Perfil...</div>
-
-        <!-- 1. MMBE Geral (Acessível para todos) -->
-        <a onclick="navegarPara('consulta.html')" class="btn-menu btn-azul">🔍 Consulta Material / Endereço (MMBE)</a>
-        
-        <!-- 2. Inventário Matinal Cego (Acessível para todos) -->
-        <a onclick="navegarPara('contagem.html')" class="btn-menu btn-laranja">📝 Realizar Inventário Cego</a>
-        
-        <!-- 3. Painel de Auditoria e Curva ABC (Exclusivo ADMIN) -->
-        <a onclick="navegarPara('auditoria.html')" class="btn-menu btn-roxo" id="btnAuditoria" style="display: none;">📊 Auditoria & Curva ABC</a>
-        
-        <!-- 4. Carga de Planilhas SAP (Exclusivo ADMIN) -->
-        <a onclick="navegarPara('carga.html')" class="btn-menu btn-verde" id="btnCarga" style="display: none;">⚙️ Alimentar Sistema (SAP)</a>
-        
-        <!-- Botão Sair modificado para executar função controlada -->
-        <a onclick="efetuarLogout()" class="btn-sair">Desconectar / Sair</a>
+    <!-- 🍔 TOPBAR -->
+    <div class="topbar">
+        <button class="btn-menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="logo-sistema">WMS Inteligente <span style="font-size:12px; color:#ffd700; font-weight:normal;">| Transpetro</span></div>
     </div>
 
-    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-    <div class="direitos-box">
-        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
-            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-            Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
-            <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> Uso autorizado apenas para e-mails institucionais da Transpetro.
-        </p>
+    <!-- 🗂️ SIDEBAR MENU COMPLETO -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="menu-grupo">
+            <div class="menu-titulo-setor">Operacional</div>
+            <button class="menu-item" onclick="navegarPara('telaConsulta')">🔍 Consulta de NM</button>
+            <button class="menu-item" onclick="navegarPara('telaInventario')">📋 Realizar Inventário</button>
+            <button class="menu-item" onclick="navegarPara('telaTrocaEndereco')">🔄 Troca de Endereço</button>
+
+            <div class="menu-titulo-setor admin-field" style="display:none;">Gerencial (Admin)</div>
+            <button class="menu-item admin-only admin-field" style="display:none;" onclick="window.location.replace('auditoria.html')">📊 Relatórios & Curva ABC</button>
+            <button class="menu-item admin-only admin-field" style="display:none;" onclick="window.location.replace('carga.html')">⚡ Alimentar Sistema (SAP)</button>
+            <button class="menu-item admin-only admin-field" style="display:none;" onclick="navegarPara('telaAdminLogEnderecos')">📜 Log de Alterações SAP</button>
+        </div>
+
+        <div class="menu-grupo">
+            <button class="menu-item" style="color: #ef4444;" onclick="logoutSessao()">🚪 Sair do Sistema</button>
+            <div style="font-size:10px; color:#64748b; text-align:center; padding: 10px 0;">&copy; 2026 Dário João Torres</div>
+        </div>
+    </div>
+
+    <!-- 📺 CONTEÚDO PRINCIPAL (MÓDULOS DE TELA CHEIA) -->
+    <div class="conteudo-principal">
+
+        <!-- MÓDULO 1: CONSULTA DE MATERIAL -->
+        <div id="telaConsulta" class="modulo-tela ativo">
+            <div class="card-expandido">
+                <h2>🔍 Consulta Qualificada de Materiais</h2>
+                <p>Aqui você terá a busca limpa ocupando a tela inteira, ideal para exibir tabelas com as dimensões, pesos e localizações exatas no pátio.</p>
+            </div>
+        </div>
+
+        <!-- MÓDULO 2: INVENTÁRIO -->
+        <div id="telaInventario" class="modulo-tela">
+            <div class="card-expandido">
+                <h2>📋 Lançamento de Inventário Físico</h2>
+                <p>Área limpa e espaçada para o operador digitar as contagens sem errar a linha no tablet ou celular.</p>
+            </div>
+        </div>
+
+        <!-- MÓDULO 3: TROCA DE ENDEREÇO (NOVO) -->
+        <div id="telaTrocaEndereco" class="modulo-tela">
+            <div class="card-expandido">
+                <h2>🔄 Solicitação de Troca de Endereço no WMS</h2>
+                <p style="margin-bottom: 20px;">Selecione o material e defina sua nova coordenada no pátio.</p>
+
+                <div class="campo-grupo">
+                    <label>Selecione o Material (NM)</label>
+                    <select id="trocaMaterial">
+                        <option value="1000142">NM 1000142 - VALVULA GLOBO 3 POL (Endereço Atual: A-12)</option>
+                        <option value="4001223">NM 4001223 - BOMBA CENTRIFUGA 5CV (Endereço Atual: B-05)</option>
+                    </select>
+                </div>
+
+                <div class="campo-grupo">
+                    <label>Novo Endereço no Pátio</label>
+                    <input type="text" id="trocaNovoEndereco" placeholder="Ex: C-14">
+                </div>
+
+                <button class="btn-acao" onclick="confirmarTrocaWMS()">Mudar Endereço no WMS</button>
+            </div>
+
+            <!-- Alerta Flutuante Condicional do SAP -->
+            <div id="alertaSAPSector" class="alerta-operacional" style="display: none;">
+                <div>
+                    <strong>⚠️ AVISO IMPORTANTE:</strong> Não esqueça de replicar e efetuar essa troca de endereço também dentro do <strong>SAP</strong> para manter o espelhamento.
+                </div>
+                <button class="btn-acao btn-laranja" onclick="abrirModalAssinaturaSAP()">Já troquei no SAP</button>
+            </div>
+        </div>
+
+        <!-- MÓDULO 4: ADMIN LOG DE ALTERAÇÕES DE ENDEREÇO (NOVO) -->
+        <div id="telaAdminLogEnderecos" class="modulo-tela">
+            <div class="card-expandido">
+                <h2>📜 Registro de Alterações e Declarações do SAP</h2>
+                <p>Auditoria em tempo real de documentos eletrônicos assinados pelos operadores atestando modificações no SAP.</p>
+                
+                <div class="tabela-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Colaborador</th><th>Data/Hora</th><th>Material (NM)</th><th>Novo End.</th><th>Status SAP</th></tr>
+                        </thead>
+                        <tbody id="corpoLogEnderecos">
+                            <tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhuma alteração registrada nesta sessão.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // 🔥 PROTOCOLO DE SEGURANÇA: Executa toda vez que a página surge na tela (inclusive no botão voltar)
-        window.addEventListener('pageshow', function() {
-            const perfilLogado = localStorage.getItem('wms_perfil');
-            const txtPerfil = document.getElementById('txtPerfil');
-            
-            // Validação rígida de sessão
-            if (!perfilLogado) {
-                window.location.replace("index.html");
-                return;
-            }
-
-            // Renderiza as permissões de forma dinâmica
-            if (perfilLogado === 'ADMIN') {
-                txtPerfil.innerText = "👑 Administrador Supremo";
-                document.getElementById('btnAuditoria').style.display = "flex";
-                document.getElementById('btnCarga').style.display = "flex";
-            } else {
-                txtPerfil.innerText = "👷 Operador de Pátio";
-                txtPerfil.style.borderColor = "rgba(59, 130, 246, 0.4)";
-                txtPerfil.style.color = "#60a5fa";
-                // Garante que fiquem ocultos caso mude de perfil sem limpar adequadamente
-                document.getElementById('btnAuditoria').style.display = "none";
-                document.getElementById('btnCarga').style.display = "none";
-            }
-        });
-
-        // 🚀 FUNÇÃO DE NAVEGAÇÃO COMPORTAMENTAL: Impede o empilhamento desordenado do histórico
-        function navegarPara(url) {
-            window.location.replace(url);
+        // Controle de Exibição do Menu com base nas permissões
+        const perfil = localStorage.getItem('wms_perfil');
+        if (perfil === 'ADMIN') {
+            document.querySelectorAll('.admin-field').forEach(el => el.style.display = 'flex');
         }
 
-        // 🚪 LOGOUT CONTROLADO: Limpa o rastro de navegação imediatamente
-        function efetuarLogout() {
+        function toggleSidebar() {
+            document.getElementById('sidebarMenu').classList.toggle('aberta');
+        }
+
+        function navegarPara(idTela) {
+            document.querySelectorAll('.modulo-tela').forEach(t => t.classList.remove('ativo'));
+            document.getElementById(idTela).classList.add('ativo');
+            if(window.innerWidth < 1024) toggleSidebar(); // Fecha no mobile após clicar
+        }
+
+        function logoutSessao() {
             localStorage.clear();
             window.location.replace("index.html");
         }
 
-        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA)
-        let cronometroInatividade;
+        // --- LÓGICA DO MÓDULO DE TROCA DE ENDEREÇO ---
+        let materialEmMudanca = "";
+        let enderecoEmMudanca = "";
 
-        function resetarCronometroSessao() {
-            clearTimeout(cronometroInatividade);
-            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); // 5 minutos (300000ms)
-        }
+        function confirmarTrocaWMS() {
+            materialEmMudanca = document.getElementById('trocaMaterial').value;
+            enderecoEmMudanca = document.getElementById('trocaNovoEndereco').value;
 
-        function executarBloqueioPorInatividade() {
-            localStorage.clear();
-            
+            if(!enderecoEmMudanca) {
+                Swal.fire('Erro', 'Insira o novo endereço do pátio.', 'error');
+                return;
+            }
+
             Swal.fire({
-                icon: 'warning',
-                title: 'Sessão Expirada!',
-                text: 'Por diretrizes de segurança, o sistema foi bloqueado devido a 5 minutos de inatividade.',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Efetuar Login Novamente',
-                allowOutsideClick: false
+                icon: 'success',
+                title: 'Atualizado no WMS!',
+                text: `O endereço do NM ${materialEmMudanca} foi alterado para ${enderecoEmMudanca} com sucesso.`,
+                confirmButtonColor: '#2563eb'
             }).then(() => {
-                window.location.replace("index.html");
+                document.getElementById('alertaSAPSector').style.display = 'flex';
             });
         }
 
-        // Monitoramento ativo de eventos do usuário
-        window.addEventListener('load', resetarCronometroSessao);
-        document.addEventListener('mousemove', resetarCronometroSessao);
-        document.addEventListener('keypress', resetarCronometroSessao);
-        document.addEventListener('click', resetarCronometroSessao);
-        document.addEventListener('scroll', resetarCronometroSessao);
-        document.addEventListener('touchstart', resetarCronometroSessao);
-    </script>
+        function abrirModalAssinaturaSAP() {
+            Swal.fire({
+                title: 'Confirmação de Registro no SAP',
+                html: `
+                    <p style="color:#334155; font-size:14px; text-align:left; margin-bottom:10px;">
+                        Eu, <b>${perfil === 'ADMIN' ? 'Dário João Torres' : 'Colaborador Padrão'}</b>, afirmo sob responsabilidade técnica que realizei a troca do endereço do NM <b>${materialEmMudanca}</b> para <b>${enderecoEmMudanca}</b> na plataforma oficial do SAP.
+                    </p>
+                    <label style="color:#334155; font-size:12px; font-weight:bold; display:block; text-align:left;">Assine na caixa abaixo:</label>
+                    <canvas id="canvasAssinatura" class="canvas-assinatura" width="400" height="150"></style>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Emitir Documento & Salvar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#15803d',
+                didOpen: () => {
+                    // Inicializa o canvas de desenho para assinatura dentro do modal
+                    const canvas = document.getElementById('canvasAssinatura');
+                    const ctx = canvas.getContext('2d');
+                    let desenhando = false;
 
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.lineWidth = 2;
+
+                    canvas.addEventListener('mousedown', () => desenhando = true);
+                    canvas.addEventListener('mouseup', () => desenhando = false);
+                    canvas.addEventListener('mousemove', (e) => {
+                        if (!desenhando) return;
+                        const rect = canvas.getBoundingClientRect();
+                        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                        ctx.stroke();
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Simulação do salvamento na base de dados (Firebase)
+                    const dataAtual = new Date();
+                    const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                    const nomeUsuario = perfil === 'ADMIN' ? 'Dário João Torres' : 'Operador Pátio';
+
+                    // Injeta dinamicamente na tabela do Administrador
+                    const tabelaLog = document.getElementById('corpoLogEnderecos');
+                    
+                    // Remove linha de "Nenhuma alteração" se for a primeira
+                    if(tabelaLog.innerText.includes("Nenhuma alteração")) tabelaLog.innerHTML = "";
+
+                    tabelaLog.innerHTML += `
+                        <tr>
+                            <td><strong>${nomeUsuario}</strong></td>
+                            <td>${dataFormatada}</td>
+                            <td>NM ${materialEmMudanca}</td>
+                            <td><span style="color:#4ade80;">${enderecoEmMudanca}</span></td>
+                            <td><span style="padding:4px 8px; background:rgba(34,197,94,0.2); color:#4ade80; border:1px solid #22c55e; font-size:11px; font-weight:bold; border-radius:4px;">✓ SINCRO SAP</span></td>
+                        </tr>
+                    `;
+
+                    Swal.fire('Documento Registrado!', 'O comprovante assinado digitalmente foi armazenado e enviado à auditoria gerencial.', 'success');
+                    document.getElementById('alertaSAPSector').style.display = 'none';
+                    document.getElementById('trocaNovoEndereco').value = "";
+                }
+            });
+        }
+
+        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE
+        let cronometroInatividade;
+        function resetarCronometroSessao() {
+            clearTimeout(cronometroInatividade);
+            cronometroInatividade = setTimeout(() => {
+                localStorage.clear();
+                window.location.replace("index.html");
+            }, 300000);
+        }
+        document.addEventListener('mousemove', resetarCronometroSessao);
+        document.addEventListener('click', resetarCronometroSessao);
+        document.addEventListener('keypress', resetarCronometroSessao);
+    </script>
 </body>
 </html>
