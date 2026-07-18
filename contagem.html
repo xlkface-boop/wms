@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Inteligente - Inventário Cego</title>
+    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -127,7 +129,17 @@
         let indiceAtual = 0;
 
         history.pushState(null, null, location.href);
-        window.onpopstate = function () { history.go(1); alert("🔒 Inventário Obrigatório."); };
+        window.onpopstate = function () { 
+            history.go(1); 
+            // Alerta moderno ao tentar voltar a página no navegador
+            Swal.fire({
+                icon: 'lock',
+                title: 'Ação Bloqueada!',
+                text: 'O inventário é obrigatório e precisa ser concluído.',
+                confirmButtonColor: '#ea580c', // Laranja que combina com o fluxo de contagem
+                confirmButtonText: 'Continuar Contagem'
+            });
+        };
 
         function carregarItem() {
             const item = filaMateriais[indiceAtual];
@@ -143,8 +155,20 @@
         function proximoItem(e) {
             e.preventDefault();
             indiceAtual++;
-            if (indiceAtual < filaMateriais.length) { carregarItem(); } 
-            else { alert("Inventário concluído!"); window.location.href = "menu.html"; }
+            if (indiceAtual < filaMateriais.length) { 
+                carregarItem(); 
+            } else { 
+                // Alerta moderno de finalização de inventário
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Inventário Concluído!',
+                    text: 'Todas as contagens foram registradas com sucesso.',
+                    confirmButtonColor: '#16a34a', // Verde sucesso do botão confirmar
+                    confirmButtonText: 'Voltar ao Menu'
+                }).then(() => {
+                    window.location.href = "menu.html";
+                });
+            }
         }
         window.onload = carregarItem;
     </script>
