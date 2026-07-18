@@ -129,20 +129,22 @@
 
 <div class="login-container">
     <h2 id="titulo-tela">Acessar WMS</h2>
-    <form id="formAuth" onsubmit="tratarAutenticacao(event)">
+    <!-- Adicionado autocomplete="off" no form para mitigar cache do browser -->
+    <form id="formAuth" onsubmit="tratarAutenticacao(event)" autocomplete="off">
         <div class="form-group">
             <label for="email">E-mail Corporativo:</label>
-            <input type="email" id="email" required placeholder="seu-usuario@transpetro.com.br">
+            <!-- autocomplete="new-password" impede o preenchimento automático persistente -->
+            <input type="email" id="email" required placeholder="seu-usuario@transpetro.com.br" autocomplete="new-password">
         </div>
         <div class="form-group">
             <label for="senha">Senha:</label>
-            <input type="password" id="senha" required placeholder="••••••••">
+            <input type="password" id="senha" required placeholder="••••••••" autocomplete="new-password">
         </div>
         
         <!-- Campo opcional para confirmação de senha no modo cadastro -->
         <div class="form-group" id="confirmar-senha-group" style="display: none;">
             <label for="confirmar-senha">Confirmar Senha:</label>
-            <input type="password" id="confirmar-senha" placeholder="••••••••">
+            <input type="password" id="confirmar-senha" placeholder="••••••••" autocomplete="new-password">
         </div>
 
         <button type="submit" id="btn-acao">Entrar no Sistema</button>
@@ -190,9 +192,9 @@
     const DOMINIO_PERMITIDO = "@transpetro.com.br";
     const EMAIL_ADMIN_SUPREMO = "dario.torres@transpetro.com.br";
 
-    // 🔥 PROTOCOLO DE SEGURANÇA MÁXIMA: Limpeza profunda ao carregar a tela de login
-    window.addEventListener('DOMContentLoaded', () => {
-        // 1. Limpa os campos visuais imediatamente para remover senhas residuais do botão "Voltar"
+    // 🔥 PROTOCOLO DE SEGURANÇA MÁXIMA: Executado tanto no carregamento comum quanto no retorno pelo botão "Voltar"
+    function efetuarLimpezaGeralSessao() {
+        // 1. Limpa os campos visuais imediatamente para remover dados residuais do botão "Voltar"
         if (document.getElementById('email')) document.getElementById('email').value = "";
         if (document.getElementById('senha')) document.getElementById('senha').value = "";
         if (document.getElementById('confirmar-senha')) document.getElementById('confirmar-senha').value = "";
@@ -206,7 +208,11 @@
         }).catch((erro) => {
             console.error("Erro ao limpar sessão:", erro);
         });
-    });
+    }
+
+    // Vincula a limpeza profunda em múltiplos eventos nativos do ciclo de vida da página
+    window.addEventListener('DOMContentLoaded', efetuarLimpezaGeralSessao);
+    window.addEventListener('pageshow', efetuarLimpezaGeralSessao);
 
     function alternarModo() {
         modoLogin = !modoLogin; 
@@ -291,7 +297,8 @@
                             confirmButtonColor: '#15803d',
                             confirmButtonText: 'Entrar no Sistema'
                         }).then(() => {
-                            window.location.href = "menu.html";
+                            // Usar replace evita o empilhamento desnecessário na árvore de histórico
+                            window.location.replace("menu.html");
                         });
                     } else {
                         localStorage.setItem('wms_perfil', 'OPERADOR');
@@ -302,7 +309,7 @@
                             confirmButtonColor: '#0056b3',
                             confirmButtonText: 'Entrar no Sistema'
                         }).then(() => {
-                            window.location.href = "menu.html";
+                            window.location.replace("menu.html");
                         });
                     }
                 })
@@ -369,7 +376,7 @@
                             title: 'Erro no Registro!',
                             text: 'Erro ao registrar conta. Tente novamente.',
                             confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Tentar Novamente'
+                            confirmButtonText: 'Tentar Outro E-mail'
                         });
                     }
                 });
