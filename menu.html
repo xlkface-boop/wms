@@ -3,180 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Transpetro - Menu Principal</title>
+    <title>WMS Inteligente - Menu Principal</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            /* Mantendo o padrão visual corporativo escuro */
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
 
         .menu-container {
+            width: 100%;
+            max-width: 420px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 35px;
             border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 420px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             text-align: center;
-            margin-top: auto;
-            margin-bottom: auto;
         }
 
-        .logo-sap { 
-            font-size: 26px; 
-            font-weight: 700; 
-            color: #ffffff; 
-            margin-bottom: 6px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .sub-title { 
-            font-size: 14px; 
-            color: #cbd5e0; 
-            margin-bottom: 25px; 
-        }
-
-        /* Badge de Perfil Estilizada */
-        .badge-perfil { 
-            font-size: 11px; 
-            font-weight: bold; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            display: inline-block; 
-            margin-bottom: 25px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .perfil-adm { 
-            background-color: #d1fae5; 
-            color: #065f46; 
-            border: 1px solid #a7f3d0;
-        }
-        
-        .perfil-ope { 
-            background-color: #fef3c7; 
-            color: #92400e; 
-            border: 1px solid #fde68a;
-        }
-
-        /* Botões Padrão do Menu */
-        .btn-menu { 
-            display: block; 
-            width: 100%; 
-            background: linear-gradient(135deg, #0056b3 0%, #003366 100%);
-            color: white; 
-            text-decoration: none; 
-            padding: 16px; 
-            margin-bottom: 15px; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            transition: 0.2s; 
-            text-align: center; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        
-        .btn-menu:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
-        }
-        
-        /* Botão exclusivo do Admin (Verde) */
-        .btn-carga { 
-            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
-            border: 1px solid #166534;
-        }
-        
-        .btn-carga:hover { 
-            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
-        }
-        
-        .btn-sair { 
-            font-size: 14px; 
-            color: #feb2b2; 
-            text-decoration: none; 
-            display: inline-block; 
-            margin-top: 15px; 
-            font-weight: 600;
-        }
-        
-        .btn-sair:hover {
-            text-decoration: underline;
+        h2 {
             color: #ffffff;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
+
+        .sub-title {
+            color: #a0aec0;
+            font-size: 14px;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .perfil-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            color: #ffd700;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        /* Botões do Menu */
+        .btn-menu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: 0.2s ease;
+        }
+
+        .btn-menu:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-menu:active {
+            transform: translateY(0);
+        }
+
+        /* Cores Identificadoras de Fluxo */
+        .btn-azul { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
+        .btn-laranja { background: linear-gradient(135deg, #c2410c, #ea580c); }
+        .btn-roxo { background: linear-gradient(135deg, #6d28d9, #7c3aed); }
+        .btn-verde { background: linear-gradient(135deg, #15803d, #16a34a); }
+
+        .btn-sair {
+            display: inline-block;
+            margin-top: 25px;
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-sair:hover { color: #ef4444; }
 
         .direitos-box {
-            max-width: 500px; 
+            max-width: 400px; 
             text-align: center; 
             padding: 15px; 
             background: rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(5px);
             border-radius: 8px;
             width: 100%;
-            margin-top: auto;
+            margin-top: 25px;
         }
     </style>
 </head>
 <body>
 
-<div class="menu-container">
-    <div class="logo-sap">WMS Inteligente</div>
-    <div class="sub-title">Painel de Controle de Fluxo</div>
-    
-    <!-- Identificador de Perfil Dinâmico -->
-    <div id="area-perfil"></div>
+    <div class="menu-container">
+        <h2>WMS Inteligente</h2>
+        <span class="sub-title">Painel de Controle de Fluxo</span>
+        
+        <!-- Identificador de Perfil Dinâmico -->
+        <div class="perfil-badge" id="txtPerfil">Carregando Perfil...</div>
 
-    <!-- Botões de Navegação (Ainda sem destino criado) -->
-    <a href="consulta.html" class="btn-menu">🔍 Consulta Material / Endereço</a>
-    <a href="painel.html" class="btn-menu">📋 Reservas Abertas & Histórico</a>
-    
-    <!-- Botão de Carga (Oculto por padrão, controlado pelo script) -->
-    <a href="carga.html" id="btn-carga-dados" class="btn-menu btn-carga" style="display: none;">📊 Alimentar Sistema (Planilhas)</a>
-    
-    <a href="index.html" class="btn-sair" onclick="localStorage.clear()">Desconectar / Sair</a>
-</div>
+        <!-- 1. MMBE Geral (Acessível para todos) -->
+        <a href="consulta.html" class="btn-menu btn-azul">🔍 Consulta Material / Endereço (MMBE)</a>
+        
+        <!-- 2. Inventário Matinal Cego (Acessível para todos) -->
+        <a href="contagem.html" class="btn-menu btn-laranja">📝 Realizar Inventário Cego</a>
+        
+        <!-- 3. Painel de Auditoria e Curva ABC (Exclusivo ADMIN) -->
+        <a href="auditoria.html" class="btn-menu btn-roxo" id="btnAuditoria" style="display: none;">📊 Auditoria & Curva ABC</a>
+        
+        <!-- 4. Carga de Planilhas SAP (Exclusivo ADMIN) -->
+        <a href="carga.html" class="btn-menu btn-verde" id="btnCarga" style="display: none;">⚙️ Alimentar Sistema (SAP)</a>
+        
+        <a href="index.html" class="btn-sair" onclick="localStorage.clear()">Desconectar / Sair</a>
+    </div>
 
-<!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-<div class="direitos-box">
-    <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
-        &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-        Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
-        <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> Uso autorizado apenas para e-mails institucionais da Transpetro. A reprodução ou uso não autorizado configura violação de direito autoral.
-    </p>
-</div>
+    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
+    <div class="direitos-box">
+        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
+            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+            Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
+            <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> Uso autorizado apenas para e-mails institucionais da Transpetro.
+        </p>
+    </div>
 
-<script>
-    // Segurança local: Se tentarem acessar a página direto sem logar, joga de volta para o login
-    const perfilLogado = localStorage.getItem('wms_perfil');
-    
-    if (!perfilLogado) {
-        window.location.href = "index.html";
-    }
+    <script>
+        // Validação de Segurança e Filtro de Perfil
+        const perfilLogado = localStorage.getItem('wms_perfil');
+        const txtPerfil = document.getElementById('txtPerfil');
+        
+        if (!perfilLogado) {
+            // Se tentar burlar sem login, chuta para a tela inicial
+            window.location.href = "index.html";
+        }
 
-    const areaPerfil = document.getElementById('area-perfil');
-    const btnCarga = document.getElementById('btn-carga-dados');
-
-    // Validação de permissões baseada no login
-    if (perfilLogado === 'ADMIN') {
-        areaPerfil.innerHTML = '<span class="badge-perfil perfil-adm">👑 ADMINISTRADOR SUPREMO</span>';
-        btnCarga.style.display = "block"; // Libera o botão verde apenas para você
-    } else {
-        areaPerfil.innerHTML = '<span class="badge-perfil perfil-ope">📋 OPERADOR DE PÁTIO</span>';
-        btnCarga.style.display = "none";  // Esconde o botão verde para os outros
-    }
-</script>
+        if (perfilLogado === 'ADMIN') {
+            txtPerfil.innerText = "👑 Administrador Supremo";
+            // Exibe recursos gerenciais apenas para o seu perfil
+            document.getElementById('btnAuditoria').style.display = "flex";
+            document.getElementById('btnCarga').style.display = "flex";
+        } else {
+            txtPerfil.innerText = "👷 Operador de Pátio";
+            txtPerfil.style.borderColor = "rgba(59, 130, 246, 0.4)";
+            txtPerfil.style.color = "#60a5fa";
+        }
+    </script>
 
 </body>
 </html>
