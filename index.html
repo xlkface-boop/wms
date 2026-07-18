@@ -161,9 +161,11 @@
     </p>
 </div>
 
-<!-- 📦 IMPORTAÇÃO DOS SDKs DO FIREBASE (VERSÃO COMPATÍVEL) -->
+<!-- 📦 IMPORTAÇÃO DOS SDKs DO FIREBASE E COMPATIBILIDADE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<!-- Adicionamos o módulo do Firestore para salvar os IPs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
     // ⚙️ CONFIGURAÇÃO DO SEU PROJETO FIREBASE (ATUALIZADA)
@@ -177,9 +179,10 @@
         measurementId: "G-QQ210F367M"
     };
 
-    // Inicializa o Firebase adequadamente
+    // Inicializa o Firebase e o Banco de Dados
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore(); // Pronto para usar a tabela que você criou!
 
     let modoLogin = true; 
     const DOMINIO_PERMITIDO = "@transpetro.com.br";
@@ -187,7 +190,6 @@
 
     function alternarModo() {
         modoLogin = !modoLogin; 
-        
         const tituloTela = document.getElementById('titulo-tela');
         const btnAcao = document.getElementById('btn-acao');
         const btnAlternar = document.getElementById('btn-alternar');
@@ -209,6 +211,33 @@
         }
     }
 
+    // 🔥 FUNÇÃO DE SEGURANÇA MÁXIMA: Captura IP, Aparelho e envia pro Firebase
+    async function registrarSegurancaAcesso(email) {
+        try {
+            // 1. Pega o IP real do usuário
+            const resposta = await fetch('https://api.ipify.org?format=json');
+            const dadosIp = await resposta.json();
+            const ipAtual = dadosIp.ip;
+
+            // 2. Pega as informações do dispositivo/navegador
+            const aparelhoAtual = navigator.userAgent;
+            const dataHora = new Date().toLocaleString('pt-BR');
+
+            // 3. Salva ou atualiza os dados na coleção que você criou no celular
+            await db.collection("usuario_seguranca").add({
+                email: email,
+                ip: ipAtual,
+                dispositivo: aparelhoAtual,
+                data_acesso: dataHora,
+                status: "VERIFICADO" // Se mudar amanhã, o Admin acusa!
+            });
+
+            console.log("Segurança: Dados de acesso registrados com sucesso.");
+        } catch (erro) {
+            console.error("Erro ao registrar dados de segurança:", erro);
+        }
+    }
+
     function tratarAutenticacao(e) {
         e.preventDefault();
         
@@ -226,7 +255,11 @@
         if (modoLogin) {
             // --- LOGIN REAL COM FIREBASE ---
             auth.signInWithEmailAndPassword(emailDigitado, senhaDigitada)
-                .then((userCredential) => {
+                .then(async (userCredential) => {
+                    
+                    // 🛡️ Executa a trava de segurança salvando IP e Aparelho no seu banco
+                    await registrarSegurancaAcesso(emailDigitado);
+
                     // Define o nível de privilégio estrito baseado no seu e-mail administrativo
                     if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
                         localStorage.setItem('wms_perfil', 'ADMIN');
@@ -252,7 +285,10 @@
             }
 
             auth.createUserWithEmailAndPassword(emailDigitado, senhaDigitada)
-                .then((userCredential) => {
+                .then(async (userCredential) => {
+                    // Também registra a segurança no momento do cadastro
+                    await registrarSegurancaAcesso(emailDigitado);
+
                     alert(`✅ Conta registrada com sucesso no Firebase para:\n${emailDigitado}!\n\nAgora você já pode realizar o login.`);
                     alternarModo();
                     emailInput.focus();
@@ -270,6 +306,3 @@
         }
     }
 </script>
-
-</body>
-</html>
