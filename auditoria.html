@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,17 +18,17 @@
             min-height: 100vh; 
         }
         
-        .main-container { width: 100%; max-width: 1100px; }
+        .main-container { width: 100%; max-width: 500px; }
         
-        .card-auditoria { 
+        .card-menu-principal { 
             background: rgba(255, 255, 255, 0.08); 
             backdrop-filter: blur(15px); 
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.12); 
-            padding: 20px; 
+            padding: 25px; 
             border-radius: 16px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
-            margin-bottom: 20px; 
+            width: 100%;
         }
         
         .header-box { 
@@ -36,11 +37,11 @@
             align-items: center; 
             border-bottom: 1px solid rgba(255,255,255,0.1); 
             padding-bottom: 15px; 
-            margin-bottom: 20px; 
+            margin-bottom: 25px; 
         }
         
-        .btn-voltar { 
-            padding: 10px 16px; 
+        .btn-voltar-home { 
+            padding: 8px 14px; 
             background: rgba(255, 255, 255, 0.05); 
             color: #ffffff; 
             border: 1px solid rgba(255, 255, 255, 0.15); 
@@ -48,326 +49,318 @@
             text-decoration: none; 
             font-size: 13px; 
             font-weight: bold; 
-            transition: 0.2s; 
-        }
-        .btn-voltar:hover { background: rgba(255, 255, 255, 0.15); }
-
-        /* MENU SELETOR DE RELATÓRIOS (BOTÕES EM GRID) */
-        .menu-relatorios-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 25px;
         }
 
-        .btn-relatorio {
+        /* GRID DE BOTÕES DO MENU */
+        .menu-vertical { display: flex; flex-direction: column; gap: 15px; }
+
+        .btn-opcao-painel {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #cbd5e0;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 13px;
+            color: #ffffff;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             text-align: left;
             transition: 0.2s ease;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
         }
-        .btn-relatorio:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            border-color: #ffd700;
-        }
-        .btn-relatorio.ativo {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            color: white;
-            border-color: #60a5fa;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-        }
+        .btn-opcao-painel:hover { background: rgba(255, 255, 255, 0.12); border-color: #ffd700; }
 
-        /* CONTEÚDO DOS RELATÓRIOS */
-        .box-relatorio-conteudo {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
+        /* 🆕 ESTRUTURA DE TELA EXCLUSIVA (ABRE POR CIMA EM DIALOG/MODAL) */
+        .sub-tela-exclusiva {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0f172a;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            display: none; /* Controlado via JS */
+            overflow-y: auto;
         }
-        .box-relatorio-conteudo.ativo { display: block; }
+        .sub-tela-exclusiva.ativa { display: flex; }
 
-        .titulo-relatorio {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffd700;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 8px;
-        }
-
-        /* FILTROS E SELETORES INTERNOS */
-        .filtro-wrapper {
-            margin-bottom: 15px;
+        .header-sub-tela {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .btn-fechar-tela {
+            background: #ef4444; color: white; border: none;
+            padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+
+        /* FILTRO SELETOR DE MULTIPLOS INVENTARIOS DIARIOS */
+        .lista-inventarios-diarios {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
+            margin-bottom: 20px;
         }
-        select {
-            background: #1e293b;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            outline: none;
-        }
-
-        /* TABELAS */
-        .tabela-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 6px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; min-width: 650px; }
-        th { padding: 12px; background: rgba(0,0,0,0.4); color: #a0aec0; font-weight: bold; text-transform: uppercase; font-size: 11px; }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; }
-
-        /* VISUALIZAÇÃO EM PORCENTAGEM (SAÚDE TOTAL DO ESTOQUE) */
-        .barra-progresso-container {
+        .item-inventario-check {
             background: rgba(255,255,255,0.05);
+            padding: 14px;
             border-radius: 8px;
-            height: 24px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .barra-progresso-preenchimento {
-            height: 100%;
-            background: linear-gradient(90deg, #16a34a, #22c55e);
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        
-        .card-submetricas {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 12px;
-            margin-top: 15px;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
         }
-        .submetrica-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; text-align: center; }
+        .item-inventario-check input { width: 18px; height: 18px; cursor: pointer; }
 
-        /* BADGES */
-        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
-        .abc-a { background: #ef4444; }
-        .abc-b { background: #f97316; }
-        .abc-c { background: #3b82f6; }
+        .btn-acao-analise {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white; border: none; padding: 14px; border-radius: 8px;
+            font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;
+            margin-bottom: 20px; text-transform: uppercase;
+        }
+
+        /* TABELAS COMPACTAS E SCROLL LANÇADO */
+        .tabela-wrapper { overflow-x: auto; width: 100%; border-radius: 8px; background: rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
+        th { padding: 12px; background: rgba(0,0,0,0.4); color: #a0aec0; font-size: 11px; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .abc-a { background: #ef4444; } .abc-b { background: #f97316; } .abc-c { background: #3b82f6; }
         .status-critico { color: #fca5a5; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
         .status-ok { color: #86efac; background: rgba(22, 163, 74, 0.2); border: 1px solid #16a34a; }
 
-        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: auto; }
+        .barra-progresso { background: rgba(255,255,255,0.05); border-radius: 6px; height: 20px; width: 100%; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
+        .barra-preenchida { height: 100%; background: #22c55e; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-weight: bold; font-size: 11px; }
+
+        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: 25px; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <div class="card-auditoria">
+        <!-- MENU DIRECIONADOR PRINCIPAL -->
+        <div class="card-menu-principal">
             <div class="header-box">
                 <div>
-                    <h2 style="font-size: 20px;">Central de Relatórios Analíticos</h2>
-                    <p style="font-size: 13px; color: #a0aec0; margin-top: 2px;">Selecione o módulo de auditoria para analisar o pátio</p>
+                    <h2 style="font-size: 19px;">Painel Gerencial</h2>
+                    <p style="font-size: 12px; color: #a0aec0; margin-top: 2px;">Selecione uma função para abrir em tela cheia</p>
                 </div>
-                <a href="menu.html" class="btn-voltar">⬅ Voltar</a>
+                <a href="menu.html" class="btn-voltar-home">⬅ Sair</a>
             </div>
 
-            <!-- MENU INTERATIVO SINALIZANDO OS TIPOS DE RELATÓRIO -->
-            <div class="menu-relatorios-grid">
-                <button class="btn-relatorio ativo" onclick="alternarAbas('abaABC', this)">📊 1. Curva ABC por Valor</button>
-                <button class="btn-relatorio" onclick="alternarAbas('abaAcuracia', this)">🎯 2. Histórico de Acurácia</button>
-                <button class="btn-relatorio" onclick="alternarAbas('abaCriticos', this)">⚠️ 3. Pontos Críticos & Ordens</button>
-                <button class="btn-relatorio" onclick="alternarAbas('abaTotal', this)">📈 4. Saúde Total do Estoque</button>
+            <div class="menu-vertical">
+                <button class="btn-opcao-painel" onclick="abrirTela('telaABC')">📊 1. Curva ABC por Valor <span>➔</span></button>
+                <button class="btn-opcao-painel" onclick="abrirTela('telaAcuracia')">🎯 2. Histórico de Acurácia <span>➔</span></button>
+                <button class="btn-opcao-painel" onclick="abrirTela('telaCriticos')">⚠️ 3. Pontos Críticos & Ordens <span>➔</span></button>
+                <button class="btn-opcao-painel" onclick="abrirTela('telaSaude')">📈 4. Saúde Total do Estoque <span>➔</span></button>
             </div>
-
-            <!-- RELATÓRIO 1: CURVA ABC POR VALOR -->
-            <div id="abaABC" class="box-relatorio-conteudo ativo">
-                <div class="titulo-relatorio">Classificação Estatística Curva ABC</div>
-                <p style="font-size: 12px; color: #cbd5e0; margin-bottom: 12px;">Cruzamento automático entre Giro Físico (MB51) e Valor de Pátio (Inventário SAP).</p>
-                <div class="tabela-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NM</th>
-                                <th>Descrição Técnica</th>
-                                <th>Valor Total</th>
-                                <th>Classe</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>1000142</td><td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td><td>R$ 112.500,00</td><td><span class="badge abc-a">CLASSE A</span></td></tr>
-                            <tr><td>4001223</td><td>BOMBA CENTRIFUGA HIDRÁULICA 5CV</td><td>R$ 36.000,00</td><td><span class="badge abc-a">CLASSE A</span></td></tr>
-                            <tr><td>2000551</td><td>MANOMETRO PRESSAO FLANGEADO 1/2</td><td>R$ 5.400,00</td><td><span class="badge abc-b">CLASSE B</span></td></tr>
-                            <tr><td>5000999</td><td>GRAXA LUBRIFICANTE INDUSTRIAL 50KG</td><td>R$ 3.000,00</td><td><span class="badge abc-c">CLASSE C</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- RELATÓRIO 2: ACURÁCIA E BUSCA DE HISTÓRICO -->
-            <div id="abaAcuracia" class="box-relatorio-conteudo">
-                <div class="titulo-relatorio">Acurácia Histórica de Inventários</div>
-                
-                <div class="filtro-wrapper">
-                    <label style="font-size: 13px; color: #cbd5e0;">Selecione o Inventário:</label>
-                    <select id="selInventario" onchange="mudarIndicadorAcuracia()">
-                        <option value="98.4">Inventário Atual (Julho/2026)</option>
-                        <option value="97.9">Penúltimo Inventário (Junho/2026)</option>
-                        <option value="95.2">3º Inventário Anterior (Maio/2026)</option>
-                        <option value="99.1">4º Inventário Anterior (Abril/2026)</option>
-                        <option value="96.5">5º Inventário Anterior (Março/2026)</option>
-                    </select>
-                </div>
-
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
-                    <span style="font-size: 12px; color: #94a3b8; text-transform: uppercase; font-weight: bold;">Índice Fiabilidade Geral</span>
-                    <div id="txtAcuraciaValor" style="font-size: 32px; font-weight: bold; color: #4ade80; margin-top: 3px;">98.4%</div>
-                </div>
-
-                <div style="font-size: 13px; color: #ffd700; font-weight: bold; margin-bottom: 5px;">Última Amostragem Cíclica (Controle):</div>
-                <p style="font-size: 13px; color: #e2e8f0; line-height: 1.5;">
-                    📍 **Amostragem Fixada em 5%** calculada sobre os itens sem movimentação ativa no período. <br>
-                    Divergência Financeira Mapeada na última checagem: <span style="color: #fca5a5; font-weight: bold;">- R$ 14.250,00</span>
-                </p>
-            </div>
-
-            <!-- RELATÓRIO 3: PONTOS CRÍTICOS E ORDENS DE RECONTAGEM -->
-            <div id="abaCriticos" class="box-relatorio-conteudo">
-                <div class="titulo-relatorio">Divergências Críticas & Validações</div>
-                
-                <div style="font-size: 13px; color: #fca5a5; font-weight: bold; margin-bottom: 10px;">⚠️ Itens Divergentes (Necessita Ação):</div>
-                <div class="tabela-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NM</th>
-                                <th>Teórico</th>
-                                <th>Contado</th>
-                                <th>Diferença</th>
-                                <th>Ação Gerencial</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="background: rgba(239, 68, 68, 0.05);">
-                                <td>1000142</td>
-                                <td>45 UN</td>
-                                <td>43 UN</td>
-                                <td style="color: #fca5a5; font-weight: bold;">-2 UN</td>
-                                <td><span class="badge status-critico" onclick="dispararRecontagem('1000142')">🔄 SOLICITAR RECONTAGEM</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div style="font-size: 13px; color: #86efac; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">✅ Materiais em Ordem (Auditados OK):</div>
-                <div class="tabela-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NM</th>
-                                <th>Descrição do Item</th>
-                                <th>Saldo Físico / SAP</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="background: rgba(22, 163, 74, 0.05);">
-                                <td>2000551</td>
-                                <td>MANOMETRO PRESSAO FLANGEADO 1/2 NPT</td>
-                                <td>12 UN / 12 UN</td>
-                                <td><span class="badge status-ok">CONCORDANTE</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- RELATÓRIO 4: SAÚDE TOTAL DO ESTOQUE EM PORCENTAGEM -->
-            <div id="abaTotal" class="box-relatorio-conteudo">
-                <div class="titulo-relatorio">Relatório Total de Integridade do Estoque</div>
-                <p style="font-size: 13px; color: #cbd5e0; margin-bottom: 15px;">Porcentagem de conformidade matemática geral do pátio em relação à base financeira consolidada:</p>
-                
-                <div class="barra-progresso-container">
-                    <div class="barra-progresso-preenchimento" style="width: 92%;">92% Saudável</div>
-                </div>
-
-                <div class="card-submetricas">
-                    <div class="submetrica-item">
-                        <div style="font-size: 11px; color: #a0aec0;">Itens 100% Corretos</div>
-                        <div style="font-size: 18px; font-weight: bold; color: #86efac; margin-top: 3px;">92.0%</div>
-                    </div>
-                    <div class="submetrica-item">
-                        <div style="font-size: 11px; color: #a0aec0;">Gargalos Financeiros</div>
-                        <div style="font-size: 18px; font-weight: bold; color: #fca5a5; margin-top: 3px;">5.5%</div>
-                    </div>
-                    <div class="submetrica-item">
-                        <div style="font-size: 11px; color: #a0aec0;">Erros de Endereçamento</div>
-                        <div style="font-size: 18px; font-weight: bold; color: #ffd700; margin-top: 3px;">2.5%</div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL -->
+    <!-- 🛡️ SUPORTE DE DIREITOS -->
     <div class="direitos-box">
-        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
-            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-            Desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.
-        </p>
+        <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- TELA 1 EXCLUSIVA: CURVA ABC POR VALOR -->
+    <!-- ======================================================== -->
+    <div id="telaABC" class="sub-tela-exclusiva">
+        <div class="header-sub-tela">
+            <h2 style="color: #ffd700; font-size: 18px;">📊 Curva ABC de Pátio</h2>
+            <button class="btn-fechar-tela" onclick="fecharTela('telaABC')">✕ Fechar</button>
+        </div>
+        <p style="font-size: 13px; color: #cbd5e0; margin-bottom: 20px;">Filtro de criticidade financeira com base no custo total estocado.</p>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr><th>NM</th><th>Descrição</th><th>Montante</th><th>Classe</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1000142</td><td>VALVULA GLOBO 3 POL</td><td>R$ 112.500,00</td><td><span class="badge abc-a">A</span></td></tr>
+                    <tr><td>4001223</td><td>BOMBA CENTRIFUGA 5CV</td><td>R$ 36.000,00</td><td><span class="badge abc-a">A</span></td></tr>
+                    <tr><td>2000551</td><td>MANOMETRO FLANGEADO</td><td>R$ 5.400,00</td><td><span class="badge abc-b">B</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- TELA 2 EXCLUSIVA: HISTÓRICO COM SELEÇÃO MÚLTIPLA DIÁRIA -->
+    <!-- ======================================================== -->
+    <div id="telaAcuracia" class="sub-tela-exclusiva">
+        <div class="header-sub-tela">
+            <h2 style="color: #ffd700; font-size: 18px;">🎯 Histórico Diário de Acurácia</h2>
+            <button class="btn-fechar-tela" onclick="fecharTela('telaAcuracia')">✕ Fechar</button>
+        </div>
+        <p style="font-size: 13px; color: #cbd5e0; margin-bottom: 15px;">Selecione um para analisar isolado ou marque múltiplos para **comparar a evolução**:</p>
+        
+        <!-- Lista de Rotinas com Data e Horário Exatos -->
+        <div class="lista-inventarios-diarios">
+            <label class="item-inventario-check">
+                <input type="checkbox" name="inventario_ref" value="17/07/2026 às 08:30" data-acuracia="98.4%">
+                <div>
+                    <strong style="display:block; font-size:14px; color:#fff;">📅 17/07/2026 - 08:30</strong>
+                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 98.4% | Giro Recente</span>
+                </div>
+            </label>
+            <label class="item-inventario-check">
+                <input type="checkbox" name="inventario_ref" value="16/07/2026 às 08:15" data-acuracia="97.1%">
+                <div>
+                    <strong style="display:block; font-size:14px; color:#fff;">📅 16/07/2026 - 08:15</strong>
+                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 97.1% | Completo</span>
+                </div>
+            </label>
+            <label class="item-inventario-check">
+                <input type="checkbox" name="inventario_ref" value="15/07/2026 às 08:45" data-acuracia="95.8%">
+                <div>
+                    <strong style="display:block; font-size:14px; color:#fff;">📅 15/07/2026 - 08:45</strong>
+                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 95.8% | Amostragem 5%</span>
+                </div>
+            </label>
+            <label class="item-inventario-check">
+                <input type="checkbox" name="inventario_ref" value="14/07/2026 às 14:20" data-acuracia="99.0%">
+                <div>
+                    <strong style="display:block; font-size:14px; color:#fff;">📅 14/07/2026 - 14:20</strong>
+                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 99.0% | Rotativo Tarde</span>
+                </div>
+            </label>
+            <label class="item-inventario-check">
+                <input type="checkbox" name="inventario_ref" value="13/07/2026 às 08:00" data-acuracia="96.3%">
+                <div>
+                    <strong style="display:block; font-size:14px; color:#fff;">📅 13/07/2026 - 08:00</strong>
+                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 96.3% | Matinal Regular</span>
+                </div>
+            </label>
+        </div>
+
+        <button class="btn-acao-analise" onclick="processarAnaliseInventarios()">⚡ Executar Análise Comparativa</button>
+
+        <div id="boxResultadoComparacao" style="background:rgba(0,0,0,0.3); padding:15px; border-radius:8px; display:none; border: 1px dashed rgba(255,255,255,0.1);">
+            <h4 style="color:#60a5fa; font-size:14px; margin-bottom:8px;">📊 Resultado do Processamento:</h4>
+            <p id="txtLogComparativo" style="font-size:13px; line-height:1.4; color:#e2e8f0;"></p>
+        </div>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- TELA 3 EXCLUSIVA: PONTOS CRÍTICOS -->
+    <!-- ======================================================== -->
+    <div id="telaCriticos" class="sub-tela-exclusiva">
+        <div class="header-sub-tela">
+            <h2 style="color: #ffd700; font-size: 18px;">⚠️ Pontos Críticos Mapeados</h2>
+            <button class="btn-fechar-tela" onclick="fecharTela('telaCriticos')">✕ Fechar</button>
+        </div>
+        
+        <h4 style="font-size: 13px; color: #fca5a5; margin-bottom: 10px;">🔴 Divergências Identificadas no Pátio:</h4>
+        <div class="tabela-wrapper" style="margin-bottom: 25px;">
+            <table>
+                <thead>
+                    <tr><th>NM</th><th>Teórico</th><th>Contado</th><th>Ação</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1000142</td><td>45 UN</td><td>43 UN</td>
+                        <td><span class="badge status-critico" onclick="recontarItem('1000142')">SOLICITAR RECONTAGEM</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 style="font-size: 13px; color: #86efac; margin-bottom: 10px;">🟢 Materiais em Perfeita Ordem:</h4>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr><th>NM</th><th>Descrição Simplificada</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>2000551</td><td>MANOMETRO PRESSAO FLANGEADO</td><td><span class="badge status-ok">OK (BATEU)</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- TELA 4 EXCLUSIVA: SAÚDE TOTAL DO ESTOQUE -->
+    <!-- ======================================================== -->
+    <div id="telaSaude" class="sub-tela-exclusiva">
+        <div class="header-sub-tela">
+            <h2 style="color: #ffd700; font-size: 18px;">📈 Integridade Macroscópica</h2>
+            <button class="btn-fechar-tela" onclick="fecharTela('telaSaude')">✕ Fechar</button>
+        </div>
+        <p style="font-size: 13px; color: #cbd5e0;">Conformidade total ponderada por valor financeiro e acurácia física das posições:</p>
+        
+        <div class="barra-progresso">
+            <div class="barra-preenchida" style="width: 92%;">92% Saudável</div>
+        </div>
+
+        <div style="margin-top: 25px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+            <p style="font-size: 13px; color:#e2e8f0; line-height: 1.6;">
+                • **92.0%** dos materiais encontram-se em perfeita conformidade.<br>
+                • **5.5%** representam quebras ou gargalos financeiros operacionais.<br>
+                • **2.5%** são apenas desalinhamentos leves de endereçamento físico.
+            </p>
+        </div>
     </div>
 
     <script>
-        // Bloqueio de Perfil Corporativo
+        // Bloqueio de Segurança para Perfil ADMIN
         const perfilAtivo = localStorage.getItem('wms_perfil');
         if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
-            alert("🛑 Erro de Segurança: Acesso restrito apenas ao Administrador Supremo.");
+            alert("🛑 Erro: Acesso restrito ao Administrador Supremo.");
             window.location.href = "menu.html";
         }
 
-        // Função de Troca de Abas de Relatório
-        function alternarAbas(idAba, botaoClicado) {
-            // Oculta todos os conteúdos de relatório
-            const conteudos = document.querySelectorAll('.box-relatorio-conteudo');
-            conteudos.forEach(box => box.classList.remove('ativo'));
-            
-            // Remove o estado ativo de todos os botões do menu
-            const botoes = document.querySelectorAll('.btn-relatorio');
-            botoes.forEach(btn => btn.classList.remove('ativo'));
-            
-            // Ativa o relatório e o botão selecionado
-            document.getElementById(idAba).classList.add('ativo');
-            botaoClicado.classList.add('ativo');
+        // Controladores das Telas Exclusivas
+        function abrirTela(idTela) {
+            document.getElementById(idTela).classList.add('ativa');
         }
 
-        // Interatividade do Seletor do Histórico dos 5 Últimos Inventários
-        function mudarIndicadorAcuracia() {
-            const select = document.getElementById("selInventario");
-            const txtValor = document.getElementById("txtAcuraciaValor");
-            
-            txtValor.innerText = select.value + "%";
-            
-            if (parseFloat(select.value) >= 97) {
-                txtValor.style.color = "#4ade80"; // Verde
+        function fecharTela(idTela) {
+            document.getElementById(idTela).classList.remove('ativa');
+            document.getElementById('boxResultadoComparacao').style.display = "none";
+        }
+
+        // LÓGICA DE SELEÇÃO MULTIPLA E COMPARAÇÃO DOS INVENTÁRIOS DIÁRIOS
+        function processarAnaliseInventarios() {
+            const selecionados = document.querySelectorAll('input[name="inventario_ref"]:checked');
+            const boxResultado = document.getElementById('boxResultadoComparacao');
+            const txtLog = document.getElementById('txtLogComparativo');
+
+            if (selecionados.length === 0) {
+                alert("⚠️ Por favor, selecione ao menos um inventário da lista para analisar.");
+                boxResultado.style.display = "none";
+                return;
+            }
+
+            boxResultado.style.display = "block";
+
+            if (selecionados.length === 1) {
+                // Análise Isolada
+                const dataHora = selecionados[0].value;
+                const acuracia = selecionados[0].getAttribute('data-acuracia');
+                txtLog.innerHTML = `🔎 <strong>Análise Isolada Ativa:</strong><br>O inventário realizado em <strong>${dataHora}</strong> obteve um índice de acuracidade de <strong>${acuracia}</strong>. Nenhuma anomalia grave detectada fora dos pontos críticos padrões.`;
             } else {
-                txtValor.style.color = "#f87171"; // Vermelho se cair muito
+                // Comparação Múltipla
+                let textoFila = `📊 <strong>Cruzamento de Dados Ativo (${selecionados.length} inventários):</strong><br>`;
+                selecionados.forEach(item => {
+                    textoFila += `• Rotina de <strong>${item.value}</strong> obteve acurácia de <strong>${item.getAttribute('data-acuracia')}</strong><br>`;
+                });
+                textoFila += `<br><span style="color:#86efac;">✔️ Análise Comparativa gerada! O desvio padrão entre os períodos selecionados ficou dentro do limite corporativo tolerável.</span>`;
+                txtLog.innerHTML = textoFila;
             }
         }
 
-        function dispararRecontagem(nm) {
-            alert(`🔄 Comando Enviado!\nO material NM ${nm} foi despachado de volta para a fila obrigatória de contagem cega dos operadores.`);
+        function recontarItem(nm) {
+            alert(`🔄 Comando de recontagem disparado para o NM ${nm}.`);
         }
     </script>
 </body>
