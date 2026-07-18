@@ -107,13 +107,31 @@
 
         /* TABELAS DESIGN */
         .tabela-wrapper { overflow-x: auto; width: 100%; border-radius: 8px; background: rgba(0,0,0,0.3); margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 450px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
         th { padding: 12px; background: rgba(0,0,0,0.5); color: #a0aec0; font-size: 11px; text-transform: uppercase; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; vertical-align: middle; }
 
         .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
         .badge-ok { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
         .badge-erro { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+
+        /* 🆕 BOTÃO DE RECONTAGEM */
+        .btn-recontar-acao {
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-recontar-acao:hover { background: #c2410c; }
 
         .abc-a { background: #ef4444; } .abc-b { background: #f97316; } .abc-c { background: #3b82f6; }
 
@@ -173,7 +191,7 @@
 
 
     <!-- ======================================================== -->
-    <!-- TELA 2 EXCLUSIVA: HISTÓRICO COM RELATÓRIO DE ERROS/ACERTOS -->
+    <!-- TELA 2 EXCLUSIVA: HISTÓRICO DIÁRIO -->
     <!-- ======================================================== -->
     <div id="telaAcuracia" class="sub-tela-exclusiva">
         <div class="header-box">
@@ -210,7 +228,6 @@
 
         <button class="btn-acao-analise" onclick="processarAnaliseInventarios()">⚡ Executar Análise Detalhada</button>
 
-        <!-- CONTAINER DO RELATÓRIO REAL QUE VOCÊ PEDIU -->
         <div id="boxResultadoComparacao" style="background:rgba(0,0,0,0.4); padding:15px; border-radius:8px; display:none; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
             <h4 style="color:#60a5fa; font-size:14px; margin-bottom:10px;" id="tituloRelatorio">📋 Relatório Gerencial Extraído:</h4>
             <div id="corpoRelatorioHTML"></div>
@@ -219,7 +236,7 @@
 
 
     <!-- ======================================================== -->
-    <!-- TELA 3 EXCLUSIVA: PONTOS CRÍTICOS -->
+    <!-- TELA 3 EXCLUSIVA: PONTOS CRÍTICOS COM RECONTAGEM ATIVA -->
     <!-- ======================================================== -->
     <div id="telaCriticos" class="sub-tela-exclusiva">
         <div class="header-box">
@@ -228,15 +245,33 @@
             <div></div>
         </div>
         
-        <h4 style="font-size: 13px; color: #fca5a5; margin-bottom: 10px;">🔴 Divergências Críticas em Aberto:</h4>
+        <h4 style="font-size: 13px; color: #fca5a5; margin-bottom: 12px;">🔴 Divergências Críticas em Aberto:</h4>
         <div class="tabela-wrapper">
             <table>
                 <thead>
-                    <tr><th>NM</th><th>Teórico</th><th>Contado</th><th>Divergência</th></tr>
+                    <tr>
+                        <th>Material / NM</th>
+                        <th>Teórico</th>
+                        <th>Contado</th>
+                        <th>Divergência</th>
+                        <th>Ação</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    <tr><td>1000142</td><td>45 UN</td><td>43 UN</td><td><span class="badge badge-erro">-2 UN</span></td></tr>
-                    <tr><td>4001223</td><td>12 UN</td><td>15 UN</td><td><span class="badge badge-erro">+3 UN</span></td></tr>
+                    <tr>
+                        <td><strong>1000142</strong><br><span style="font-size:11px; color:#a0aec0;">VALVULA GLOBO 3 POL</span></td>
+                        <td>45 UN</td>
+                        <td>43 UN</td>
+                        <td><span class="badge badge-erro">-2 UN</span></td>
+                        <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('1000142', 'VALVULA GLOBO 3 POL')">🔄 Recontar</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>4001223</strong><br><span style="font-size:11px; color:#a0aec0;">BOMBA CENTRIFUGA 5CV</span></td>
+                        <td>12 UN</td>
+                        <td>15 UN</td>
+                        <td><span class="badge badge-erro">+3 UN</span></td>
+                        <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('4001223', 'BOMBA CENTRIFUGA 5CV')">🔄 Recontar</button></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -244,7 +279,7 @@
 
 
     <!-- ======================================================== -->
-    <!-- TELA 4 EXCLUSIVA: SAÚDE TOTAL DO ESTOQUE (ESPELHO DO INVENTÁRIO) -->
+    <!-- TELA 4 EXCLUSIVA: SAÚDE TOTAL DO ESTOQUE -->
     <!-- ======================================================== -->
     <div id="telaSaude" class="sub-tela-exclusiva">
         <div class="header-box">
@@ -273,22 +308,15 @@
     </div>
 
     <script>
-        // Simulação de banco de dados por inventário para gerar o relatório real por NM
         const dadosInventarios = {
             "inv_17": {
                 acuracia: "98.4%",
-                bateram: [
-                    { nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" }
-                ],
-                naoBateram: [
-                    { nm: "1000142", desc: "VALVULA GLOBO 3 POL", teorico: "45 UN", contado: "43 UN", dif: "-2 UN" }
-                ]
+                bateram: [{ nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" }],
+                naoBateram: [{ nm: "1000142", desc: "VALVULA GLOBO 3 POL", teorico: "45 UN", contado: "43 UN", dif: "-2 UN" }]
             },
             "inv_16": {
                 acuracia: "95.1%",
-                bateram: [
-                    { nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" }
-                ],
+                bateram: [{ nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" }],
                 naoBateram: [
                     { nm: "1000142", desc: "VALVULA GLOBO 3 POL", teorico: "45 UN", contado: "41 UN", dif: "-4 UN" },
                     { nm: "4001223", desc: "BOMBA CENTRIFUGA 5CV", teorico: "12 UN", contado: "15 UN", dif: "+3 UN" }
@@ -314,7 +342,11 @@
         function abrirTela(idTela) { document.getElementById(idTela).classList.add('ativa'); }
         function fecharTela(idTela) { document.getElementById(idTela).classList.remove('ativa'); }
 
-        // GERADOR DE RELATÓRIO AVANÇADO E ATUALIZADOR DE ESPELHO (SAÚDE)
+        // FUNÇÃO DE RECONTAGEM ATIVA
+        function solicitarRecontagem(nm, descricao) {
+            alert(`🔄 Solicitação enviada!\n\nO material NM ${nm} (${descricao}) entrou na fila prioritária de Recontagem Cega para os operadores.`);
+        }
+
         function processarAnaliseInventarios() {
             const checkboxes = document.querySelectorAll('input[name="inventario_ref"]:checked');
             const boxResultado = document.getElementById('boxResultadoComparacao');
@@ -327,8 +359,6 @@
 
             boxResultado.style.display = "block";
             let relatorioFinal = "";
-
-            // Variáveis para sincronizar com a aba de Saúde Total (Espelho)
             let todosAcertosEspelho = [];
             let todasFalhasEspelho = [];
             let acuraciaUltimoSelecionado = "100%";
@@ -341,12 +371,11 @@
                 relatorioFinal += `
                     <div style="margin-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
                         <span style="font-size:13px; color:#ffd700; font-weight:bold;">📅 Rotina: ${box.value} | Acurácia: ${dados.acuracia}</span>
-                        
                         <p style="margin-top:10px; font-size:12px; color:#4ade80; font-weight:bold;">🟢 MATERIAIS QUE BATERAM TOTALMENTE:</p>
                 `;
 
                 if(dados.bateram.length === 0) {
-                    relatorioFinal += `<p style="font-size:11px; color:#a0aec0; margin-left:10px;">Nenhum material 100% correto nesta checagem.</p>`;
+                    relatorioFinal += `<p style="font-size:11px; color:#a0aec0; margin-left:10px;">Nenhum material correto.</p>`;
                 } else {
                     dados.bateram.forEach(b => {
                         relatorioFinal += `<p style="font-size:12px; margin-left:10px; color:#e2e8f0;">• NM ${b.nm} - ${b.desc} (${b.qtd})</p>`;
@@ -354,16 +383,16 @@
                     });
                 }
 
-                relatorioFinal += `<p style="margin-top:10px; font-size:12px; color:#fca5a5; font-weight:bold;">🔴 MATERIAIS COM DIVERGÊNCIA (ERROS):</p>`;
+                relatorioFinal += `<p style="margin-top:10px; font-size:12px; color:#fca5a5; font-weight:bold;">🔴 MATERIAIS COM DIVERGÊNCIA:</p>`;
 
                 if(dados.naoBateram.length === 0) {
-                    relatorioFinal += `<p style="font-size:11px; color:#a0aec0; margin-left:10px;">Perfeito! Zero erros encontrados.</p>`;
+                    relatorioFinal += `<p style="font-size:11px; color:#a0aec0; margin-left:10px;">Zero erros.</p>`;
                 } else {
                     dados.naoBateram.forEach(n => {
                         relatorioFinal += `
                             <p style="font-size:12px; margin-left:10px; color:#e2e8f0;">
-                                • <strong style="color:#f87171;">NM ${n.nm}</strong> - ${n.desc}<br>
-                                <span style="font-size:11px; color:#cbd5e0; margin-left:10px;">[Esperado SAP: ${n.teorico} | Contado Físico: ${n.contado} | Desvio: <strong>${n.dif}</strong>]</span>
+                                • <strong>NM ${n.nm}</strong> - ${n.desc}<br>
+                                <span style="font-size:11px; color:#cbd5e0; margin-left:10px;">[SAP: ${n.teorico} | Físico: ${n.contado} | Erro: ${n.dif}]</span>
                             </p>
                         `;
                         todasFalhasEspelho.push(n);
@@ -374,7 +403,6 @@
 
             corpoHTML.innerHTML = relatorioFinal;
 
-            // 🔁 CONSTRUÇÃO DO ESPELHO DIRETO NA ABA 4 (SAÚDE TOTAL DO ESTOQUE)
             const barraSaude = document.getElementById('barraSaudeProgresso');
             const corpoEspelho = document.getElementById('corpoEspelhoSaude');
 
@@ -383,14 +411,13 @@
 
             let htmlEspelho = "";
             todasFalhasEspelho.forEach(f => {
-                htmlEspelho += `<tr><td><strong>NM ${f.nm}</strong><br><span style="font-size:11px; color:#a0aec0;">${f.desc}</span></td><td>Desvio físico de ${f.dif}. Requer ajuste fiscal.</td><td><span class="badge badge-erro">DIVERGENTE</span></td></tr>`;
+                htmlEspelho += `<tr><td><strong>NM ${f.nm}</strong><br><span style="font-size:11px; color:#a0aec0;">${f.desc}</span></td><td>Desvio físico de ${f.dif}.</td><td><span class="badge badge-erro">DIVERGENTE</span></td></tr>`;
             });
             todosAcertosEspelho.forEach(a => {
-                htmlEspelho += `<tr><td><strong>NM ${a.nm}</strong><br><span style="font-size:11px; color:#a0aec0;">${a.desc}</span></td><td>Físico confere perfeitamente com o SAP.</td><td><span class="badge badge-ok">CONFORME</span></td></tr>`;
+                htmlEspelho += `<tr><td><strong>NM ${a.nm}</strong><br><span style="font-size:11px; color:#a0aec0;">${a.desc}</span></td><td>Físico confere.</td><td><span class="badge badge-ok">CONFORME</span></td></tr>`;
             });
-
             corpoEspelho.innerHTML = htmlEspelho;
         }
     </script>
 </body>
-</html>
+<
