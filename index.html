@@ -190,6 +190,24 @@
     const DOMINIO_PERMITIDO = "@transpetro.com.br";
     const EMAIL_ADMIN_SUPREMO = "dario.torres@transpetro.com.br";
 
+    // 🔥 PROTOCOLO DE SEGURANÇA MÁXIMA: Limpeza profunda ao carregar a tela de login
+    window.addEventListener('DOMContentLoaded', () => {
+        // 1. Limpa os campos visuais imediatamente para remover senhas residuais do botão "Voltar"
+        if (document.getElementById('email')) document.getElementById('email').value = "";
+        if (document.getElementById('senha')) document.getElementById('senha').value = "";
+        if (document.getElementById('confirmar-senha')) document.getElementById('confirmar-senha').value = "";
+
+        // 2. Destrói o privilégio de perfil armazenado localmente
+        localStorage.removeItem('wms_perfil');
+
+        // 3. Força o encerramento imediato de qualquer sessão ativa no Firebase
+        auth.signOut().then(() => {
+            console.log("Sessão limpa e encerrada com sucesso.");
+        }).catch((erro) => {
+            console.error("Erro ao limpar sessão:", erro);
+        });
+    });
+
     function alternarModo() {
         modoLogin = !modoLogin; 
         const tituloTela = document.getElementById('titulo-tela');
@@ -213,7 +231,7 @@
         }
     }
 
-    // 🔥 FUNÇÃO DE SEGURANÇA MÁXIMA: Captura IP, Aparelho e envia pro Firebase
+    // 🔥 FUNÇÃO DE SEGURANÇA: Captura IP, Aparelho e envia pro Firebase
     async function registrarSegurancaAcesso(email) {
         try {
             const resposta = await fetch('https://api.ipify.org?format=json');
@@ -246,7 +264,6 @@
         const confirmarSenhaInput = document.getElementById('confirmar-senha');
         const confirmarSenhaDigitada = confirmarSenhaInput.value;
         
-        // CORREÇÃO 1: Substituído alert antigo por SweetAlert2 para Domínio Negado
         if (!emailDigitado.endsWith(DOMINIO_PERMITIDO)) {
             Swal.fire({
                 icon: 'error',
@@ -265,7 +282,6 @@
                     
                     await registrarSegurancaAcesso(emailDigitado);
 
-                    // CORREÇÃO 2: Substituído alerts antigos por SweetAlert2 com redirecionamento correto
                     if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
                         localStorage.setItem('wms_perfil', 'ADMIN');
                         Swal.fire({
