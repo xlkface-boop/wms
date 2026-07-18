@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS Inteligente - Inventário Cego</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 650px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        /* Card de Trava de Segurança */
+        .trava-alerta {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Container Principal */
+        .inventario-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        h3 {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .meta-info {
+            color: #cbd5e0;
+            font-size: 13px;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        /* Card de Cada Item (Sem Saldo Teórico) */
+        .item-contagem-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ea580c; /* Detalhe laranja do fluxo */
+        }
+
+        .badge-tipo {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .bg-rotativo { background-color: #c2410c; color: white; }
+        .bg-ciclico { background-color: #2563eb; color: white; }
+
+        .nm-titulo {
+            color: #ffd700;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .desc-material {
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .deposito-tag {
+            font-size: 12px;
+            color: #a0aec0;
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        /* Campo de Input Numérico */
+        .input-qtd {
+            width: 100%;
+            padding: 14px;
+            background: #ffffff;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            outline: none;
+            color: #1a202c;
+            transition: 0.2s;
+        }
+
+        .input-qtd:focus {
+            border-color: #ea580c;
+            box-shadow: 0 0 10px rgba(234, 88, 12, 0.3);
+        }
+
+        /* Botão Finalizar */
+        .btn-concluir {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn-concluir:hover {
+            transform: translateY(-1px);
+        }
+
+        .direitos-box {
+            max-width: 500px; 
+            text-align: center; 
+            padding: 15px; 
+            background: rgba(0, 0, 0, 0.6); 
+            border-radius: 8px;
+            width: 100%;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Banner de Travamento de Rotina -->
+        <div class="trava-alerta">
+            🔒 MODO DE AUDITORIA ATIVO<br>
+            As funcionalidades do WMS foram suspensas. Conclua a contagem para liberar o sistema.
+        </div>
+
+        <div class="inventario-container">
+            <h3>Contagem Matinal Cega</h3>
+            <span class="meta-info">Foco em movimentações recentes + Amostragem Cíclica de 5%</span>
+
+            <form id="formInventario" onsubmit="enviarInventario(event)">
+                
+                <!-- Item 1: Gerado por Saída Recente (Rotativo) -->
+                <div class="item-contagem-box">
+                    <span class="badge-tipo bg-rotativo">Giro Recente (Rotativo)</span>
+                    <div class="nm-titulo">NM: 1000142</div>
+                    <div class="desc-material">VALVULA GLOBO FLUÍDOS 3 POL SCH40</div>
+                    <span class="deposito-tag">📍 Depósito: DP01</span>
+                    <input type="number" class="input-qtd" placeholder="Insira a quantidade física exata..." required min="0" inputmode="numeric">
+                </div>
+
+                <!-- Item 2: Gerado por Amostragem Aleatória (Cíclico) -->
+                <div class="item-contagem-box">
+                    <span class="badge-tipo bg-ciclico">Amostragem Aleatória (5%)</span>
+                    <div class="nm-titulo">NM: 2000551</div>
+                    <div class="desc-material">MANOMETRO PRESSAO FLANGEADO 1/2 NPT</div>
+                    <span class="deposito-tag">📍 Depósito: DP03</span>
+                    <input type="number" class="input-qtd" placeholder="Insira a quantidade física exata..." required min="0" inputmode="numeric">
+                </div>
+
+                <button type="submit" class="btn-concluir">🔒 Enviar e Finalizar Inventário</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL -->
+    <div class="direitos-box">
+        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
+            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+            Propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.
+        </p>
+    </div>
+
+    <script>
+        // Bloqueio de Segurança: Trava a navegação de retorno
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+            alert("🔒 Atenção: O inventário matinal está em andamento. Digite as contagens e finalize para liberar seu usuário.");
+        };
+
+        function enviarInventario(e) {
+            e.preventDefault();
+            alert("✅ Sucesso! Contagem gravada na base de auditoria.\n\nO sistema foi liberado.");
+            // Libera o usuário e volta pro menu
+            window.location.href = "menu.html";
+        }
+    </script>
+
+</body>
+</html>
