@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Inteligente - Central de Relatórios</title>
+    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
@@ -161,6 +163,7 @@
         </div>
     </div>
 
+    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL -->
     <div class="direitos-box">
         <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
     </div>
@@ -335,16 +338,29 @@
 
         const perfilAtivo = localStorage.getItem('wms_perfil');
         if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
-            alert("🛑 Erro: Acesso restrito.");
-            window.location.href = "menu.html";
+            Swal.fire({
+                icon: 'error',
+                title: 'Acesso Restrito',
+                text: 'Esta área é exclusiva para Administradores.',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Voltar ao Menu'
+            }).then(() => {
+                window.location.href = "menu.html";
+            });
         }
 
         function abrirTela(idTela) { document.getElementById(idTela).classList.add('ativa'); }
         function fecharTela(idTela) { document.getElementById(idTela).classList.remove('ativa'); }
 
-        // FUNÇÃO DE RECONTAGEM ATIVA
+        // FUNÇÃO DE RECONTAGEM ATIVA COM SWEETALERT2
         function solicitarRecontagem(nm, descricao) {
-            alert(`🔄 Solicitação enviada!\n\nO material NM ${nm} (${descricao}) entrou na fila prioritária de Recontagem Cega para os operadores.`);
+            Swal.fire({
+                icon: 'success',
+                title: 'Solicitação Enviada!',
+                html: `O material <b>NM ${nm}</b> (${descricao}) entrou na fila prioritária de Recontagem Cega para os operadores.`,
+                confirmButtonColor: '#ea580c',
+                confirmButtonText: 'Entendido'
+            });
         }
 
         function processarAnaliseInventarios() {
@@ -353,7 +369,13 @@
             const corpoHTML = document.getElementById('corpoRelatorioHTML');
 
             if (checkboxes.length === 0) {
-                alert("⚠️ Selecione ao menos um inventário para visualizar o relatório.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    text: 'Selecione ao menos um inventário para visualizar o relatório.',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
 
@@ -420,4 +442,4 @@
         }
     </script>
 </body>
-<
+</html>
