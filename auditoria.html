@@ -6,6 +6,17 @@
     <title>WMS Inteligente - Central de Relatórios</title>
     <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO (PREVENT OVERFLASH)
+        // Executado imediatamente antes do carregamento do body para evitar que dados confidenciais pisquem em telas não autorizadas
+        (function() {
+            const perfilAtivo = localStorage.getItem('wms_perfil');
+            if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
+                // Redireciona imediatamente limpando o rastro de histórico
+                window.location.replace("index.html");
+            }
+        })();
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
@@ -149,7 +160,7 @@
         <!-- MENU DIRECIONADOR PRINCIPAL -->
         <div class="card-menu-principal">
             <div class="header-box">
-                <a href="menu.html" class="btn-x-voltar">✕</a>
+                <button type="button" class="btn-x-voltar" onclick="voltarParaMenu()">✕</button>
                 <div class="titulo-central">Painel Gerencial</div>
                 <div></div>
             </div>
@@ -163,7 +174,7 @@
         </div>
     </div>
 
-    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL -->
+    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
     <div class="direitos-box">
         <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
     </div>
@@ -328,18 +339,16 @@
             }
         };
 
-        // 🛡️ VALIDAÇÃO DE SEGURANÇA EXCLUSIVA DE ADMIN
-        const perfilAtivo = localStorage.getItem('wms_perfil');
-        if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Acesso Restrito',
-                text: 'Esta área é exclusiva para Administradores.',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Voltar ao Menu'
-            }).then(() => {
-                window.location.href = "menu.html";
-            });
+        // Interceptação imediata ao carregar a página/restaurar do cache do navegador
+        window.addEventListener('pageshow', function() {
+            const perfilAtivo = localStorage.getItem('wms_perfil');
+            if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
+                window.location.replace("index.html");
+            }
+        });
+
+        function voltarParaMenu() {
+            window.location.replace("menu.html");
         }
 
         function abrirTela(idTela) { document.getElementById(idTela).classList.add('ativa'); }
@@ -441,8 +450,8 @@
             cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); // 5 minutos
         }
 
-        function ejecutarBloqueioPorInatividade() {
-            localStorage.removeItem('wms_perfil');
+        function executarBloqueioPorInatividade() {
+            localStorage.clear();
             
             Swal.fire({
                 icon: 'warning',
@@ -452,11 +461,11 @@
                 confirmButtonText: 'Efetuar Login Novamente',
                 allowOutsideClick: false
             }).then(() => {
-                window.location.href = "index.html";
+                window.location.replace("index.html");
             });
         }
 
-        // 🆕 IMPLANTAÇÃO MÚLTIPLA SEGURA: Escuta eventos adicionando comportamento, sem sobrescrever
+        // Inicialização combinada
         window.addEventListener('load', () => {
             resetarCronometroSessao();
         });
