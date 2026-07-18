@@ -286,9 +286,13 @@
         } else {
             // --- CADASTRO REAL COM FIREBASE ---
             if (senhaDigitada !== confirmarSenhaDigitada) {
-                alert("🛑 Erro no Cadastro!\nAs senhas digitadas não coincidem. Tente novamente.");
-                confirmarSenhaInput.value = "";
-                confirmarSenhaInput.focus();
+                Swal.fire({
+        icon: 'warning', // Ícone de atenção amarelado
+        title: 'Erro no Cadastro!',
+        text: 'As senhas digitadas não coincidem. Tente novamente.',
+        confirmButtonColor: '#005c53',
+        confirmButtonText: 'Corrigir Senha'
+    });
                 return;
             }
 
@@ -297,18 +301,42 @@
                     // Também registra a segurança no momento do cadastro
                     await registrarSegurancaAcesso(emailDigitado);
 
-                    alert(`✅ Conta registrada com sucesso no Firebase para:\n${emailDigitado}!\n\nAgora você já pode realizar o login.`);
+                    Swal.fire({
+                icon: 'success', // Ícone de check verde animado
+                title: 'Conta Criada!',
+                text: `Cadastro realizado com sucesso para o e-mail: ${emailDigitado}.`,
+                confirmButtonColor: '#005c53',
+                confirmButtonText: 'Ir para o Sistema'
+            });
                     alternarModo();
                     emailInput.focus();
                 })
                 .catch((error) => {
                     console.error("Erro ao cadastrar:", error.code);
                     if (error.code === 'auth/email-already-in-use') {
-                        alert("🛑 Erro no Cadastro!\nEste e-mail corporativo já está registrado no sistema.");
+                        Swal.fire({
+                icon: 'error',
+                title: 'E-mail Já Registrado!',
+                text: 'Este e-mail corporativo já está cadastrado no sistema.',
+                confirmButtonColor: '#005c53',
+                confirmButtonText: 'Tentar Outro E-mail'
+            });
                     } else if (error.code === 'auth/weak-password') {
-                        alert("🛑 Senha Fraca!\nA senha deve conter no mínimo 6 caracteres.");
+                       Swal.fire({
+                icon: 'warning',
+                title: 'Senha Fraca!',
+                text: 'A senha deve conter no mínimo 6 caracteres.',
+                confirmButtonColor: '#005c53',
+                confirmButtonText: 'Mudar Senha'
+            });
                     } else {
-                        alert("🛑 Erro ao registrar conta. Tente novamente.");
+                       Swal.fire({
+                icon: 'error',
+                title: 'Erro no Registro!',
+                text: 'Erro ao registrar conta. Tente novamente.',
+                confirmButtonColor: '#005c53',
+                confirmButtonText: 'Tentar Novamente'
+            });
                     }
                 });
         }
