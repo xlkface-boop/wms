@@ -17,203 +17,84 @@
             padding: 20px;
         }
 
-        .main-container {
-            width: 100%;
-            max-width: 500px;
-            margin-top: 10px;
-            margin-bottom: 30px;
-        }
+        .main-container { width: 100%; max-width: 500px; margin-top: 10px; margin-bottom: 30px; }
 
-        /* Banner de Alerta Superior */
         .trava-alerta {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 20px;
+            background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5;
+            padding: 12px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px;
         }
 
-        /* Container Principal do Card */
         .inventario-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            position: relative;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15); padding: 25px; border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); position: relative;
         }
 
-        /* Contador de Progresso da Fila */
         .progresso-box {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            background: rgba(255,255,255,0.1);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ffd700;
-            border: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.1);
+            padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #ffd700;
         }
 
-        h3 {
-            color: #ffffff;
-            font-size: 20px;
-            font-weight: 700;
+        /* 🆕 CABEÇALHO DA CONTAGEM: SEM O "X", MAS CENTRALIZADO NO MEIO */
+        .header-contagem-box {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
             margin-bottom: 25px;
-        }
-
-        /* Bloco Dinâmico do Item Atual */
-        .item-focado {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 5px solid #ea580c;
-        }
-
-        .nm-label {
-            font-size: 12px;
-            color: #a0aec0;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .nm-titulo {
-            color: #ffd700;
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .desc-material {
-            color: #ffffff;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        /* Grid de Localização Detalhada */
-        .loc-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 15px;
-        }
-
-        .loc-box {
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.03);
-        }
-
-        .loc-titulo {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .loc-valor {
-            font-size: 14px;
-            color: #60a5fa;
-            font-weight: bold;
-            margin-top: 2px;
-        }
-
-        /* Área de Lançamento de Dados */
-        .label-input {
-            display: block;
-            font-size: 13px;
-            color: #cbd5e0;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .input-qtd {
-            width: 100%;
-            padding: 16px;
-            background: #ffffff;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            outline: none;
-            color: #1a202c;
             text-align: center;
-            transition: 0.2s;
-            margin-bottom: 20px;
+        }
+        
+        .header-contagem-box h3 {
+            color: #ffffff; font-size: 20px; font-weight: 700;
         }
 
-        .input-qtd:focus {
-            border-color: #ea580c;
-            box-shadow: 0 0 15px rgba(234, 88, 12, 0.3);
+        .item-focado {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 5px solid #ea580c;
         }
 
-        /* Botão de Envio */
+        .nm-label { font-size: 12px; color: #a0aec0; text-transform: uppercase; font-weight: bold; }
+        .nm-titulo { color: #ffd700; font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+        .desc-material { color: #ffffff; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+
+        .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+        .loc-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; }
+        .loc-titulo { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+        .loc-valor { font-size: 14px; color: #60a5fa; font-weight: bold; margin-top: 2px; }
+
+        .label-input { display: block; font-size: 13px; color: #cbd5e0; margin-bottom: 8px; font-weight: 600; }
+        .input-qtd {
+            width: 100%; padding: 16px; background: #ffffff; border: 2px solid transparent; border-radius: 8px;
+            font-size: 20px; font-weight: bold; outline: none; color: #1a202c; text-align: center; margin-bottom: 20px;
+        }
+        .input-qtd:focus { border-color: #ea580c; box-shadow: 0 0 15px rgba(234, 88, 12, 0.3); }
+
         .btn-proximo {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;
         }
 
-        .direitos-box {
-            max-width: 500px; 
-            text-align: center; 
-            padding: 15px; 
-            background: rgba(0, 0, 0, 0.6); 
-            border-radius: 8px;
-            width: 100%;
-            margin-top: auto;
-        }
+        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: auto; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <div class="trava-alerta">
-            🔒 MODO DE AUDITORIA ATIVO - CONTAGEM CEGA
-        </div>
+        <div class="trava-alerta">🔒 MODO DE AUDITORIA ATIVO - CONTAGEM CEGA</div>
 
         <div class="inventario-container">
-            <!-- Indicador do Progresso Atual -->
             <div class="progresso-box" id="qtdProgresso">1 / 2</div>
 
-            <h3>Ajuste de Estoque</h3>
+            <!-- Cabeçalho Centralizado Sem Botão de Sair -->
+            <div class="header-contagem-box">
+                <h3>Ajuste de Estoque</h3>
+            </div>
 
             <form id="formFilaInventario" onsubmit="proximoItem(event)">
-                
-                <!-- Estrutura Dinâmica que muda via Script -->
                 <div class="item-focado">
                     <span class="nm-label">Número de Material (NM)</span>
                     <div class="nm-titulo" id="lblNM">1000142</div>
-                    
                     <div class="desc-material" id="lblDescricao">VALVULA GLOBO FLUÍDOS 3 POL SCH40</div>
                     
-                    <!-- Detalhamento Físico de Destino -->
                     <div class="loc-grid">
                         <div class="loc-box">
                             <span class="loc-titulo">🏢 Depósito</span>
@@ -235,67 +116,37 @@
     </div>
 
     <div class="direitos-box">
-        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
-            &copy; 2026 WMS Inteligente. Propriedade exclusiva de <strong>Dário João Torres</strong>.
-        </p>
+        <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
     </div>
 
     <script>
-        // Simulação da Fila Dinâmica de Materiais Sorteados
         const filaMateriais = [
             { nm: "1000142", desc: "VALVULA GLOBO FLUÍDOS 3 POL SCH40", deposito: "DP01", endereco: "P-04-A-02" },
             { nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO 1/2 NPT", deposito: "DP03", endereco: "P-01-C-05" }
         ];
-
         let indiceAtual = 0;
 
-        // Trava do Botão de Voltar do Celular
         history.pushState(null, null, location.href);
-        window.onpopstate = function () {
-            history.go(1);
-            alert("🔒 Inventário Obrigatório: Termine a fila de contagem para liberar o WMS.");
-        };
+        window.onpopstate = function () { history.go(1); alert("🔒 Inventário Obrigatório."); };
 
         function carregarItem() {
             const item = filaMateriais[indiceAtual];
-            
-            // Atualiza os dados textuais na tela
             document.getElementById("lblNM").innerText = item.nm;
             document.getElementById("lblDescricao").innerText = item.desc;
             document.getElementById("lblDeposito").innerText = item.deposito;
             document.getElementById("lblEndereco").innerText = item.endereco;
-            
-            // Atualiza a numeração (Ex: 1 / 2)
             document.getElementById("qtdProgresso").innerText = `${indiceAtual + 1} / ${filaMateriais.length}`;
-            
-            // Limpa o campo numérico e joga o cursor nele
             document.getElementById("txtQtd").value = "";
             document.getElementById("txtQtd").focus();
         }
 
         function proximoItem(e) {
             e.preventDefault();
-            
-            const valorDigitado = document.getElementById("txtQtd").value;
-            
-            // Aqui futuramente o sistema guarda a informação digitada
-            console.log(`Lançado para o NM ${filaMateriais[indiceAtual].nm}: Qtd = ${valorDigitado}`);
-
             indiceAtual++;
-
-            // Se ainda tem material na fila, carrega o próximo
-            if (indiceAtual < filaMateriais.length) {
-                carregarItem();
-            } else {
-                // Se acabou tudo, encerra o modo auditoria e libera o menu
-                alert("🎉 Excelente, Dário! Todos os itens da fila matinal foram auditados com sucesso. Sistema liberado!");
-                window.location.href = "menu.html";
-            }
+            if (indiceAtual < filaMateriais.length) { carregarItem(); } 
+            else { alert("Inventário concluído!"); window.location.href = "menu.html"; }
         }
-
-        // Inicializa o primeiro item ao carregar a página
         window.onload = carregarItem;
     </script>
-
 </body>
 </html>
