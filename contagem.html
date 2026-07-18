@@ -19,26 +19,25 @@
 
         .main-container {
             width: 100%;
-            max-width: 650px;
+            max-width: 500px;
             margin-top: 10px;
             margin-bottom: 30px;
         }
 
-        /* Card de Trava de Segurança */
+        /* Banner de Alerta Superior */
         .trava-alerta {
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid #ef4444;
             color: #fca5a5;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             text-align: center;
             font-size: 13px;
             font-weight: bold;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
         }
 
-        /* Container Principal */
+        /* Container Principal do Card */
         .inventario-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
@@ -47,90 +46,127 @@
             padding: 25px;
             border-radius: 16px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        /* Contador de Progresso da Fila */
+        .progresso-box {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffd700;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         h3 {
             color: #ffffff;
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .meta-info {
-            color: #cbd5e0;
-            font-size: 13px;
             margin-bottom: 25px;
-            display: block;
         }
 
-        /* Card de Cada Item (Sem Saldo Teórico) */
-        .item-contagem-box {
-            background: rgba(0, 0, 0, 0.25);
+        /* Bloco Dinâmico do Item Atual */
+        .item-focado {
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 15px;
-            border-left: 4px solid #ea580c; /* Detalhe laranja do fluxo */
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ea580c;
         }
 
-        .badge-tipo {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
+        .nm-label {
+            font-size: 12px;
+            color: #a0aec0;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
-        .bg-rotativo { background-color: #c2410c; color: white; }
-        .bg-ciclico { background-color: #2563eb; color: white; }
 
         .nm-titulo {
             color: #ffd700;
-            font-size: 17px;
-            font-weight: bold;
-            margin-bottom: 4px;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
         }
 
         .desc-material {
-            color: #e2e8f0;
-            font-size: 14px;
-            line-height: 1.4;
-            margin-bottom: 15px;
+            color: #ffffff;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
 
-        .deposito-tag {
-            font-size: 12px;
-            color: #a0aec0;
+        /* Grid de Localização Detalhada */
+        .loc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .loc-box {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .loc-titulo {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .loc-valor {
+            font-size: 14px;
+            color: #60a5fa;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        /* Área de Lançamento de Dados */
+        .label-input {
             display: block;
-            margin-bottom: 12px;
+            font-size: 13px;
+            color: #cbd5e0;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
-        /* Campo de Input Numérico */
         .input-qtd {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background: #ffffff;
             border: 2px solid transparent;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
             outline: none;
             color: #1a202c;
+            text-align: center;
             transition: 0.2s;
+            margin-bottom: 20px;
         }
 
         .input-qtd:focus {
             border-color: #ea580c;
-            box-shadow: 0 0 10px rgba(234, 88, 12, 0.3);
+            box-shadow: 0 0 15px rgba(234, 88, 12, 0.3);
         }
 
-        /* Botão Finalizar */
-        .btn-concluir {
+        /* Botão de Envio */
+        .btn-proximo {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -138,12 +174,10 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: 0.2s;
-            margin-top: 15px;
-        }
-
-        .btn-concluir:hover {
-            transform: translateY(-1px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .direitos-box {
@@ -160,63 +194,107 @@
 <body>
 
     <div class="main-container">
-        <!-- Banner de Travamento de Rotina -->
         <div class="trava-alerta">
-            🔒 MODO DE AUDITORIA ATIVO<br>
-            As funcionalidades do WMS foram suspensas. Conclua a contagem para liberar o sistema.
+            🔒 MODO DE AUDITORIA ATIVO - CONTAGEM CEGA
         </div>
 
         <div class="inventario-container">
-            <h3>Contagem Matinal Cega</h3>
-            <span class="meta-info">Foco em movimentações recentes + Amostragem Cíclica de 5%</span>
+            <!-- Indicador do Progresso Atual -->
+            <div class="progresso-box" id="qtdProgresso">1 / 2</div>
 
-            <form id="formInventario" onsubmit="enviarInventario(event)">
+            <h3>Ajuste de Estoque</h3>
+
+            <form id="formFilaInventario" onsubmit="proximoItem(event)">
                 
-                <!-- Item 1: Gerado por Saída Recente (Rotativo) -->
-                <div class="item-contagem-box">
-                    <span class="badge-tipo bg-rotativo">Giro Recente (Rotativo)</span>
-                    <div class="nm-titulo">NM: 1000142</div>
-                    <div class="desc-material">VALVULA GLOBO FLUÍDOS 3 POL SCH40</div>
-                    <span class="deposito-tag">📍 Depósito: DP01</span>
-                    <input type="number" class="input-qtd" placeholder="Insira a quantidade física exata..." required min="0" inputmode="numeric">
+                <!-- Estrutura Dinâmica que muda via Script -->
+                <div class="item-focado">
+                    <span class="nm-label">Número de Material (NM)</span>
+                    <div class="nm-titulo" id="lblNM">1000142</div>
+                    
+                    <div class="desc-material" id="lblDescricao">VALVULA GLOBO FLUÍDOS 3 POL SCH40</div>
+                    
+                    <!-- Detalhamento Físico de Destino -->
+                    <div class="loc-grid">
+                        <div class="loc-box">
+                            <span class="loc-titulo">🏢 Depósito</span>
+                            <div class="loc-valor" id="lblDeposito">DP01</div>
+                        </div>
+                        <div class="loc-box">
+                            <span class="loc-titulo">📍 Endereço</span>
+                            <div class="loc-valor" id="lblEndereco">P-04-A-02</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Item 2: Gerado por Amostragem Aleatória (Cíclico) -->
-                <div class="item-contagem-box">
-                    <span class="badge-tipo bg-ciclico">Amostragem Aleatória (5%)</span>
-                    <div class="nm-titulo">NM: 2000551</div>
-                    <div class="desc-material">MANOMETRO PRESSAO FLANGEADO 1/2 NPT</div>
-                    <span class="deposito-tag">📍 Depósito: DP03</span>
-                    <input type="number" class="input-qtd" placeholder="Insira a quantidade física exata..." required min="0" inputmode="numeric">
-                </div>
+                <label class="label-input">Quantidade Física Encontrada no Local:</label>
+                <input type="number" id="txtQtd" class="input-qtd" placeholder="0" required min="0" inputmode="numeric" autofocus>
 
-                <button type="submit" class="btn-concluir">🔒 Enviar e Finalizar Inventário</button>
+                <button type="submit" class="btn-proximo">💾 Confirmar e Avançar ➔</button>
             </form>
         </div>
     </div>
 
-    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL -->
     <div class="direitos-box">
         <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
-            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-            Propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.
+            &copy; 2026 WMS Inteligente. Propriedade exclusiva de <strong>Dário João Torres</strong>.
         </p>
     </div>
 
     <script>
-        // Bloqueio de Segurança: Trava a navegação de retorno
+        // Simulação da Fila Dinâmica de Materiais Sorteados
+        const filaMateriais = [
+            { nm: "1000142", desc: "VALVULA GLOBO FLUÍDOS 3 POL SCH40", deposito: "DP01", endereco: "P-04-A-02" },
+            { nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO 1/2 NPT", deposito: "DP03", endereco: "P-01-C-05" }
+        ];
+
+        let indiceAtual = 0;
+
+        // Trava do Botão de Voltar do Celular
         history.pushState(null, null, location.href);
         window.onpopstate = function () {
             history.go(1);
-            alert("🔒 Atenção: O inventário matinal está em andamento. Digite as contagens e finalize para liberar seu usuário.");
+            alert("🔒 Inventário Obrigatório: Termine a fila de contagem para liberar o WMS.");
         };
 
-        function enviarInventario(e) {
-            e.preventDefault();
-            alert("✅ Sucesso! Contagem gravada na base de auditoria.\n\nO sistema foi liberado.");
-            // Libera o usuário e volta pro menu
-            window.location.href = "menu.html";
+        function carregarItem() {
+            const item = filaMateriais[indiceAtual];
+            
+            // Atualiza os dados textuais na tela
+            document.getElementById("lblNM").innerText = item.nm;
+            document.getElementById("lblDescricao").innerText = item.desc;
+            document.getElementById("lblDeposito").innerText = item.deposito;
+            document.getElementById("lblEndereco").innerText = item.endereco;
+            
+            // Atualiza a numeração (Ex: 1 / 2)
+            document.getElementById("qtdProgresso").innerText = `${indiceAtual + 1} / ${filaMateriais.length}`;
+            
+            // Limpa o campo numérico e joga o cursor nele
+            document.getElementById("txtQtd").value = "";
+            document.getElementById("txtQtd").focus();
         }
+
+        function proximoItem(e) {
+            e.preventDefault();
+            
+            const valorDigitado = document.getElementById("txtQtd").value;
+            
+            // Aqui futuramente o sistema guarda a informação digitada
+            console.log(`Lançado para o NM ${filaMateriais[indiceAtual].nm}: Qtd = ${valorDigitado}`);
+
+            indiceAtual++;
+
+            // Se ainda tem material na fila, carrega o próximo
+            if (indiceAtual < filaMateriais.length) {
+                carregarItem();
+            } else {
+                // Se acabou tudo, encerra o modo auditoria e libera o menu
+                alert("🎉 Excelente, Dário! Todos os itens da fila matinal foram auditados com sucesso. Sistema liberado!");
+                window.location.href = "menu.html";
+            }
+        }
+
+        // Inicializa o primeiro item ao carregar a página
+        window.onload = carregarItem;
     </script>
 
 </body>
