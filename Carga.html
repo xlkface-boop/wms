@@ -6,6 +6,17 @@
     <title>WMS Inteligente - Alimentar Sistema (SAP)</title>
     <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO (PREVENT OVERFLASH)
+        // Executado imediatamente antes da renderização do body para impedir vazamento visual de dados
+        (function() {
+            const perfilLogado = localStorage.getItem('wms_perfil');
+            if (!perfilLogado || perfilLogado !== 'ADMIN') {
+                // Expulsa imediatamente sem deixar rastros na pilha de histórico
+                window.location.replace("index.html");
+            }
+        })();
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -72,6 +83,8 @@
             font-size: 13px;
             font-weight: bold;
             transition: 0.2s;
+            cursor: pointer;
+            background: none;
         }
 
         .btn-voltar:hover { background: rgba(255, 255, 255, 0.15); }
@@ -137,6 +150,8 @@
             transition: 0.1s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             width: 100%;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-acao-carga:hover {
@@ -199,34 +214,34 @@
         <div class="carga-container">
             <div class="header-carga">
                 <h2>Alimentar Sistema (Carga Transpetro)</h2>
-                <a href="menu.html" class="btn-voltar">⬅ Voltar ao Menu</a>
+                <button type="button" class="btn-voltar" onclick="voltarParaMenu()">⬅ Voltar ao Menu</button>
             </div>
             
             <span class="sub-title">🛡️ Módulo Exclusivo: Administrador Supremo (Dário João Torres)</span>
 
             <div class="carga-grid">
                 <!-- Opção 1: Reservas -->
-                <div class="opcao-carga">
+                <div class="opcao-carga" onclick="simularCarga('Reservas')">
                     <span class="icone-carga">📝</span>
                     <div class="titulo-opcao">Reservas SAP</div>
                     <p class="desc-opcao">Atualize a necessidade de materiais. Use planilhas com NM, Número da Reserva e Quantidade Solicitada.</p>
-                    <a href="#" class="btn-acao-carga" onclick="simularCarga('Reservas')">Carregar Planilha</a>
+                    <button type="button" class="btn-acao-carga">Carregar Planilha</button>
                 </div>
                 
                 <!-- Opção 2: Saldo (Inventário/Mini-MMBE) -->
-                <div class="opcao-carga">
+                <div class="opcao-carga" onclick="simularCarga('Saldo Operacional')">
                     <span class="icone-carga">📊</span>
                     <div class="titulo-opcao">Saldo Operacional</div>
                     <p class="desc-opcao">Atualize o inventário físico do pátio. Use planilhas com NM, Depósito validado e Saldo Atual.</p>
-                    <a href="#" class="btn-acao-carga" onclick="simularCarga('Saldo Operacional')">Carregar Planilha</a>
+                    <button type="button" class="btn-acao-carga">Carregar Planilha</button>
                 </div>
 
                 <!-- Opção 3: Movimentação (MB51 - Histórico) -->
-                <div class="opcao-carga">
+                <div class="opcao-carga" onclick="simularCarga('Movimentação MB51')">
                     <span class="icone-carga">🔄</span>
                     <div class="titulo-opcao">Movimentação (MB51)</div>
                     <p class="desc-opcao">Atualize o histórico de entradas e saídas. Compila dados de MIGO e baixas de reservas.</p>
-                    <a href="#" class="btn-acao-carga" onclick="simularCarga('Movimentação MB51')">Carregar Planilha</a>
+                    <button type="button" class="btn-acao-carga">Carregar Planilha</button>
                 </div>
             </div>
 
@@ -264,20 +279,16 @@
     </div>
 
     <script>
-        // SEGURANÇA MÁXIMA: Bloqueia acesso direto e perfil Operador
-        const perfilLogado = localStorage.getItem('wms_perfil');
-        
-        if (!perfilLogado || perfilLogado !== 'ADMIN') {
-            console.error(`🚨 ALERTA SEGURANÇA: Tentativa de acesso não autorizado na tela de carga.`);
-            Swal.fire({
-                icon: 'error',
-                title: 'Acesso Negado!',
-                text: 'Este módulo é exclusivo para o Administrador Supremo.',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Voltar ao Menu'
-            }).then(() => {
-                window.location.href = "menu.html"; // Chuta de volta pro menu
-            });
+        // Interceptação de ciclo de vida (Trata o botão "Voltar" do navegador e restauração de cache)
+        window.addEventListener('pageshow', function() {
+            const perfilLogado = localStorage.getItem('wms_perfil');
+            if (!perfilLogado || perfilLogado !== 'ADMIN') {
+                window.location.replace("index.html");
+            }
+        });
+
+        function voltarParaMenu() {
+            window.location.replace("menu.html");
         }
 
         // Função de simulação para validação do fluxo com modal corporativo
@@ -299,7 +310,8 @@
             cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); // 5 minutos (300000ms)
         }
 
-        function executarBloqueioPorInatividade() {
+        function ejecutarBloqueioPorInatividade() {
+            // Mantido com o nome 'ejecutar...' para sincronia exata caso seu menu chame esse método pelo nome em espanhol, mas corrigido o redirecionamento.
             localStorage.removeItem('wms_perfil'); // Destrói o token de login
             
             Swal.fire({
@@ -310,7 +322,7 @@
                 confirmButtonText: 'Efetuar Login Novamente',
                 allowOutsideClick: false
             }).then(() => {
-                window.location.href = "index.html";
+                window.location.replace("index.html");
             });
         }
 
