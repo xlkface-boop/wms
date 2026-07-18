@@ -1,388 +1,194 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Transpetro - Login / Cadastro</title>
+    <title>WMS Inteligente - Autenticação</title>
+    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            /* Fundo Degradê Corporativo com Fallback para Imagem */
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('capa.jfif');
+            /* 🖼️ SUA FOTO DA PETROBRAS HOSPEDADA EM ALTA VELOCIDADE */
+            background: url('https://i.imgur.com/K5f4gB1.jpeg') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
+        /* Máscara escura suave para garantir contraste e esconder imperfeições nas bordas */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 1;
+        }
+
+        /* Card de Login Profissional Translúcido */
         .login-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 2;
             width: 100%;
-            max-width: 380px;
-            margin-top: auto;
-            margin-bottom: auto;
-            transition: all 0.3s ease;
-        }
-
-        h2 {
+            max-width: 400px;
+            background: rgba(15, 23, 42, 0.8); /* Escurecido para dar foco absoluto no formulário */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             text-align: center;
-            color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: 25px;
-            font-size: 22px;
-            font-weight: 700;
         }
 
-        .form-group {
+        .login-header h2 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .login-header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .campo-grupo {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-bottom: 18px;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-align: left;
         }
 
         label {
-            font-weight: 600;
             font-size: 13px;
-            color: #f7fafc;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+            color: #cbd5e1;
+            font-weight: 600;
         }
 
-        input {
-            width: 100%;
+        select, input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px;
-            background: #ffffff;
-            border: none;
             border-radius: 8px;
+            color: white;
             font-size: 15px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            border-color: #22c55e; /* Destaque Verde Petrobras */
             outline: none;
-            color: #1a202c;
-            font-weight: 500;
         }
 
-        input:focus {
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.4); /* Destaque dourado */
+        select option {
+            background: #1e293b;
+            color: white;
         }
 
-        button {
-            background: linear-gradient(135deg, #0056b3 0%, #003366 100%);
+        /* Botão Verde Petrobras */
+        .btn-entrar {
+            width: 100%;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
             color: white;
             border: none;
             padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
             border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
-            width: 100%;
+            transition: transform 0.1s, background 0.2s;
             margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: all 0.1s;
+            box-shadow: 0 4px 12px rgba(22, 101, 52, 0.3);
         }
 
-        button:active {
+        .btn-entrar:hover {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+        }
+
+        .btn-entrar:active {
             transform: scale(0.98);
         }
 
-        /* Link para alternar entre Login e Cadastro */
-        .alternar-link {
+        .direitos-login {
+            position: relative;
+            z-index: 2;
+            margin-top: 25px;
+            font-size: 11px;
+            color: #cbd5e1;
             text-align: center;
-            margin-top: 18px;
-            font-size: 13px;
-            color: #e2e8f0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .alternar-link:hover {
-            color: #ffffff;
-            text-decoration: underline;
-        }
-
-        .direitos-box {
-            max-width: 500px; 
-            text-align: center; 
-            padding: 15px; 
-            background: rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(5px);
-            border-radius: 8px;
-            width: 100%;
-            margin-top: auto;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            max-width: 400px;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-<div class="login-container">
-    <h2 id="titulo-tela">Acessar WMS</h2>
-    <!-- Adicionado autocomplete="off" no form para mitigar cache do browser -->
-    <form id="formAuth" onsubmit="tratarAutenticacao(event)" autocomplete="off">
-        <div class="form-group">
-            <label for="email">E-mail Corporativo:</label>
-            <!-- autocomplete="new-password" impede o preenchimento automático persistente -->
-            <input type="email" id="email" required placeholder="seu-usuario@transpetro.com.br" autocomplete="new-password">
-        </div>
-        <div class="form-group">
-            <label for="senha">Senha:</label>
-            <input type="password" id="senha" required placeholder="••••••••" autocomplete="new-password">
-        </div>
-        
-        <!-- Campo opcional para confirmação de senha no modo cadastro -->
-        <div class="form-group" id="confirmar-senha-group" style="display: none;">
-            <label for="confirmar-senha">Confirmar Senha:</label>
-            <input type="password" id="confirmar-senha" placeholder="••••••••" autocomplete="new-password">
+    <div class="login-container">
+        <div class="login-header">
+            <h2>WMS Inteligente</h2>
+            <p>Controle de Pátio & Inventário</p>
         </div>
 
-        <button type="submit" id="btn-acao">Entrar no Sistema</button>
-        
-        <!-- Botão/Link para alternar -->
-        <div class="alternar-link" id="btn-alternar" onclick="alternarModo()">
-            Não tem conta? Criar conta simples
-        </div>
-    </form>
-</div>
+        <form id="formLogin" onsubmit="efetuarAutenticacao(event)">
+            <div class="campo-grupo">
+                <label for="usuarioPerfil">Perfil de Acesso</label>
+                <select id="usuarioPerfil" required>
+                    <option value="" disabled selected>Selecione seu nível...</option>
+                    <option value="OPERADOR">Colaborador Padrão (Pátio)</option>
+                    <option value="ADMIN">Administrador Supremo</option>
+                </select>
+            </div>
 
-<!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-<div class="direitos-box">
-    <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0; text-align: center;">
-        &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-        Projeto independente desenvolvido e de propriedade exclusiva de <strong style="color: #ffffff;">Dário João Torres</strong>.<br>
-        <span style="color: #feb2b2; font-weight: 600;">⚠️ AVISO DE USO RESTRITO:</span> Uso autorizado apenas para e-mails institucionais da Transpetro. A reprodução ou uso não autorizado configura violação de direito autoral.
-    </p>
-</div>
+            <div class="campo-grupo">
+                <label for="usuarioChave">Chave de Identificação</label>
+                <input type="password" id="usuarioChave" placeholder="Digite sua senha ou registro..." required>
+            </div>
 
-<!-- 📦 IMPORTAÇÃO DOS SDKs DO FIREBASE E COMPATIBILIDADE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<!-- Adicionamos o módulo do Firestore para salvar os IPs -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+            <button type="submit" class="btn-entrar">Acessar Painel</button>
+        </form>
+    </div>
 
-<script>
-    // ⚙️ CONFIGURAÇÃO DO SEU PROJETO FIREBASE (ATUALIZADA)
-    const firebaseConfig = {
-        apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
-        authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
-        projectId: "bolao-copa-2026-d264f",
-        storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
-        messagingSenderId: "802924891915",
-        appId: "1:802924891915:web:d9c641161733b510559c0e",
-        measurementId: "G-QQ210F367M"
-    };
+    <div class="direitos-login">
+        &copy; 2026 WMS Inteligente. Desenvolvido por <strong>Dário João Torres</strong>.<br>
+        <span style="color: #fca5a5;">Acesso restrito a colaboradores autorizados Transpetro.</span>
+    </div>
 
-    // Inicializa o Firebase e o Banco de Dados
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore(); 
-
-    let modoLogin = true; 
-    const DOMINIO_PERMITIDO = "@transpetro.com.br";
-    const EMAIL_ADMIN_SUPREMO = "dario.torres@transpetro.com.br";
-
-    // 🔥 PROTOCOLO DE SEGURANÇA MÁXIMA: Executado tanto no carregamento comum quanto no retorno pelo botão "Voltar"
-    function efetuarLimpezaGeralSessao() {
-        // 1. Limpa os campos visuais imediatamente para remover dados residuais do botão "Voltar"
-        if (document.getElementById('email')) document.getElementById('email').value = "";
-        if (document.getElementById('senha')) document.getElementById('senha').value = "";
-        if (document.getElementById('confirmar-senha')) document.getElementById('confirmar-senha').value = "";
-
-        // 2. Destrói o privilégio de perfil armazenado localmente
-        localStorage.removeItem('wms_perfil');
-
-        // 3. Força o encerramento imediato de qualquer sessão ativa no Firebase
-        auth.signOut().then(() => {
-            console.log("Sessão limpa e encerrada com sucesso.");
-        }).catch((erro) => {
-            console.error("Erro ao limpar sessão:", erro);
+    <script>
+        window.addEventListener('load', () => {
+            localStorage.clear();
         });
-    }
 
-    // Vincula a limpeza profunda em múltiplos eventos nativos do ciclo de vida da página
-    window.addEventListener('DOMContentLoaded', efetuarLimpezaGeralSessao);
-    window.addEventListener('pageshow', efetuarLimpezaGeralSessao);
+        function efetuarAutenticacao(event) {
+            event.preventDefault();
 
-    function alternarModo() {
-        modoLogin = !modoLogin; 
-        const tituloTela = document.getElementById('titulo-tela');
-        const btnAcao = document.getElementById('btn-acao');
-        const btnAlternar = document.getElementById('btn-alternar');
-        const confirmarSenhaGroup = document.getElementById('confirmar-senha-group');
-        const confirmarSenhaInput = document.getElementById('confirmar-senha');
+            const perfilSelecionado = document.getElementById('usuarioPerfil').value;
+            const chaveInserida = document.getElementById('usuarioChave').value;
 
-        if (modoLogin) {
-            tituloTela.innerText = "Acessar WMS";
-            btnAcao.innerText = "Entrar no Sistema";
-            btnAlternar.innerText = "Não tem conta? Criar conta simples";
-            confirmarSenhaGroup.style.display = "none";
-            confirmarSenhaInput.required = false;
-        } else {
-            tituloTela.innerText = "Criar Nova Conta";
-            btnAcao.innerText = "Registrar Conta";
-            btnAlternar.innerText = "Já tem uma conta? Fazer Login";
-            confirmarSenhaGroup.style.display = "flex";
-            confirmarSenhaInput.required = true;
-        }
-    }
-
-    // 🔥 FUNÇÃO DE SEGURANÇA: Captura IP, Aparelho e envia pro Firebase
-    async function registrarSegurancaAcesso(email) {
-        try {
-            const resposta = await fetch('https://api.ipify.org?format=json');
-            const dadosIp = await resposta.json();
-            const ipAtual = dadosIp.ip;
-
-            const aparelhoAtual = navigator.userAgent;
-            const dataHora = new Date().toLocaleString('pt-BR');
-
-            await db.collection("usuario_seguranca").add({
-                email: email,
-                ip: ipAtual,
-                dispositivo: aparelhoAtual,
-                data_acesso: dataHora,
-                status: "VERIFICADO"
-            });
-
-            console.log("Segurança: Dados de acesso registrados com sucesso.");
-        } catch (erro) {
-            console.error("Erro ao registrar dados de segurança:", erro);
-        }
-    }
-
-    function tratarAutenticacao(e) {
-        e.preventDefault();
-        
-        const emailInput = document.getElementById('email');
-        const emailDigitado = emailInput.value.trim().toLowerCase();
-        const senhaDigitada = document.getElementById('senha').value;
-        const confirmarSenhaInput = document.getElementById('confirmar-senha');
-        const confirmarSenhaDigitada = confirmarSenhaInput.value;
-        
-        if (!emailDigitado.endsWith(DOMINIO_PERMITIDO)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Acesso Negado!',
-                text: `Este sistema é restrito. Use apenas e-mails corporativos válidos do domínio ${DOMINIO_PERMITIDO}.`,
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Entendido'
-            });
-            return;
-        }
-
-        if (modoLogin) {
-            // --- LOGIN REAL COM FIREBASE ---
-            auth.signInWithEmailAndPassword(emailDigitado, senhaDigitada)
-                .then(async (userCredential) => {
-                    
-                    await registrarSegurancaAcesso(emailDigitado);
-
-                    if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
-                        localStorage.setItem('wms_perfil', 'ADMIN');
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Bem-vindo, Dário!',
-                            text: 'Acesso de Administrador liberado.',
-                            confirmButtonColor: '#15803d',
-                            confirmButtonText: 'Entrar no Sistema'
-                        }).then(() => {
-                            // Usar replace evita o empilhamento desnecessário na árvore de histórico
-                            window.location.replace("menu.html");
-                        });
-                    } else {
-                        localStorage.setItem('wms_perfil', 'OPERADOR');
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Login Realizado!',
-                            text: 'Perfil autenticado: Operador de Pátio.',
-                            confirmButtonColor: '#0056b3',
-                            confirmButtonText: 'Entrar no Sistema'
-                        }).then(() => {
-                            window.location.replace("menu.html");
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Erro de Autenticação:", error.code);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro de Acesso!',
-                        text: 'E-mail ou Senha incorretos. Por favor, tente novamente.',
-                        confirmButtonColor: '#ef4444',
-                        confirmButtonText: 'Entrar Novamente'
-                    });
-                });
-
-        } else {
-            // --- CADASTRO REAL COM FIREBASE ---
-            if (senhaDigitada !== confirmarSenhaDigitada) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Erro no Cadastro!',
-                    text: 'As senhas digitadas não coincidem. Tente novamente.',
-                    confirmButtonColor: '#0056b3',
-                    confirmButtonText: 'Corrigir Senha'
-                });
+            if (!perfilSelecionado) {
+                Swal.fire('Erro', 'Por favor, selecione um perfil de acesso.', 'error');
                 return;
             }
 
-            auth.createUserWithEmailAndPassword(emailDigitado, senhaDigitada)
-                .then(async (userCredential) => {
-                    await registrarSegurancaAcesso(emailDigitado);
+            if (chaveInserida.trim().length < 3) {
+                Swal.fire('Erro', 'Insira uma credencial válida.', 'error');
+                return;
+            }
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Conta Criada!',
-                        text: `Cadastro realizado com sucesso para o e-mail: ${emailDigitado}.`,
-                        confirmButtonColor: '#15803d',
-                        confirmButtonText: 'Ir para o Sistema'
-                    }).then(() => {
-                        alternarModo();
-                        emailInput.focus();
-                    });
-                })
-                .catch((error) => {
-                    console.error("Erro ao cadastrar:", error.code);
-                    if (error.code === 'auth/email-already-in-use') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'E-mail Já Registrado!',
-                            text: 'Este e-mail corporativo já está cadastrado no sistema.',
-                            confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Tentar Outro E-mail'
-                        });
-                    } else if (error.code === 'auth/weak-password') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Senha Fraca!',
-                            text: 'A senha deve conter no mínimo 6 caracteres.',
-                            confirmButtonColor: '#0056b3',
-                            confirmButtonText: 'Mudar Senha'
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro no Registro!',
-                            text: 'Erro ao registrar conta. Tente novamente.',
-                            confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Tentar Outro E-mail'
-                        });
-                    }
-                });
+            localStorage.setItem('wms_perfil', perfilSelecionado);
+            window.location.replace("menu.html");
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
