@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Transpetro - Login / Cadastro</title>
@@ -184,7 +184,7 @@
     // Inicializa o Firebase e o Banco de Dados
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore(); // Pronto para usar a tabela que você criou!
+    const db = firebase.firestore(); 
 
     let modoLogin = true; 
     const DOMINIO_PERMITIDO = "@transpetro.com.br";
@@ -216,22 +216,19 @@
     // 🔥 FUNÇÃO DE SEGURANÇA MÁXIMA: Captura IP, Aparelho e envia pro Firebase
     async function registrarSegurancaAcesso(email) {
         try {
-            // 1. Pega o IP real do usuário
             const resposta = await fetch('https://api.ipify.org?format=json');
             const dadosIp = await resposta.json();
             const ipAtual = dadosIp.ip;
 
-            // 2. Pega as informações do dispositivo/navegador
             const aparelhoAtual = navigator.userAgent;
             const dataHora = new Date().toLocaleString('pt-BR');
 
-            // 3. Salva ou atualiza os dados na coleção que você criou no celular
             await db.collection("usuario_seguranca").add({
                 email: email,
                 ip: ipAtual,
                 dispositivo: aparelhoAtual,
                 data_acesso: dataHora,
-                status: "VERIFICADO" // Se mudar amanhã, o Admin acusa!
+                status: "VERIFICADO"
             });
 
             console.log("Segurança: Dados de acesso registrados com sucesso.");
@@ -249,8 +246,15 @@
         const confirmarSenhaInput = document.getElementById('confirmar-senha');
         const confirmarSenhaDigitada = confirmarSenhaInput.value;
         
+        // CORREÇÃO 1: Substituído alert antigo por SweetAlert2 para Domínio Negado
         if (!emailDigitado.endsWith(DOMINIO_PERMITIDO)) {
-            alert(`🛑 Acesso Negado!\n\nEste sistema é restrito. Use apenas e-mails corporativos válidos do domínio ${DOMINIO_PERMITIDO}.`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Acesso Negado!',
+                text: `Este sistema é restrito. Use apenas e-mails corporativos válidos do domínio ${DOMINIO_PERMITIDO}.`,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
@@ -259,86 +263,103 @@
             auth.signInWithEmailAndPassword(emailDigitado, senhaDigitada)
                 .then(async (userCredential) => {
                     
-                    // 🛡️ Executa a trava de segurança salvando IP e Aparelho no seu banco
                     await registrarSegurancaAcesso(emailDigitado);
 
-                    // Define o nível de privilégio estrito baseado no seu e-mail administrativo
+                    // CORREÇÃO 2: Substituído alerts antigos por SweetAlert2 com redirecionamento correto
                     if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
                         localStorage.setItem('wms_perfil', 'ADMIN');
-                        alert("🔓 Bem-vindo, Dário! Acesso de Administrador liberado.");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Bem-vindo, Dário!',
+                            text: 'Acesso de Administrador liberado.',
+                            confirmButtonColor: '#15803d',
+                            confirmButtonText: 'Entrar no Sistema'
+                        }).then(() => {
+                            window.location.href = "menu.html";
+                        });
                     } else {
                         localStorage.setItem('wms_perfil', 'OPERADOR');
-                        alert("📋 Login realizado com sucesso. Perfil: Operador de Pátio.");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Login Realizado!',
+                            text: 'Perfil autenticado: Operador de Pátio.',
+                            confirmButtonColor: '#0056b3',
+                            confirmButtonText: 'Entrar no Sistema'
+                        }).then(() => {
+                            window.location.href = "menu.html";
+                        });
                     }
-                    window.location.href = "menu.html";
                 })
-             .catch((error) => {
-            console.error("Erro de Autenticação:", error.code);
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro de Acesso!',
-                text: 'E-mail ou Senha incorretos. Por favor, tente novamente.',
-                confirmButtonColor: '#005c53',
-                confirmButtonText: 'Entrar Novamente'
-            });
-        });
+                .catch((error) => {
+                    console.error("Erro de Autenticação:", error.code);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro de Acesso!',
+                        text: 'E-mail ou Senha incorretos. Por favor, tente novamente.',
+                        confirmButtonColor: '#ef4444',
+                        confirmButtonText: 'Entrar Novamente'
+                    });
+                });
 
         } else {
             // --- CADASTRO REAL COM FIREBASE ---
             if (senhaDigitada !== confirmarSenhaDigitada) {
                 Swal.fire({
-        icon: 'warning', // Ícone de atenção amarelado
-        title: 'Erro no Cadastro!',
-        text: 'As senhas digitadas não coincidem. Tente novamente.',
-        confirmButtonColor: '#005c53',
-        confirmButtonText: 'Corrigir Senha'
-    });
+                    icon: 'warning',
+                    title: 'Erro no Cadastro!',
+                    text: 'As senhas digitadas não coincidem. Tente novamente.',
+                    confirmButtonColor: '#0056b3',
+                    confirmButtonText: 'Corrigir Senha'
+                });
                 return;
             }
 
             auth.createUserWithEmailAndPassword(emailDigitado, senhaDigitada)
                 .then(async (userCredential) => {
-                    // Também registra a segurança no momento do cadastro
                     await registrarSegurancaAcesso(emailDigitado);
 
                     Swal.fire({
-                icon: 'success', // Ícone de check verde animado
-                title: 'Conta Criada!',
-                text: `Cadastro realizado com sucesso para o e-mail: ${emailDigitado}.`,
-                confirmButtonColor: '#005c53',
-                confirmButtonText: 'Ir para o Sistema'
-            });
-                    alternarModo();
-                    emailInput.focus();
+                        icon: 'success',
+                        title: 'Conta Criada!',
+                        text: `Cadastro realizado com sucesso para o e-mail: ${emailDigitado}.`,
+                        confirmButtonColor: '#15803d',
+                        confirmButtonText: 'Ir para o Sistema'
+                    }).then(() => {
+                        alternarModo();
+                        emailInput.focus();
+                    });
                 })
                 .catch((error) => {
                     console.error("Erro ao cadastrar:", error.code);
                     if (error.code === 'auth/email-already-in-use') {
                         Swal.fire({
-                icon: 'error',
-                title: 'E-mail Já Registrado!',
-                text: 'Este e-mail corporativo já está cadastrado no sistema.',
-                confirmButtonColor: '#005c53',
-                confirmButtonText: 'Tentar Outro E-mail'
-            });
+                            icon: 'error',
+                            title: 'E-mail Já Registrado!',
+                            text: 'Este e-mail corporativo já está cadastrado no sistema.',
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Tentar Outro E-mail'
+                        });
                     } else if (error.code === 'auth/weak-password') {
-                       Swal.fire({
-                icon: 'warning',
-                title: 'Senha Fraca!',
-                text: 'A senha deve conter no mínimo 6 caracteres.',
-                confirmButtonColor: '#005c53',
-                confirmButtonText: 'Mudar Senha'
-            });
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Senha Fraca!',
+                            text: 'A senha deve conter no mínimo 6 caracteres.',
+                            confirmButtonColor: '#0056b3',
+                            confirmButtonText: 'Mudar Senha'
+                        });
                     } else {
-                       Swal.fire({
-                icon: 'error',
-                title: 'Erro no Registro!',
-                text: 'Erro ao registrar conta. Tente novamente.',
-                confirmButtonColor: '#005c53',
-                confirmButtonText: 'Tentar Novamente'
-            });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro no Registro!',
+                            text: 'Erro ao registrar conta. Tente novamente.',
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Tentar Novamente'
+                        });
                     }
                 });
         }
     }
 </script>
+
+</body>
+</html>
