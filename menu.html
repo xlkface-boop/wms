@@ -169,6 +169,39 @@
             txtPerfil.style.borderColor = "rgba(59, 130, 246, 0.4)";
             txtPerfil.style.color = "#60a5fa";
         }
+
+        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA)
+        let cronometroInatividade;
+
+        function resetarCronometroSessao() {
+            clearTimeout(cronometroInatividade);
+            // 5 minutos convertidos para milissegundos
+            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
+        }
+
+        function ejecutarBloqueioPorInatividade() {
+            // Apaga as permissões locais instantaneamente
+            localStorage.clear();
+            
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sessão Expirada!',
+                text: 'Por diretrizes de segurança, o sistema foi bloqueado devido a 5 minutos de inatividade.',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Efetuar Login Novamente',
+                allowOutsideClick: false
+            }).then(() => {
+                window.location.href = "index.html"; // Chuta o usuário para fora
+            });
+        }
+
+        // Monitora as ações do usuário (cliques, movimentos, teclado, touch)
+        window.onload = resetarCronometroSessao;
+        document.onmousemove = resetarCronometroSessao;
+        document.onkeypress = resetarCronometroSessao;
+        document.onclick = resetarCronometroSessao;
+        document.onscroll = resetarCronometroSessao;
+        document.ontouchstart = resetarCronometroSessao;
     </script>
 
 </body>
