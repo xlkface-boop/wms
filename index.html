@@ -166,7 +166,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
-        // ⚙️ CONFIGURAÇÃO DO SEU PROJETO FIREBASE (ATUALIZADA)
+    // ⚙️ CONFIGURAÇÃO DO SEU PROJETO FIREBASE (ATUALIZADA)
     const firebaseConfig = {
         apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
         authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
@@ -177,13 +177,7 @@
         measurementId: "G-QQ210F367M"
     };
 
-    // Inicializa o Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    };
-
-    // Inicializa o Firebase
+    // Inicializa o Firebase adequadamente
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -233,7 +227,7 @@
             // --- LOGIN REAL COM FIREBASE ---
             auth.signInWithEmailAndPassword(emailDigitado, senhaDigitada)
                 .then((userCredential) => {
-                    // Define o nível de privilégio estrito baseado no seu e-mail
+                    // Define o nível de privilégio estrito baseado no seu e-mail administrativo
                     if (emailDigitado === EMAIL_ADMIN_SUPREMO.toLowerCase()) {
                         localStorage.setItem('wms_perfil', 'ADMIN');
                         alert("🔓 Bem-vindo, Dário! Acesso de Administrador liberado.");
@@ -245,7 +239,6 @@
                 })
                 .catch((error) => {
                     console.error("Erro de Autenticação:", error.code);
-                    // Bloqueio definitivo se errar dados ou senha
                     alert("🛑 Erro de Acesso!\nE-mail ou Senha incorretos. Por favor, tente novamente.");
                 });
 
@@ -268,7 +261,7 @@
                     console.error("Erro ao cadastrar:", error.code);
                     if (error.code === 'auth/email-already-in-use') {
                         alert("🛑 Erro no Cadastro!\nEste e-mail corporativo já está registrado no sistema.");
-                    } else if (error.code === 'auth/weak-senha') {
+                    } else if (error.code === 'auth/weak-password') {
                         alert("🛑 Senha Fraca!\nA senha deve conter no mínimo 6 caracteres.");
                     } else {
                         alert("🛑 Erro ao registrar conta. Tente novamente.");
