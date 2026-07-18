@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Inteligente - Consulta MMBE</title>
+    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
@@ -99,30 +101,30 @@
                 <!-- X no canto esquerdo voltando para o menu principal -->
                 <a href="menu.html" class="btn-x-voltar">✕</a>
                 <div class="titulo-central">Consulta de Estoque (MMBE)</div>
-                <div></div> <!-- Contrabaço do Grid -->
+                <div></div> <!-- Contrabalanço do Grid -->
             </div>
 
             <!-- FILTROS DE PESQUISA -->
             <div class="campo-grupo">
                 <label class="label-filtro">NM (SAP)</label>
-                <input type="text" class="input-filtro" placeholder="Digite o NM...">
+                <input type="text" id="filtroNM" class="input-filtro" placeholder="Digite o NM..." oninput="filtrarTabela()">
             </div>
             
             <div class="campo-grupo">
                 <label class="label-filtro">Descrição (*Contém*)</label>
-                <input type="text" class="input-filtro" placeholder="Buscar na descrição...">
+                <input type="text" id="filtroDesc" class="input-filtro" placeholder="Buscar na descrição..." oninput="filtrarTabela()">
             </div>
 
             <div class="campo-grupo">
                 <label class="label-filtro">Depósito (DP01-DP05, DPA1-DPA2)</label>
-                <input type="text" class="input-filtro" placeholder="Ex: DP01...">
+                <input type="text" id="filtroDeposito" class="input-filtro" placeholder="Ex: DP01..." oninput="filtrarTabela()">
             </div>
         </div>
 
         <!-- REGRID DE DADOS DA TABELA ABAIXO -->
         <div class="tabela-card">
             <div class="tabela-wrapper">
-                <table>
+                <table id="tabelaEstoque">
                     <thead>
                         <tr>
                             <th>NM (SAP)</th>
@@ -157,9 +159,37 @@
         </div>
     </div>
 
+    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
     <div class="direitos-box">
-        <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
+        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0;">
+            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+            Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
+        </p>
     </div>
 
+    <script>
+        // Função inteligente para filtrar as linhas da tabela em tempo real
+        function filtrarTabela() {
+            const valNM = document.getElementById('filtroNM').value.toUpperCase();
+            const valDesc = document.getElementById('filtroDesc').value.toUpperCase();
+            const valDep = document.getElementById('filtroDeposito').value.toUpperCase();
+            
+            const tabela = document.getElementById('tabelaEstoque');
+            const linhas = tabela.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (let i = 0; i < linhas.length; i++) {
+                const celulaNM = linhas[i].getElementsByTagName('td')[0].innerText.toUpperCase();
+                const celulaDep = linhas[i].getElementsByTagName('td')[1].innerText.toUpperCase();
+                const celulaDesc = linhas[i].getElementsByTagName('td')[2].innerText.toUpperCase();
+
+                // Verifica se a linha atende a todos os filtros preenchidos de forma simultânea
+                if (celulaNM.includes(valNM) && celulaDep.includes(valDep) && celulaDesc.includes(valDesc)) {
+                    linhas[i].style.display = "";
+                } else {
+                    linhas[i].style.display = "none";
+                }
+            }
+        }
+    </script>
 </body>
 </html>
