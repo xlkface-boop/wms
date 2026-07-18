@@ -76,6 +76,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
             transition: 0.2s ease;
+            cursor: pointer;
         }
 
         .btn-menu:hover {
@@ -101,6 +102,7 @@
             font-size: 14px;
             font-weight: 600;
             transition: 0.2s;
+            cursor: pointer;
         }
 
         .btn-sair:hover { color: #ef4444; }
@@ -126,18 +128,19 @@
         <div class="perfil-badge" id="txtPerfil">Carregando Perfil...</div>
 
         <!-- 1. MMBE Geral (Acessível para todos) -->
-        <a href="consulta.html" class="btn-menu btn-azul">🔍 Consulta Material / Endereço (MMBE)</a>
+        <a onclick="navegarPara('consulta.html')" class="btn-menu btn-azul">🔍 Consulta Material / Endereço (MMBE)</a>
         
         <!-- 2. Inventário Matinal Cego (Acessível para todos) -->
-        <a href="contagem.html" class="btn-menu btn-laranja">📝 Realizar Inventário Cego</a>
+        <a onclick="navegarPara('contagem.html')" class="btn-menu btn-laranja">📝 Realizar Inventário Cego</a>
         
         <!-- 3. Painel de Auditoria e Curva ABC (Exclusivo ADMIN) -->
-        <a href="auditoria.html" class="btn-menu btn-roxo" id="btnAuditoria" style="display: none;">📊 Auditoria & Curva ABC</a>
+        <a onclick="navegarPara('auditoria.html')" class="btn-menu btn-roxo" id="btnAuditoria" style="display: none;">📊 Auditoria & Curva ABC</a>
         
         <!-- 4. Carga de Planilhas SAP (Exclusivo ADMIN) -->
-        <a href="carga.html" class="btn-menu btn-verde" id="btnCarga" style="display: none;">⚙️ Alimentar Sistema (SAP)</a>
+        <a onclick="navegarPara('carga.html')" class="btn-menu btn-verde" id="btnCarga" style="display: none;">⚙️ Alimentar Sistema (SAP)</a>
         
-        <a href="index.html" class="btn-sair" onclick="localStorage.clear()">Desconectar / Sair</a>
+        <!-- Botão Sair modificado para executar função controlada -->
+        <a onclick="efetuarLogout()" class="btn-sair">Desconectar / Sair</a>
     </div>
 
     <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
@@ -150,24 +153,41 @@
     </div>
 
     <script>
-        // Validação de Segurança e Filtro de Perfil
-        const perfilLogado = localStorage.getItem('wms_perfil');
-        const txtPerfil = document.getElementById('txtPerfil');
-        
-        if (!perfilLogado) {
-            // Se tentar burlar sem login, chuta para a tela inicial
-            window.location.href = "index.html";
+        // 🔥 PROTOCOLO DE SEGURANÇA: Executa toda vez que a página surge na tela (inclusive no botão voltar)
+        window.addEventListener('pageshow', function() {
+            const perfilLogado = localStorage.getItem('wms_perfil');
+            const txtPerfil = document.getElementById('txtPerfil');
+            
+            // Validação rígida de sessão
+            if (!perfilLogado) {
+                window.location.replace("index.html");
+                return;
+            }
+
+            // Renderiza as permissões de forma dinâmica
+            if (perfilLogado === 'ADMIN') {
+                txtPerfil.innerText = "👑 Administrador Supremo";
+                document.getElementById('btnAuditoria').style.display = "flex";
+                document.getElementById('btnCarga').style.display = "flex";
+            } else {
+                txtPerfil.innerText = "👷 Operador de Pátio";
+                txtPerfil.style.borderColor = "rgba(59, 130, 246, 0.4)";
+                txtPerfil.style.color = "#60a5fa";
+                // Garante que fiquem ocultos caso mude de perfil sem limpar adequadamente
+                document.getElementById('btnAuditoria').style.display = "none";
+                document.getElementById('btnCarga').style.display = "none";
+            }
+        });
+
+        // 🚀 FUNÇÃO DE NAVEGAÇÃO COMPORTAMENTAL: Impede o empilhamento desordenado do histórico
+        function navegarPara(url) {
+            window.location.replace(url);
         }
 
-        if (perfilLogado === 'ADMIN') {
-            txtPerfil.innerText = "👑 Administrador Supremo";
-            // Exibe recursos gerenciais apenas para o seu perfil
-            document.getElementById('btnAuditoria').style.display = "flex";
-            document.getElementById('btnCarga').style.display = "flex";
-        } else {
-            txtPerfil.innerText = "👷 Operador de Pátio";
-            txtPerfil.style.borderColor = "rgba(59, 130, 246, 0.4)";
-            txtPerfil.style.color = "#60a5fa";
+        // 🚪 LOGOUT CONTROLADO: Limpa o rastro de navegação imediatamente
+        function efetuarLogout() {
+            localStorage.clear();
+            window.location.replace("index.html");
         }
 
         // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA)
@@ -175,12 +195,10 @@
 
         function resetarCronometroSessao() {
             clearTimeout(cronometroInatividade);
-            // 5 minutos convertidos para milissegundos
-            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
+            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); // 5 minutos (300000ms)
         }
 
-        function ejecutarBloqueioPorInatividade() {
-            // Apaga as permissões locais instantaneamente
+        function executarBloqueioPorInatividade() {
             localStorage.clear();
             
             Swal.fire({
@@ -191,17 +209,17 @@
                 confirmButtonText: 'Efetuar Login Novamente',
                 allowOutsideClick: false
             }).then(() => {
-                window.location.href = "index.html"; // Chuta o usuário para fora
+                window.location.replace("index.html");
             });
         }
 
-        // Monitora as ações do usuário (cliques, movimentos, teclado, touch)
-        window.onload = resetarCronometroSessao;
-        document.onmousemove = resetarCronometroSessao;
-        document.onkeypress = resetarCronometroSessao;
-        document.onclick = resetarCronometroSessao;
-        document.onscroll = resetarCronometroSessao;
-        document.ontouchstart = resetarCronometroSessao;
+        // Monitoramento ativo de eventos do usuário
+        window.addEventListener('load', resetarCronometroSessao);
+        document.addEventListener('mousemove', resetarCronometroSessao);
+        document.addEventListener('keypress', resetarCronometroSessao);
+        document.addEventListener('click', resetarCronometroSessao);
+        document.addEventListener('scroll', resetarCronometroSessao);
+        document.addEventListener('touchstart', resetarCronometroSessao);
     </script>
 
 </body>
