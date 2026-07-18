@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Inteligente - Alimentar Sistema (SAP)</title>
+    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -266,14 +268,27 @@
         const perfilLogado = localStorage.getItem('wms_perfil');
         
         if (!perfilLogado || perfilLogado !== 'ADMIN') {
-            alert("🛑 Acesso Negado!\n\nEste módulo é exclusivo para o Administrador Supremo.\nVocê será redirecionado.");
             console.error(`🚨 ALERTA SEGURANÇA: Tentativa de acesso não autorizado na tela de carga.`);
-            window.location.href = "menu.html"; // Chuta de volta pro menu
+            Swal.fire({
+                icon: 'error',
+                title: 'Acesso Negado!',
+                text: 'Este módulo é exclusivo para o Administrador Supremo.',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Voltar ao Menu'
+            }).then(() => {
+                window.location.href = "menu.html"; // Chuta de volta pro menu
+            });
         }
 
-        // Função de simulação para validação do fluxo
+        // Função de simulação para validação do fluxo com modal corporativo
         function simularCarga(tipo) {
-            alert(`✅ Função Iniciada: Carga de ${tipo}.\n\n(No futuro, aqui abrirá a janela para selecionar o arquivo Excel e integrar com o Firebase).`);
+            Swal.fire({
+                icon: 'info',
+                title: `Carga de ${tipo}`,
+                html: 'A rotina foi iniciada com sucesso!<br><br><small style="color: #cbd5e0;">(No fluxo de produção, esta janela permitirá selecionar os arquivos Excel extraídos do SAP para sincronização automatizada via Firebase).</small>',
+                confirmButtonColor: '#15803d',
+                confirmButtonText: 'Compreendido'
+            });
         }
     </script>
 
