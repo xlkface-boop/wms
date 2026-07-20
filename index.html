@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Autenticação</title>
+    <title>WMS Inteligente - Autenticação Corporativa</title>
     <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            /* 🖼️ SUA FOTO DA PETROBRAS HOSPEDADA EM ALTA VELOCIDADE */
-            background: url('https://i.imgur.com/K5f4gB1.jpeg') no-repeat center center fixed;
-            background-size: cover;
+            /* 🖼️ IMAGEM EM BASE64 EMBUTIDA - FUNCIONA OFFLINE E SEM DEPENDER DO IMGUR */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="%230f172a"/><path d="M0 0h100v100H0z" fill="%231e293b" opacity=".4"/><circle cx="50" cy="50" r="40" fill="%23334155" opacity=".15"/></svg>') repeat fixed;
+            background-color: #0f172a;
+            color: #1e293b;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -22,25 +23,23 @@
             position: relative;
         }
 
-        /* Máscara escura suave para garantir contraste e esconder imperfeições nas bordas */
         body::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(15, 23, 42, 0.6);
             z-index: 1;
         }
 
-        /* Card de Login Profissional Translúcido */
         .login-container {
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 400px;
-            background: rgba(15, 23, 42, 0.8); /* Escurecido para dar foco absoluto no formulário */
+            max-width: 420px;
+            background: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 40px 30px;
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
@@ -76,7 +75,7 @@
         }
 
         select, input {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px;
             border-radius: 8px;
@@ -87,7 +86,7 @@
         }
 
         select:focus, input:focus {
-            border-color: #22c55e; /* Destaque Verde Petrobras */
+            border-color: #22c55e;
             outline: none;
         }
 
@@ -96,7 +95,6 @@
             color: white;
         }
 
-        /* Botão Verde Petrobras */
         .btn-entrar {
             width: 100%;
             background: linear-gradient(135deg, #15803d 0%, #166534 100%);
@@ -128,7 +126,7 @@
             color: #cbd5e1;
             text-align: center;
             text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-            max-width: 400px;
+            max-width: 420px;
             line-height: 1.5;
         }
     </style>
@@ -145,15 +143,20 @@
             <div class="campo-grupo">
                 <label for="usuarioPerfil">Perfil de Acesso</label>
                 <select id="usuarioPerfil" required>
-                    <option value="" disabled selected>Selecione seu nível...</option>
-                    <option value="OPERADOR">Colaborador Padrão (Pátio)</option>
-                    <option value="ADMIN">Administrador Supremo</option>
+                    <option value="" disabled selected>Selecione seu perfil...</option>
+                    <option value="OPERACIONAL">Operacional</option>
+                    <option value="GERENCIAL">Gerencial</option>
                 </select>
             </div>
 
             <div class="campo-grupo">
-                <label for="usuarioChave">Chave de Identificação</label>
-                <input type="password" id="usuarioChave" placeholder="Digite sua senha ou registro..." required>
+                <label for="usuarioEmail">E-mail Corporativo</label>
+                <input type="email" id="usuarioEmail" placeholder="seu.nome@transpetro.com.br" required autocomplete="off">
+            </div>
+
+            <div class="campo-grupo">
+                <label for="usuarioSenha">Senha do Sistema</label>
+                <input type="password" id="usuarioSenha" placeholder="Digite sua senha..." required>
             </div>
 
             <button type="submit" class="btn-entrar">Acessar Painel</button>
@@ -162,32 +165,123 @@
 
     <div class="direitos-login">
         &copy; 2026 WMS Inteligente. Desenvolvido por <strong>Dário João Torres</strong>.<br>
-        <span style="color: #fca5a5;">Acesso restrito a colaboradores autorizados Transpetro.</span>
+        <span style="color: #fca5a5;">Acesso restrito e monitorado. Domínio @transpetro obrigatório.</span>
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-            localStorage.clear();
+        // 🔒 LIMPEZA RIGOROSA DE SESSÃO AO CARREGAR OU VOLTAR NAVEGADOR
+        function limparSessaoCompleta() {
+            localStorage.removeItem('wms_sessao_ativa');
+            localStorage.removeItem('wms_usuario_ativo');
+            localStorage.removeItem('wms_chave_ativa');
+            localStorage.removeItem('wms_perfil');
+            localStorage.removeItem('wms_email');
+        }
+
+        window.addEventListener('load', limparSessaoCompleta);
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                limparSessaoCompleta();
+            }
         });
 
         function efetuarAutenticacao(event) {
             event.preventDefault();
 
-            const perfilSelecionado = document.getElementById('usuarioPerfil').value;
-            const chaveInserida = document.getElementById('usuarioChave').value;
+            const perfil = document.getElementById('usuarioPerfil').value;
+            const email = document.getElementById('usuarioEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('usuarioSenha').value;
 
-            if (!perfilSelecionado) {
-                Swal.fire('Erro', 'Por favor, selecione um perfil de acesso.', 'error');
+            // 1. VALIDAÇÃO DE DOMÍNIO OBRIGATÓRIO
+            if (!email.endsWith('@transpetro.com.br')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acesso Negado!',
+                    text: 'Este sistema é exclusivo para colaboradores Transpetro. Digite seu e-mail institucional.',
+                    confirmButtonColor: '#ef4444'
+                });
                 return;
             }
 
-            if (chaveInserida.trim().length < 3) {
-                Swal.fire('Erro', 'Insira uma credencial válida.', 'error');
+            // 2. BLOQUEIO DE SEGURANÇA AOS DOMINGOS
+            const hoje = new Date();
+            const diaSemana = hoje.getDay(); // 0 = Domingo
+            if (diaSemana === 0 && perfil === 'OPERACIONAL') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Operação Indisponível',
+                    text: 'Acessos operacionais estão suspensos aos domingos para manutenção de banco de dados.',
+                    confirmButtonColor: '#ea580c'
+                });
                 return;
             }
 
-            localStorage.setItem('wms_perfil', perfilSelecionado);
-            window.location.replace("menu.html");
+            // 3. GRAVAÇÃO INICIAL DA SESSÃO
+            localStorage.setItem('wms_perfil', perfil);
+            localStorage.setItem('wms_email', email);
+
+            // 4. VERIFICAÇÃO DE DADOS DE AUDITORIA (NOME E CHAVE)
+            const dadosCadastrados = localStorage.getItem('wms_user_' + email);
+
+            if (!dadosCadastrados) {
+                // PRIMEIRO ACESSO: OBRIGA A PREENCHER NOME E CHAVE PARA O SAP
+                Swal.fire({
+                    title: 'Cadastro de Auditoria',
+                    text: 'Para registro de responsabilidade no SAP, informe seu Nome e Chave de Identificação:',
+                    icon: 'info',
+                    html:
+                        '<input id="swal-nome" class="swal2-input" placeholder="Nome Completo">' +
+                        '<input id="swal-chave" class="swal2-input" placeholder="Chave de Identificação (Ex: CH1234)">',
+                    focusConfirm: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    confirmButtonText: 'Registrar e Entrar',
+                    confirmButtonColor: '#15803d',
+                    preConfirm: () => {
+                        const nome = document.getElementById('swal-nome').value.trim();
+                        const chave = document.getElementById('swal-chave').value.trim();
+                        if (!nome || !chave) {
+                            Swal.showValidationMessage('Preencha o Nome e a Chave para prosseguir!');
+                        }
+                        return { nome: nome, chave: chave }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const perfilUsuario = {
+                            nome: result.value.nome,
+                            chave: result.value.chave,
+                            email: email,
+                            perfil: perfil
+                        };
+                        localStorage.setItem('wms_user_' + email, JSON.stringify(perfilUsuario));
+                        
+                        localStorage.setItem('wms_usuario_ativo', result.value.nome);
+                        localStorage.setItem('wms_chave_ativa', result.value.chave);
+                        localStorage.setItem('wms_sessao_ativa', 'true');
+
+                        concluirLogin();
+                    }
+                });
+            } else {
+                const usuario = JSON.parse(dadosCadastrados);
+                localStorage.setItem('wms_usuario_ativo', usuario.nome);
+                localStorage.setItem('wms_chave_ativa', usuario.chave);
+                localStorage.setItem('wms_sessao_ativa', 'true');
+
+                concluirLogin();
+            }
+        }
+
+        function concluirLogin() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Autenticado com Sucesso!',
+                text: 'Redirecionando para o painel...',
+                timer: 1200,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.replace("menu.html");
+            });
         }
     </script>
 </body>
