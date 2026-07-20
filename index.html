@@ -8,7 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
         body {
-            /* 🖼️ Imagem de fundo corrigida para funcionar como plano de fundo do sistema */
+            /* 🖼️ Imagem de fundo corrigida */
             background: url('https://i.imgur.com/K5f4gB1.jpeg') no-repeat center center fixed;
             background-size: cover;
             background-color: #0b101d;
@@ -20,15 +20,13 @@
             min-height: 100vh;
             padding: 20px;
             position: relative;
-            overflow: hidden;
         }
 
-        /* Overlay para garantir legibilidade sobre a imagem */
         body::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(11, 16, 29, 0.75);
+            background: rgba(11, 16, 29, 0.85);
             z-index: 1;
         }
 
@@ -82,7 +80,7 @@
             border-color: #10b981;
         }
 
-        .btn-acessar {
+        .btn-primary {
             width: 100%;
             background: #10b981;
             color: white;
@@ -96,8 +94,18 @@
             transition: background 0.2s;
         }
 
-        .btn-acessar:hover {
+        .btn-primary:hover {
             background: #059669;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: none;
+            margin-top: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: underline;
         }
 
         .rodape-login {
@@ -111,10 +119,6 @@
             line-height: 1.5;
         }
 
-        .rodape-login strong {
-            color: #9ca3af;
-        }
-
         .aviso-restrito {
             color: #f87171;
             font-weight: bold;
@@ -122,11 +126,11 @@
             margin-top: 4px;
         }
 
-        /* 🔔 Estilização do Alerta Padronizado (Modal) */
+        /* 🔔 Modal Padronizado */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
@@ -141,14 +145,13 @@
             width: 90%;
             text-align: center;
             border: 1px solid #374151;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
         .modal-text {
             color: #ffffff;
             font-size: 16px;
             margin-bottom: 20px;
-            line-height: 1.5;
+            white-space: pre-line;
         }
 
         .modal-btn {
@@ -160,25 +163,43 @@
             font-weight: 600;
             cursor: pointer;
         }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
+    <!-- CARD DE LOGIN -->
+    <div class="login-card" id="cardLogin">
         <h2>Acessar WMS</h2>
-
-        <form id="formLogin" onsubmit="validarLogin(event)">
+        <form onsubmit="validarLogin(event)">
             <div class="form-group">
-                <label for="txtEmail">E-mail Corporativo:</label>
-                <input type="email" id="txtEmail" placeholder="seu.nome@transpetro.com.br" required autocomplete="off">
+                <label>E-mail Corporativo:</label>
+                <input type="email" id="loginEmail" placeholder="seu.nome@transpetro.com.br" required>
             </div>
-
             <div class="form-group">
-                <label for="txtSenha">Senha do Sistema:</label>
-                <input type="password" id="txtSenha" placeholder="Digite sua senha..." required>
+                <label>Senha do Sistema:</label>
+                <input type="password" id="loginSenha" placeholder="Digite sua senha..." required>
             </div>
+            <button type="submit" class="btn-primary">Acessar Painel</button>
+            <button type="button" class="btn-secondary" onclick="alternarTelas()">Não tem conta? Criar Acesso</button>
+        </form>
+    </div>
 
-            <button type="submit" class="btn-acessar">Acessar Painel</button>
+    <!-- CARD DE CADASTRO -->
+    <div class="login-card hidden" id="cardCadastro">
+        <h2>Criar Acesso</h2>
+        <form onsubmit="registrarUsuario(event)">
+            <div class="form-group">
+                <label>E-mail Corporativo:</label>
+                <input type="email" id="regEmail" placeholder="seu.nome@transpetro.com.br" required>
+            </div>
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" id="regSenha" placeholder="Crie uma senha..." required>
+            </div>
+            <button type="submit" class="btn-primary">Cadastrar</button>
+            <button type="button" class="btn-secondary" onclick="alternarTelas()">Já tenho conta. Entrar</button>
         </form>
     </div>
 
@@ -189,7 +210,7 @@
         <span class="aviso-restrito">⚠️ AVISO DE USO RESTRITO: Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
     </div>
 
-    <!-- Estrutura do Modal Padronizado -->
+    <!-- Alerta Padronizado -->
     <div id="customAlert" class="modal-overlay">
         <div class="modal-content">
             <div id="alertMsg" class="modal-text"></div>
@@ -198,26 +219,24 @@
     </div>
 
     <script>
-        // 🔒 LIMPEZA RIGOROSA DE SESSÃO AO NAVEGAR OU VOLTAR NO NAVEGADOR
-        function resetarSessao() {
-            localStorage.removeItem('wms_sessao_ativa');
-            localStorage.removeItem('wms_usuario_ativo');
-            localStorage.removeItem('wms_chave_ativa');
-            localStorage.removeItem('wms_perfil');
-            localStorage.removeItem('wms_email');
+        const EMAIL_ADMIN = "joao.torres33@live.com";
+        const SENHA_ADMIN_PADRAO = "admin123"; // Senha inicial do ADM
+
+        // Inicializa o banco de dados local se não existir
+        if (!localStorage.getItem('wms_usuarios')) {
+            const usuariosIniciais = {};
+            usuariosIniciais[EMAIL_ADMIN] = { senha: SENHA_ADMIN_PADRAO, perfil: "GERENCIAL", nome: "Dário João Torres" };
+            localStorage.setItem('wms_usuarios', JSON.stringify(usuariosIniciais));
         }
 
-        window.addEventListener('load', resetarSessao);
-        window.addEventListener('pageshow', (event) => {
-            if (event.persisted) {
-                resetarSessao();
-            }
-        });
+        function alternarTelas() {
+            document.getElementById('cardLogin').classList.toggle('hidden');
+            document.getElementById('cardCadastro').classList.toggle('hidden');
+        }
 
-        // Função para exibir o alerta padronizado (substituindo o alert nativo)
         let proximoPasso = null;
-        function exibirAlerta(mensagem, callback = null) {
-            document.getElementById('alertMsg').innerText = mensagem;
+        function exibirAlerta(msg, callback = null) {
+            document.getElementById('alertMsg').innerText = msg;
             document.getElementById('customAlert').style.display = 'flex';
             proximoPasso = callback;
         }
@@ -227,55 +246,69 @@
             if (proximoPasso) proximoPasso();
         }
 
+        function registrarUsuario(e) {
+            e.preventDefault();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('regSenha').value;
+            const usuarios = JSON.parse(localStorage.getItem('wms_usuarios'));
+
+            if (!email.endsWith('@transpetro.com.br') && email !== EMAIL_ADMIN) {
+                exibirAlerta('⚠️ Erro!\nUtilize um e-mail @transpetro.com.br');
+                return;
+            }
+
+            if (usuarios[email]) {
+                exibirAlerta('⚠️ Este e-mail já está cadastrado.');
+                return;
+            }
+
+            usuarios[email] = { 
+                senha: senha, 
+                perfil: "OPERACIONAL", 
+                nome: email.split('@')[0] 
+            };
+            
+            localStorage.setItem('wms_usuarios', JSON.stringify(usuarios));
+            exibirAlerta('✅ Cadastro realizado com sucesso!', () => alternarTelas());
+        }
+
         function validarLogin(e) {
             e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('loginSenha').value;
+            const usuarios = JSON.parse(localStorage.getItem('wms_usuarios'));
 
-            const email = document.getElementById('txtEmail').value.trim().toLowerCase();
-            const senha = document.getElementById('txtSenha').value;
+            const usuario = usuarios[email];
 
-            // 1. VALIDAÇÃO DE DOMÍNIO E E-MAIL ADMINISTRATIVO
-            const emailAdmin = "joao.torres33@live.com";
-            
-            if (email !== emailAdmin && !email.endsWith('@transpetro.com.br')) {
-                exibirAlerta('⚠️ Acesso Negado!\n\nEste sistema é exclusivo para colaboradores Transpetro ou Administração. Utilize seu e-mail institucional.');
+            if (!usuario || usuario.senha !== senha) {
+                exibirAlerta('❌ Acesso Negado!\nE-mail ou senha incorretos.');
                 return;
             }
 
-            // 2. DEFINIÇÃO DE PERFIL
-            let perfil = "OPERACIONAL";
-            if (email === emailAdmin) {
-                perfil = "GERENCIAL";
-            }
-
-            // 3. BLOQUEIO DE DOMINGO PARA OPERACIONAL
-            const diaSemana = new Date().getDay(); // 0 = Domingo
-            if (diaSemana === 0 && perfil === 'OPERACIONAL') {
-                exibirAlerta('⛔ Operação Indisponível!\n\nAcessos operacionais estão suspensos aos domingos para manutenção de banco de dados.');
+            // Bloqueio de Domingo para Operacional
+            const diaSemana = new Date().getDay();
+            if (diaSemana === 0 && usuario.perfil === 'OPERACIONAL') {
+                exibirAlerta('⛔ Operação Indisponível!\nAcessos operacionais suspensos aos domingos.');
                 return;
             }
 
-            // 4. MENSAGEM PADRÃO DE ALERT PADRONIZADA
-            if (perfil === "GERENCIAL") {
-                exibirAlerta('🔓 Bem-vindo, Dário! Acesso de Administrador liberado.', () => {
-                    localStorage.setItem('wms_usuario_ativo', 'Dário João Torres');
-                    localStorage.setItem('wms_chave_ativa', 'GERENTE-01');
-                    finalizarLogin(perfil, email);
-                });
-            } else {
-                exibirAlerta('✅ Login efetuado com sucesso!', () => {
-                    localStorage.setItem('wms_usuario_ativo', email.split('@')[0]);
-                    localStorage.setItem('wms_chave_ativa', 'OPERADOR-01');
-                    finalizarLogin(perfil, email);
-                });
-            }
+            const saudacao = usuario.perfil === "GERENCIAL" 
+                ? `🔓 Bem-vindo, ${usuario.nome}!\nAcesso de Administrador liberado.` 
+                : `✅ Login efetuado com sucesso!\nBem-vindo, ${usuario.nome}.`;
+
+            exibirAlerta(saudacao, () => {
+                localStorage.setItem('wms_sessao_ativa', 'true');
+                localStorage.setItem('wms_usuario_ativo', usuario.nome);
+                localStorage.setItem('wms_perfil', usuario.perfil);
+                localStorage.setItem('wms_email', email);
+                window.location.replace('menu.html');
+            });
         }
 
-        function finalizarLogin(perfil, email) {
-            localStorage.setItem('wms_perfil', perfil);
-            localStorage.setItem('wms_email', email);
-            localStorage.setItem('wms_sessao_ativa', 'true');
-            window.location.replace('menu.html');
-        }
+        // Limpeza de sessão ao carregar
+        window.onload = () => {
+            localStorage.removeItem('wms_sessao_ativa');
+        };
     </script>
 </body>
 </html>
