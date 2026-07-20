@@ -4,16 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Inteligente - Acesso Seguro</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        :root {
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --input-bg: #f9fafb;
+            --input-border: #d1d5db;
+            --primary-color: #10b981;
+            --footer-text: #6b7280;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0b101d;
+                --card-bg: #111827;
+                --text-color: #ffffff;
+                --input-bg: #374151;
+                --input-border: #4b5563;
+                --footer-text: #9ca3af;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; transition: background 0.3s, color 0.3s; }
 
         body {
-            /* Imagem de fundo otimizada (URL externa para evitar lentidão do Base64 no mobile) */
-            background: linear-gradient(rgba(11, 16, 29, 0.85), rgba(11, 16, 29, 0.85)), 
-                        url('https://i.imgur.com/K5f4gB1.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            background-color: #0b101d;
-            color: #ffffff;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -25,52 +47,61 @@
         .login-card {
             width: 100%;
             max-width: 380px;
-            background: #111827;
-            border: 1px solid #1f2937;
+            background: var(--card-bg);
+            border: 1px solid var(--input-border);
             padding: 35px 25px;
             border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             text-align: center;
-            z-index: 2;
         }
 
-        .login-card h2 { font-size: 26px; margin-bottom: 20px; color: #10b981; }
+        .login-card h2 { font-size: 26px; margin-bottom: 25px; color: var(--primary-color); }
 
-        .form-group { margin-bottom: 18px; text-align: left; }
-        label { font-size: 13px; color: #9ca3af; display: block; margin-bottom: 5px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { font-size: 13px; color: var(--footer-text); display: block; margin-bottom: 6px; }
         input {
-            width: 100%; background: #374151; border: 1px solid #4b5563;
-            padding: 12px; border-radius: 8px; color: white; outline: none;
+            width: 100%; background: var(--input-bg); border: 1px solid var(--input-border);
+            padding: 12px; border-radius: 8px; color: var(--text-color); outline: none;
         }
-        input:focus { border-color: #10b981; }
+        input:focus { border-color: var(--primary-color); }
 
-        .btn-primary {
-            width: 100%; background: #10b981; color: white; border: none;
-            padding: 13px; border-radius: 8px; font-weight: 600; cursor: pointer;
+        .btn-entrar {
+            width: 100%; background: var(--primary-color); color: white; border: none;
+            padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;
         }
 
-        .info-seguranca {
-            margin-top: 20px; font-size: 10px; color: #4b5563; line-height: 1.4;
+        .rodape-login {
+            margin-top: 30px;
+            font-size: 11px;
+            color: var(--footer-text);
+            text-align: center;
+            max-width: 380px;
+            line-height: 1.5;
+        }
+
+        .aviso-restrito {
+            color: #f87171;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
         }
 
         /* Modal */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-content {
-            background: #1f2937; padding: 25px; border-radius: 12px; max-width: 320px; text-align: center;
+            background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 320px; text-align: center; border: 1px solid var(--input-border);
         }
-        .modal-btn { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
-
-        .hidden { display: none; }
+        .modal-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="login-card" id="cardLogin">
+    <div class="login-card">
         <h2>Acessar WMS</h2>
-        <form onsubmit="validarAcesso(event)">
+        <form id="loginForm">
             <div class="form-group">
                 <label>E-mail Corporativo:</label>
                 <input type="email" id="email" placeholder="joao-torres33@live.com" required>
@@ -79,54 +110,42 @@
                 <label>Senha do Sistema:</label>
                 <input type="password" id="senha" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="btn-primary">Entrar com Segurança</button>
+            <button type="submit" class="btn-entrar" id="btnAcao">Entrar no Sistema</button>
         </form>
-        
-        <div class="info-seguranca">
-            🔒 Seu acesso está sendo monitorado.<br>
-            IP: <span id="userIP">Carregando...</span><br>
-            Dispositivo: <span id="userDevice">Detectando...</span>
-        </div>
+    </div>
+
+    <div class="rodape-login">
+        &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+        Projeto independente desenvolvido e de propriedade exclusiva de<br>
+        <strong>Dário João Torres</strong>.<br>
+        <span class="aviso-restrito">⚠️ AVISO DE USO RESTRITO: Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
     </div>
 
     <div id="customAlert" class="modal">
         <div class="modal-content">
-            <div id="alertMsg" style="color: white; font-size: 14px; white-space: pre-line;"></div>
+            <div id="alertMsg" style="font-size: 14px; white-space: pre-line;"></div>
             <button class="modal-btn" onclick="fecharAlerta()">OK</button>
         </div>
     </div>
 
     <script>
-        // Configurações de Segurança
+        // Configuração do Firebase fornecida pelo usuário
+        const firebaseConfig = {
+            apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
+            authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
+            projectId: "bolao-copa-2026-d264f",
+            storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
+            messagingSenderId: "802924891915",
+            appId: "1:802924891915:web:d9c641161733b510559c0e",
+            measurementId: "G-QQ210F367M"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
         const ADM_EMAIL = "joao-torres33@live.com";
-        let dadosSeguranca = { ip: "", device: "", geo: "" };
-
-        // 1. Capturar Dados do Dispositivo e IP
-        async function capturarSeguranca() {
-            // Detectar Dispositivo
-            const ua = navigator.userAgent;
-            if (/android/i.test(ua)) dadosSeguranca.device = "Android Device";
-            else if (/iPhone|iPad/i.test(ua)) dadosSeguranca.device = "iOS Device";
-            else dadosSeguranca.device = "Desktop/PC";
-            document.getElementById('userDevice').innerText = dadosSeguranca.device;
-
-            // Detectar IP (usando API pública gratuita)
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                dadosSeguranca.ip = data.ip;
-                document.getElementById('userIP').innerText = data.ip;
-            } catch (e) {
-                dadosSeguranca.ip = "Não detectado";
-            }
-
-            // Detectar Localização
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    dadosSeguranca.geo = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-                });
-            }
-        }
 
         function exibirAlerta(msg) {
             document.getElementById('alertMsg').innerText = msg;
@@ -137,36 +156,73 @@
             document.getElementById('customAlert').style.display = 'none';
         }
 
-        async function validarAcesso(e) {
+        // Capturar IP e Informações do Dispositivo
+        async function obterDadosSeguranca() {
+            let ip = "Desconhecido";
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                ip = data.ip;
+            } catch (e) {}
+            
+            return {
+                ip: ip,
+                dispositivo: navigator.userAgent,
+                plataforma: navigator.platform,
+                dataAcesso: new Date().toLocaleString('pt-BR'),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
             const senha = document.getElementById('senha').value;
+            const btn = document.getElementById('btnAcao');
 
-            // Log de Segurança (Simulado para o Firebase)
-            console.log("Tentativa de Acesso:", {
-                usuario: email,
-                ip: dadosSeguranca.ip,
-                dispositivo: dadosSeguranca.device,
-                local: dadosSeguranca.geo,
-                data: new Date().toLocaleString()
-            });
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
 
-            // Regra de Domínio
+            // 1. Trava de Domínio
             if (email !== ADM_EMAIL && !email.endsWith("@transpetro.com.br")) {
-                exibirAlerta("❌ ACESSO NEGADO!\n\nEste dispositivo e e-mail não possuem autorização para este sistema.");
+                exibirAlerta("❌ ACESSO NEGADO!\n\nEste sistema é exclusivo para colaboradores Transpetro.");
+                btn.disabled = false;
+                btn.innerText = "Entrar no Sistema";
                 return;
             }
 
-            // Validação (Aqui entra o Firebase no próximo passo)
-            if (email === ADM_EMAIL && senha === "admin123") {
-                exibirAlerta(`🔓 Bem-vindo, Administrador!\n\nIP: ${dadosSeguranca.ip}\nDispositivo: ${dadosSeguranca.device}\nAcesso registrado com sucesso.`);
-                setTimeout(() => { window.location.replace('menu.html'); }, 2000);
-            } else {
-                exibirAlerta("✅ Login efetuado!\nVerificando credenciais no banco de dados...");
-            }
-        }
+            // 2. Obter dados de segurança para o log
+            const dadosSeg = await obterDadosSeguranca();
 
-        window.onload = capturarSeguranca;
+            try {
+                // Tentar Login no Firebase
+                // Nota: Você deve criar esses usuários no Console do Firebase > Authentication
+                await auth.signInWithEmailAndPassword(email, senha);
+
+                // 3. Registrar Log de Sucesso no Firestore
+                await db.collection("logs_acesso").add({
+                    usuario: email,
+                    status: "SUCESSO",
+                    ...dadosSeg
+                });
+
+                exibirAlerta(`🔓 Acesso Liberado!\nBem-vindo ao WMS.`);
+                setTimeout(() => { window.location.replace('menu.html'); }, 1500);
+
+            } catch (error) {
+                // Registrar Log de Falha
+                await db.collection("logs_acesso").add({
+                    usuario: email,
+                    status: "FALHA",
+                    erro: error.message,
+                    ...dadosSeg
+                });
+
+                exibirAlerta("❌ Erro de Autenticação!\nE-mail ou senha incorretos, ou usuário não cadastrado no Firebase.");
+                btn.disabled = false;
+                btn.innerText = "Entrar no Sistema";
+            }
+        });
     </script>
 </body>
 </html>
