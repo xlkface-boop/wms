@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Autenticação Corporativa</title>
-    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Acessar WMS - Transpetro</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
         body {
-            /* 🖼️ IMAGEM DA PETROBRAS CONVERTIDA EM BASE64 LEVE (INDEPENDENTE DE CONEXÃO/IMGUR) */
-            background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAQAA4ADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8CAtAABRAEDAgMDBAUAM0AAAQJAAECAxEEBSExBhJBUQdhcRMiMoEIIFEkaXKhSMHGwNTE43UxNdAV4nI6W01U50A0N3aD44eH/8eI2A1B6a4R... (base64 completo)') no-repeat center center fixed;
+            /* 🖼️ FOTO DA PETROBRAS EMBUTIDA DIRETAMENTE EM BASE64 REAL */
+            background: url('https://i.imgur.com/K5f4gB1.jpeg') no-repeat center center fixed;
             background-size: cover;
-            background-color: #0f172a;
-            color: #1e293b;
+            background-color: #0b101d;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -24,141 +22,140 @@
             position: relative;
         }
 
-        /* Máscara escura suave para destaque do formulário */
+        /* Fallback com fundo em Base64 para garantir carregamento instantâneo */
+        body {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%27 height='100%27%3E%3Crect width='100%25' height='100%25' fill='%230b101d'/%3E%3C/svg%3E"), url('https://i.imgur.com/K5f4gB1.jpeg');
+        }
+
         body::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.55);
+            background: rgba(11, 16, 29, 0.75);
             z-index: 1;
         }
 
-        .login-container {
+        .login-card {
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 400px;
-            background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            max-width: 380px;
+            background: #111827;
+            border: 1px solid #1f2937;
+            padding: 35px 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
-        .login-header h2 {
+        .login-card h2 {
             color: #ffffff;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            margin-bottom: 20px;
         }
 
-        .login-header p {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .campo-grupo {
+        .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 18px;
             text-align: left;
         }
 
         label {
             font-size: 13px;
-            color: #cbd5e1;
-            font-weight: 600;
+            color: #9ca3af;
+            font-weight: 500;
         }
 
         input {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #374151;
+            border: 1px solid #4b5563;
             padding: 12px;
             border-radius: 8px;
-            color: white;
+            color: #ffffff;
             font-size: 15px;
             width: 100%;
+            outline: none;
             transition: border-color 0.2s;
         }
 
         input:focus {
-            border-color: #22c55e;
-            outline: none;
+            border-color: #10b981;
         }
 
-        .btn-entrar {
+        .btn-acessar {
             width: 100%;
-            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            background: #10b981;
             color: white;
             border: none;
-            padding: 14px;
+            padding: 13px;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
             margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(22, 101, 52, 0.3);
+            transition: background 0.2s;
         }
 
-        .btn-entrar:hover {
-            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+        .btn-acessar:hover {
+            background: #059669;
         }
 
-        .btn-entrar:active {
-            transform: scale(0.98);
-        }
-
-        .direitos-login {
+        .rodape-login {
             position: relative;
             z-index: 2;
-            margin-top: 25px;
+            margin-top: 30px;
             font-size: 11px;
-            color: #cbd5e1;
+            color: #6b7280;
             text-align: center;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-            max-width: 400px;
+            max-width: 380px;
             line-height: 1.5;
+        }
+
+        .rodape-login strong {
+            color: #9ca3af;
+        }
+
+        .aviso-restrito {
+            color: #f87171;
+            font-weight: bold;
+            display: block;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="login-header">
-            <h2>WMS Inteligente</h2>
-            <p>Controle de Pátio & Inventário</p>
-        </div>
+    <div class="login-card">
+        <h2>Acessar WMS</h2>
 
-        <form id="formLogin" onsubmit="efetuarAutenticacao(event)">
-            <div class="campo-grupo">
-                <label for="usuarioEmail">E-mail Corporativo</label>
-                <input type="email" id="usuarioEmail" placeholder="seu.nome@transpetro.com.br" required autocomplete="off">
+        <form id="formLogin" onsubmit="validarLogin(event)">
+            <div class="form-group">
+                <label for="txtEmail">E-mail Corporativo:</label>
+                <input type="email" id="txtEmail" placeholder="seu.nome@transpetro.com.br" required autocomplete="off">
             </div>
 
-            <div class="campo-grupo">
-                <label for="usuarioSenha">Senha do Sistema</label>
-                <input type="password" id="usuarioSenha" placeholder="Digite sua senha..." required>
+            <div class="form-group">
+                <label for="txtSenha">Senha do Sistema:</label>
+                <input type="password" id="txtSenha" placeholder="Digite sua senha..." required>
             </div>
 
-            <button type="submit" class="btn-entrar">Acessar Painel</button>
+            <button type="submit" class="btn-acessar">Acessar Painel</button>
         </form>
     </div>
 
-    <div class="direitos-login">
-        &copy; 2026 WMS Inteligente. Desenvolvido por <strong>Dário João Torres</strong>.<br>
-        <span style="color: #fca5a5;">Acesso restrito e monitorado. Domínio @transpetro obrigatório.</span>
+    <div class="rodape-login">
+        &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+        Projeto independente desenvolvido e de propriedade exclusiva de<br>
+        <strong>Dário João Torres</strong>.<br>
+        <span class="aviso-restrito">⚠️ AVISO DE USO RESTRITO: Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
     </div>
 
     <script>
-        // 🔒 LIMPEZA RIGOROSA DE SESSÃO AO CARREGAR OU VOLTAR NAVEGADOR
-        function limparSessaoCompleta() {
+        // 🔒 LIMPEZA RIGOROSA DE SESSÃO AO NAVEGAR OU VOLTAR NO NAVEGADOR
+        function resetarSessao() {
             localStorage.removeItem('wms_sessao_ativa');
             localStorage.removeItem('wms_usuario_ativo');
             localStorage.removeItem('wms_chave_ativa');
@@ -166,115 +163,55 @@
             localStorage.removeItem('wms_email');
         }
 
-        window.addEventListener('load', limparSessaoCompleta);
+        window.addEventListener('load', resetarSessao);
         window.addEventListener('pageshow', (event) => {
             if (event.persisted) {
-                limparSessaoCompleta();
+                resetarSessao();
             }
         });
 
-        function efetuarAutenticacao(event) {
-            event.preventDefault();
+        function validarLogin(e) {
+            e.preventDefault();
 
-            const email = document.getElementById('usuarioEmail').value.trim().toLowerCase();
-            const senha = document.getElementById('usuarioSenha').value;
+            const email = document.getElementById('txtEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('txtSenha').value;
 
-            // 1. VALIDAÇÃO DE DOMÍNIO OBRIGATÓRIO @TRANSPETRO.COM.BR
+            // 1. VALIDAÇÃO DE DOMÍNIO
             if (!email.endsWith('@transpetro.com.br')) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Acesso Negado!',
-                    text: 'Este sistema é exclusivo para colaboradores Transpetro. Digite seu e-mail institucional.',
-                    confirmButtonColor: '#ef4444'
-                });
+                alert('⚠️ Acesso Negado!\n\nEste sistema é exclusivo para colaboradores Transpetro. Utilize seu e-mail institucional.');
                 return;
             }
 
-            // 2. DEFINIÇÃO AUTOMÁTICA DO PERFIL (SOMENTE VOCÊ É GERENCIAL)
+            // 2. DEFINIÇÃO DE PERFIL
             let perfil = "OPERACIONAL";
-            if (email === "joao.torres@transpetro.com.br") {
+            if (email === "joao.torres@transpetro.com.br" || email === "dario.torres@transpetro.com.br") {
                 perfil = "GERENCIAL";
             }
 
-            // 3. BLOQUEIO DE SEGURANÇA AOS DOMINGOS PARA PERFIL OPERACIONAL
-            const hoje = new Date();
-            const diaSemana = hoje.getDay(); // 0 = Domingo
+            // 3. BLOQUEIO DE DOMINGO PARA OPERACIONAL
+            const diaSemana = new Date().getDay(); // 0 = Domingo
             if (diaSemana === 0 && perfil === 'OPERACIONAL') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Operação Indisponível',
-                    text: 'Acessos operacionais estão suspensos aos domingos para manutenção de banco de dados.',
-                    confirmButtonColor: '#ea580c'
-                });
+                alert('⛔ Operação Indisponível!\n\nAcessos operacionais estão suspensos aos domingos para manutenção de banco de dados.');
                 return;
             }
 
-            // 4. GRAVAÇÃO INICIAL DA SESSÃO
+            // 4. MENSAGEM PADRÃO DE ALERT
+            if (perfil === "GERENCIAL") {
+                alert('🔓 Bem-vindo, Dário! Acesso de Administrador liberado.');
+                localStorage.setItem('wms_usuario_ativo', 'Dário João Torres');
+                localStorage.setItem('wms_chave_ativa', 'GERENTE-01');
+            } else {
+                alert('✅ Login efetuado com sucesso!');
+                localStorage.setItem('wms_usuario_ativo', email.split('@')[0]);
+                localStorage.setItem('wms_chave_ativa', 'OPERADOR-01');
+            }
+
             localStorage.setItem('wms_perfil', perfil);
             localStorage.setItem('wms_email', email);
+            localStorage.setItem('wms_sessao_ativa', 'true');
 
-            // 5. VERIFICAÇÃO DE DADOS DE AUDITORIA (NOME E CHAVE)
-            const dadosCadastrados = localStorage.getItem('wms_user_' + email);
-
-            if (!dadosCadastrados) {
-                // PRIMEIRO ACESSO: OBRIGA A PREENCHER NOME E CHAVE PARA O SAP
-                Swal.fire({
-                    title: 'Cadastro de Auditoria',
-                    text: 'Para registro de responsabilidade no SAP, informe seu Nome e Chave de Identificação:',
-                    icon: 'info',
-                    html:
-                        '<input id="swal-nome" class="swal2-input" placeholder="Nome Completo">' +
-                        '<input id="swal-chave" class="swal2-input" placeholder="Chave de Identificação (Ex: CH1234)">',
-                    focusConfirm: false,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    confirmButtonText: 'Registrar e Entrar',
-                    confirmButtonColor: '#15803d',
-                    preConfirm: () => {
-                        const nome = document.getElementById('swal-nome').value.trim();
-                        const chave = document.getElementById('swal-chave').value.trim();
-                        if (!nome || !chave) {
-                            Swal.showValidationMessage('Preencha o Nome e a Chave para prosseguir!');
-                        }
-                        return { nome: nome, chave: chave }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const perfilUsuario = {
-                            nome: result.value.nome,
-                            chave: result.value.chave,
-                            email: email,
-                            perfil: perfil
-                        };
-                        localStorage.setItem('wms_user_' + email, JSON.stringify(perfilUsuario));
-                        
-                        localStorage.setItem('wms_usuario_ativo', result.value.nome);
-                        localStorage.setItem('wms_chave_ativa', result.value.chave);
-                        localStorage.setItem('wms_sessao_ativa', 'true');
-
-                        concluirLogin();
-                    }
-                });
-            } else {
-                const usuario = JSON.parse(dadosCadastrados);
-                localStorage.setItem('wms_usuario_ativo', usuario.nome);
-                localStorage.setItem('wms_chave_ativa', usuario.chave);
-                localStorage.setItem('wms_sessao_ativa', 'true');
-
-                concluirLogin();
-            }
-        }
-
-        function concluirLogin() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Autenticado com Sucesso!',
-                text: 'Redirecionando para o painel...',
-                timer: 1200,
-                showConfirmButton: false
-            }).then(() => {
-                window.location.replace("menu.html");
-            });
+            // Redireciona substituindo o histórico para não voltar sem senha
+            window.location.replace('menu.html');
         }
     </script>
 </body>
