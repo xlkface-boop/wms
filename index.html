@@ -8,7 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
         body {
-            /* 🖼️ FOTO DA PETROBRAS EMBUTIDA DIRETAMENTE EM BASE64 REAL */
+            /* 🖼️ Imagem de fundo corrigida para funcionar como plano de fundo do sistema */
             background: url('https://i.imgur.com/K5f4gB1.jpeg') no-repeat center center fixed;
             background-size: cover;
             background-color: #0b101d;
@@ -20,13 +20,10 @@
             min-height: 100vh;
             padding: 20px;
             position: relative;
+            overflow: hidden;
         }
 
-        /* Fallback com fundo em Base64 para garantir carregamento instantâneo */
-        body {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%27 height='100%27%3E%3Crect width='100%25' height='100%25' fill='%230b101d'/%3E%3C/svg%3E"), url('https://i.imgur.com/K5f4gB1.jpeg');
-        }
-
+        /* Overlay para garantir legibilidade sobre a imagem */
         body::before {
             content: '';
             position: absolute;
@@ -124,6 +121,45 @@
             display: block;
             margin-top: 4px;
         }
+
+        /* 🔔 Estilização do Alerta Padronizado (Modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #1f2937;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #374151;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-text {
+            color: #ffffff;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -153,6 +189,14 @@
         <span class="aviso-restrito">⚠️ AVISO DE USO RESTRITO: Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
     </div>
 
+    <!-- Estrutura do Modal Padronizado -->
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-content">
+            <div id="alertMsg" class="modal-text"></div>
+            <button class="modal-btn" onclick="fecharAlerta()">OK</button>
+        </div>
+    </div>
+
     <script>
         // 🔒 LIMPEZA RIGOROSA DE SESSÃO AO NAVEGAR OU VOLTAR NO NAVEGADOR
         function resetarSessao() {
@@ -170,47 +214,66 @@
             }
         });
 
+        // Função para exibir o alerta padronizado (substituindo o alert nativo)
+        let proximoPasso = null;
+        function exibirAlerta(mensagem, callback = null) {
+            document.getElementById('alertMsg').innerText = mensagem;
+            document.getElementById('customAlert').style.display = 'flex';
+            proximoPasso = callback;
+        }
+
+        function fecharAlerta() {
+            document.getElementById('customAlert').style.display = 'none';
+            if (proximoPasso) proximoPasso();
+        }
+
         function validarLogin(e) {
             e.preventDefault();
 
             const email = document.getElementById('txtEmail').value.trim().toLowerCase();
             const senha = document.getElementById('txtSenha').value;
 
-            // 1. VALIDAÇÃO DE DOMÍNIO
-            if (!email.endsWith('@transpetro.com.br')) {
-                alert('⚠️ Acesso Negado!\n\nEste sistema é exclusivo para colaboradores Transpetro. Utilize seu e-mail institucional.');
+            // 1. VALIDAÇÃO DE DOMÍNIO E E-MAIL ADMINISTRATIVO
+            const emailAdmin = "joao.torres33@live.com";
+            
+            if (email !== emailAdmin && !email.endsWith('@transpetro.com.br')) {
+                exibirAlerta('⚠️ Acesso Negado!\n\nEste sistema é exclusivo para colaboradores Transpetro ou Administração. Utilize seu e-mail institucional.');
                 return;
             }
 
             // 2. DEFINIÇÃO DE PERFIL
             let perfil = "OPERACIONAL";
-            if (email === "joao.torres@transpetro.com.br" || email === "dario.torres@transpetro.com.br") {
+            if (email === emailAdmin) {
                 perfil = "GERENCIAL";
             }
 
             // 3. BLOQUEIO DE DOMINGO PARA OPERACIONAL
             const diaSemana = new Date().getDay(); // 0 = Domingo
             if (diaSemana === 0 && perfil === 'OPERACIONAL') {
-                alert('⛔ Operação Indisponível!\n\nAcessos operacionais estão suspensos aos domingos para manutenção de banco de dados.');
+                exibirAlerta('⛔ Operação Indisponível!\n\nAcessos operacionais estão suspensos aos domingos para manutenção de banco de dados.');
                 return;
             }
 
-            // 4. MENSAGEM PADRÃO DE ALERT
+            // 4. MENSAGEM PADRÃO DE ALERT PADRONIZADA
             if (perfil === "GERENCIAL") {
-                alert('🔓 Bem-vindo, Dário! Acesso de Administrador liberado.');
-                localStorage.setItem('wms_usuario_ativo', 'Dário João Torres');
-                localStorage.setItem('wms_chave_ativa', 'GERENTE-01');
+                exibirAlerta('🔓 Bem-vindo, Dário! Acesso de Administrador liberado.', () => {
+                    localStorage.setItem('wms_usuario_ativo', 'Dário João Torres');
+                    localStorage.setItem('wms_chave_ativa', 'GERENTE-01');
+                    finalizarLogin(perfil, email);
+                });
             } else {
-                alert('✅ Login efetuado com sucesso!');
-                localStorage.setItem('wms_usuario_ativo', email.split('@')[0]);
-                localStorage.setItem('wms_chave_ativa', 'OPERADOR-01');
+                exibirAlerta('✅ Login efetuado com sucesso!', () => {
+                    localStorage.setItem('wms_usuario_ativo', email.split('@')[0]);
+                    localStorage.setItem('wms_chave_ativa', 'OPERADOR-01');
+                    finalizarLogin(perfil, email);
+                });
             }
+        }
 
+        function finalizarLogin(perfil, email) {
             localStorage.setItem('wms_perfil', perfil);
             localStorage.setItem('wms_email', email);
             localStorage.setItem('wms_sessao_ativa', 'true');
-
-            // Redireciona substituindo o histórico para não voltar sem senha
             window.location.replace('menu.html');
         }
     </script>
