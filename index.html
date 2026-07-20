@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Acesso Seguro</title>
+    <title>WMS Inteligente - Acesso</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
@@ -65,9 +65,15 @@
         }
         input:focus { border-color: var(--primary-color); }
 
-        .btn-entrar {
+        .btn-acao {
             width: 100%; background: var(--primary-color); color: white; border: none;
             padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .btn-toggle {
+            background: transparent; color: var(--footer-text); border: none;
+            font-size: 13px; cursor: pointer; text-decoration: underline;
         }
 
         .rodape-login {
@@ -86,7 +92,6 @@
             margin-top: 5px;
         }
 
-        /* Modal */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
@@ -95,22 +100,28 @@
             background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 320px; text-align: center; border: 1px solid var(--input-border);
         }
         .modal-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2>Acessar WMS</h2>
-        <form id="loginForm">
+        <h2 id="tituloTela">Acessar WMS</h2>
+        
+        <!-- Formulário Único para Login e Cadastro -->
+        <form id="authForm">
             <div class="form-group">
                 <label>E-mail Corporativo:</label>
-                <input type="email" id="email" placeholder="joao-torres33@live.com" required>
+                <!-- Placeholder alterado para não vir preenchido -->
+                <input type="email" id="email" placeholder="exemplo@transpetro.com.br" required autocomplete="off">
             </div>
             <div class="form-group">
                 <label>Senha do Sistema:</label>
                 <input type="password" id="senha" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="btn-entrar" id="btnAcao">Entrar no Sistema</button>
+            <button type="submit" class="btn-acao" id="btnPrincipal">Entrar no Sistema</button>
+            <button type="button" class="btn-toggle" id="btnToggle" onclick="alternarModo()">Não tem conta? Criar Acesso</button>
         </form>
     </div>
 
@@ -129,7 +140,6 @@
     </div>
 
     <script>
-        // Configuração do Firebase fornecida pelo usuário
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
             authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
@@ -140,12 +150,12 @@
             measurementId: "G-QQ210F367M"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
         const ADM_EMAIL = "joao-torres33@live.com";
+        let modoLogin = true;
 
         function exibirAlerta(msg) {
             document.getElementById('alertMsg').innerText = msg;
@@ -156,7 +166,13 @@
             document.getElementById('customAlert').style.display = 'none';
         }
 
-        // Capturar IP e Informações do Dispositivo
+        function alternarModo() {
+            modoLogin = !modoLogin;
+            document.getElementById('tituloTela').innerText = modoLogin ? "Acessar WMS" : "Criar Acesso";
+            document.getElementById('btnPrincipal').innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
+            document.getElementById('btnToggle').innerText = modoLogin ? "Não tem conta? Criar Acesso" : "Já tenho conta. Entrar";
+        }
+
         async function obterDadosSeguranca() {
             let ip = "Desconhecido";
             try {
@@ -164,65 +180,71 @@
                 const data = await res.json();
                 ip = data.ip;
             } catch (e) {}
-            
             return {
                 ip: ip,
                 dispositivo: navigator.userAgent,
-                plataforma: navigator.platform,
                 dataAcesso: new Date().toLocaleString('pt-BR'),
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
         }
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
             const senha = document.getElementById('senha').value;
-            const btn = document.getElementById('btnAcao');
+            const btn = document.getElementById('btnPrincipal');
 
             btn.disabled = true;
-            btn.innerText = "Verificando...";
+            btn.innerText = "Processando...";
 
-            // 1. Trava de Domínio
+            // Trava de Domínio
             if (email !== ADM_EMAIL && !email.endsWith("@transpetro.com.br")) {
-                exibirAlerta("❌ ACESSO NEGADO!\n\nEste sistema é exclusivo para colaboradores Transpetro.");
+                exibirAlerta("❌ ACESSO NEGADO!\n\nUtilize seu e-mail institucional @transpetro.com.br.");
                 btn.disabled = false;
-                btn.innerText = "Entrar no Sistema";
+                btn.innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
                 return;
             }
 
-            // 2. Obter dados de segurança para o log
             const dadosSeg = await obterDadosSeguranca();
 
             try {
-                // Tentar Login no Firebase
-                // Nota: Você deve criar esses usuários no Console do Firebase > Authentication
-                await auth.signInWithEmailAndPassword(email, senha);
-
-                // 3. Registrar Log de Sucesso no Firestore
-                await db.collection("logs_acesso").add({
-                    usuario: email,
-                    status: "SUCESSO",
-                    ...dadosSeg
-                });
-
-                exibirAlerta(`🔓 Acesso Liberado!\nBem-vindo ao WMS.`);
-                setTimeout(() => { window.location.replace('menu.html'); }, 1500);
-
+                if (modoLogin) {
+                    // LOGIN
+                    await auth.signInWithEmailAndPassword(email, senha);
+                    await db.collection("logs_acesso").add({ usuario: email, status: "LOGIN_SUCESSO", ...dadosSeg });
+                    exibirAlerta(`🔓 Bem-vindo!\nAcesso liberado.`);
+                    setTimeout(() => { window.location.replace('menu.html'); }, 1500);
+                } else {
+                    // CADASTRO
+                    await auth.createUserWithEmailAndPassword(email, senha);
+                    await db.collection("usuarios").doc(email).set({
+                        email: email,
+                        perfil: (email === ADM_EMAIL ? "GERENCIAL" : "OPERACIONAL"),
+                        dataCadastro: new Date().toISOString()
+                    });
+                    await db.collection("logs_acesso").add({ usuario: email, status: "CADASTRO_SUCESSO", ...dadosSeg });
+                    exibirAlerta("✅ Cadastro realizado!\nAgora você já pode entrar.");
+                    alternarModo();
+                }
             } catch (error) {
-                // Registrar Log de Falha
-                await db.collection("logs_acesso").add({
-                    usuario: email,
-                    status: "FALHA",
-                    erro: error.message,
-                    ...dadosSeg
-                });
-
-                exibirAlerta("❌ Erro de Autenticação!\nE-mail ou senha incorretos, ou usuário não cadastrado no Firebase.");
-                btn.disabled = false;
-                btn.innerText = "Entrar no Sistema";
+                let msgErro = "Ocorreu um erro. Verifique seus dados.";
+                if (error.code === "auth/email-already-in-use") msgErro = "Este e-mail já está em uso.";
+                if (error.code === "auth/wrong-password") msgErro = "Senha incorreta.";
+                if (error.code === "auth/user-not-found") msgErro = "Usuário não encontrado.";
+                
+                await db.collection("logs_acesso").add({ usuario: email, status: "ERRO", erro: error.code, ...dadosSeg });
+                exibirAlerta("❌ " + msgErro);
             }
+
+            btn.disabled = false;
+            btn.innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
         });
+
+        // Garante que os campos comecem limpos
+        window.onload = () => {
+            document.getElementById('email').value = "";
+            document.getElementById('senha').value = "";
+        };
     </script>
 </body>
 </html>
