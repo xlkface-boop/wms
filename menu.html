@@ -147,6 +147,40 @@
             gap: 10px;
         }
 
+        /* Upload Cards */
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .upload-card {
+            background: var(--input-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .upload-card:hover {
+            border-color: var(--primary-color);
+        }
+
+        .upload-card-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .upload-card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
         /* Grid de Gráficos do Dashboard */
         .dashboard-grid {
             display: grid;
@@ -228,6 +262,15 @@
             cursor: pointer;
             font-size: 13px;
         }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .status-success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .status-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
         /* Tabelas */
         .table-responsive {
@@ -326,7 +369,7 @@
     <!-- MAIN CONTENT AREA -->
     <div class="content-area">
 
-        <!-- 1. CONSULTA NM -->
+        <!-- 1. CONSULTA NM (Filtro por Depósito Restaurado) -->
         <div id="view-consulta" class="view-section active">
             <div class="card">
                 <div class="card-header-title">🔍 Consulta Qualificada de Materiais</div>
@@ -338,7 +381,14 @@
                     <div class="form-group">
                         <label>Filtrar por Depósito:</label>
                         <select class="form-control">
-                            <option>Todos os Depósitos</option>
+                            <option value="">Todos os Depósitos</option>
+                            <option value="1001">1001 - Depósito Central</option>
+                            <option value="1002">1002 - Almoxarifado Principal</option>
+                            <option value="1003">1003 - Tubulações e Conexões</option>
+                            <option value="1004">1004 - Válvulas e Instrumentação</option>
+                            <option value="1005">1005 - Equipamentos de Segurança (EPI)</option>
+                            <option value="1006">1006 - Químicos e Lubrificantes</option>
+                            <option value="1007">1007 - Sucata e Desfazimento</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -402,38 +452,51 @@
             </div>
         </div>
 
-        <!-- 4. TROCA DE ENDEREÇO -->
+        <!-- 4. TROCA DE ENDEREÇO (Criado Form Completo) -->
         <div id="view-troca" class="view-section">
             <div class="card">
-                <div class="card-header-title">📦 Troca de Endereço de Material</div>
-                <p style="color: var(--text-muted);">Módulo de transferência de localizador dentro do depósito.</p>
+                <div class="card-header-title">📦 Transferência & Troca de Endereço</div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Informe o NM do material e redefina a localização física dentro do almoxarifado.</p>
+
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label>Código do Material (NM):</label>
+                        <input type="text" class="form-control" placeholder="Ex: 10029384">
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço Atual (Origem):</label>
+                        <input type="text" class="form-control" placeholder="Ex: A-01-02">
+                    </div>
+                    <div class="form-group">
+                        <label>Novo Endereço (Destino):</label>
+                        <input type="text" class="form-control" placeholder="Ex: B-04-01">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade Movimentada:</label>
+                        <input type="number" class="form-control" placeholder="Ex: 10">
+                    </div>
+                </div>
+
+                <button class="btn-action">Confirmar Troca de Endereço</button>
             </div>
         </div>
 
-        <!-- 5. GERENCIAL: DASHBOARD ANALÍTICO (GRÁFICOS) -->
+        <!-- 5. GERENCIAL: DASHBOARD ANALÍTICO -->
         <div id="view-dashboard" class="view-section">
             <div class="card-header-title" style="margin-bottom: 20px;">📉 Painel Geral de Indicadores Logísticos</div>
-            
             <div class="dashboard-grid">
-                <!-- Gráfico 1: Acurácia de Inventário -->
                 <div class="chart-card">
                     <div class="chart-title">📈 Acuracidade dos Inventários Diários (%)</div>
                     <canvas id="chartAcuracia"></canvas>
                 </div>
-
-                <!-- Gráfico 2: Curva ABC -->
                 <div class="chart-card">
                     <div class="chart-title">📊 Proporção do Valor em Estoque (Curva ABC)</div>
                     <canvas id="chartABC"></canvas>
                 </div>
-
-                <!-- Gráfico 3: Entradas e Saídas -->
                 <div class="chart-card">
                     <div class="chart-title">🔄 Fluxo de Movimentação (Entradas vs Saídas)</div>
                     <canvas id="chartMovimentacao"></canvas>
                 </div>
-
-                <!-- Gráfico 4: Pontos Críticos -->
                 <div class="chart-card">
                     <div class="chart-title">⚠️ Distribuição de Pontos Críticos</div>
                     <canvas id="chartCriticos"></canvas>
@@ -532,19 +595,78 @@
             </div>
         </div>
 
-        <!-- 10. GERENCIAL: ALIMENTAR SISTEMA -->
+        <!-- 10. GERENCIAL: ALIMENTAR SISTEMA (3 Opções Separadas) -->
         <div id="view-alimentar" class="view-section">
             <div class="card">
-                <div class="card-header-title">⚡ Alimentar Sistema (Carga SAP)</div>
-                <p style="color: var(--text-muted);">Upload de planilhas e carga de dados brutos extraídos do SAP.</p>
+                <div class="card-header-title">⚡ Alimentar Sistema (Importação SAP)</div>
+                <p style="color: var(--text-muted);">Anexe as planilhas oficiais extraídas do SAP nos seus respectivos campos para atualizar a base de dados do WMS.</p>
+                
+                <div class="upload-grid">
+                    <!-- Opção 1: MB51 -->
+                    <div class="upload-card">
+                        <div class="upload-card-title">📄 Planilha MB51</div>
+                        <div class="upload-card-desc">Histórico de Movimentações de Entrada e Saída.</div>
+                        <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" style="display: none;">
+                        <button class="btn-action" onclick="document.getElementById('fileMB51').click()">Anexar MB51</button>
+                    </div>
+
+                    <!-- Opção 2: MB25 -->
+                    <div class="upload-card">
+                        <div class="upload-card-title">📄 Planilha MB25</div>
+                        <div class="upload-card-desc">Lista de Reservas de Materiais em Aberto.</div>
+                        <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" style="display: none;">
+                        <button class="btn-action" onclick="document.getElementById('fileMB25').click()">Anexar MB25</button>
+                    </div>
+
+                    <!-- Opção 3: ZQMM_0026A -->
+                    <div class="upload-card">
+                        <div class="upload-card-title">📄 Planilha ZQMM_0026A</div>
+                        <div class="upload-card-desc">Base Geral de Saldos e Posições do Estoque.</div>
+                        <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" style="display: none;">
+                        <button class="btn-action" onclick="document.getElementById('fileZQMM').click()">Anexar ZQMM_0026A</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 11. GERENCIAL: LOGS -->
+        <!-- 11. GERENCIAL: LOG DE ALTERAÇÕES SAP (Detalhamento) -->
         <div id="view-logs" class="view-section">
             <div class="card">
-                <div class="card-header-title">📜 Log de Alterações SAP</div>
-                <p style="color: var(--text-muted);">Histórico detalhado de movimentações e sincronizações executadas.</p>
+                <div class="card-header-title">📜 Log de Alterações e Auditoria SAP</div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Rastreabilidade de todas as cargas de arquivos, alterações manuais e contagens realizadas.</p>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data / Hora</th>
+                                <th>Usuário</th>
+                                <th>Ação Realizada</th>
+                                <th>Arquivo / Origem</th>
+                                <th>Registros Afetados</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>21/07/2026 20:45</td>
+                                <td>Dário Torres</td>
+                                <td>Carga de Planilha</td>
+                                <td>ZQMM_0026A.xlsx</td>
+                                <td>1.450 itens</td>
+                                <td><span class="status-badge status-success">Sucesso</span></td>
+                            </tr>
+                            <tr>
+                                <td>21/07/2026 18:30</td>
+                                <td>Operador WMS</td>
+                                <td>Troca de Endereço</td>
+                                <td>Manual (Sistêmica)</td>
+                                <td>1 item (NM 10293)</td>
+                                <td><span class="status-badge status-success">Sucesso</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -580,7 +702,6 @@
                 event.currentTarget.classList.add('active');
             }
 
-            // Renderiza os gráficos quando a aba Dashboard for aberta
             if(idView === 'dashboard') {
                 inicializarGraficos();
             }
@@ -592,7 +713,6 @@
             if (chartsInicializados) return;
             chartsInicializados = true;
 
-            // 1. Gráfico de Acuracidade
             new Chart(document.getElementById('chartAcuracia'), {
                 type: 'line',
                 data: {
@@ -609,7 +729,6 @@
                 options: { responsive: true, plugins: { legend: { display: false } } }
             });
 
-            // 2. Gráfico da Curva ABC
             new Chart(document.getElementById('chartABC'), {
                 type: 'doughnut',
                 data: {
@@ -622,7 +741,6 @@
                 options: { responsive: true }
             });
 
-            // 3. Gráfico de Entradas vs Saídas
             new Chart(document.getElementById('chartMovimentacao'), {
                 type: 'bar',
                 data: {
@@ -635,7 +753,6 @@
                 options: { responsive: true }
             });
 
-            // 4. Gráfico de Pontos Críticos
             new Chart(document.getElementById('chartCriticos'), {
                 type: 'bar',
                 data: {
@@ -650,7 +767,7 @@
             });
         }
 
-        // Função de Logout
+        // Logout
         function logout() {
             localStorage.removeItem('wms_usuario');
             localStorage.removeItem('wms_perfil');
