@@ -8,6 +8,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    
+    <!-- Chart.js para os Gráficos Logísticos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -144,6 +147,52 @@
             gap: 10px;
         }
 
+        /* Grid de Gráficos do Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        /* Metrics & Badges */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+
         /* Filtros e Inputs */
         .filter-grid {
             display: grid;
@@ -167,6 +216,17 @@
             background: var(--input-bg);
             color: var(--text-main);
             outline: none;
+        }
+
+        .btn-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
         }
 
         /* Tabelas */
@@ -194,7 +254,6 @@
             font-size: 11px;
         }
 
-        /* Utilitários */
         .sidebar-footer {
             margin-top: auto;
             padding-top: 15px;
@@ -222,12 +281,18 @@
         <div class="menu-item" onclick="navegarPara('inventario')">
             📋 Realizar Inventário
         </div>
+        <div class="menu-item" onclick="navegarPara('reservas')">
+            📌 Reservas de Estoque
+        </div>
         <div class="menu-item" onclick="navegarPara('troca')">
             📦 Troca de Endereço
         </div>
 
         <!-- GERENCIAL (ADMIN) -->
         <div class="menu-group-title" id="secGerencialTitle">Gerencial (Admin)</div>
+        <div class="menu-item gerencial-item" onclick="navegarPara('dashboard')">
+            📉 Dashboard Analítico
+        </div>
         <div class="menu-item gerencial-item" onclick="navegarPara('abc')">
             📊 Curva ABC por Valor
         </div>
@@ -291,13 +356,11 @@
                                 <th>Endereço</th>
                                 <th>Saldo</th>
                                 <th>Unidade</th>
-                                <th>Peso</th>
-                                <th>Dimensão</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="8" style="text-align: center; color: var(--text-muted);">Use os filtros acima para consultar o estoque.</td>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Use os filtros acima para consultar o estoque.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -313,7 +376,33 @@
             </div>
         </div>
 
-        <!-- 3. TROCA DE ENDEREÇO -->
+        <!-- 3. RESERVAS DE ESTOQUE -->
+        <div id="view-reservas" class="view-section">
+            <div class="card">
+                <div class="card-header-title">📌 Reservas de Estoque Em Aberto</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nº Reserva</th>
+                                <th>NM</th>
+                                <th>Descrição do Material</th>
+                                <th>Qtd Reservada</th>
+                                <th>Solicitante</th>
+                                <th>Data Reserva</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhuma reserva pendente no momento.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. TROCA DE ENDEREÇO -->
         <div id="view-troca" class="view-section">
             <div class="card">
                 <div class="card-header-title">📦 Troca de Endereço de Material</div>
@@ -321,39 +410,129 @@
             </div>
         </div>
 
-        <!-- 4. GERENCIAL: CURVA ABC -->
+        <!-- 5. GERENCIAL: DASHBOARD ANALÍTICO (GRÁFICOS) -->
+        <div id="view-dashboard" class="view-section">
+            <div class="card-header-title" style="margin-bottom: 20px;">📉 Painel Geral de Indicadores Logísticos</div>
+            
+            <div class="dashboard-grid">
+                <!-- Gráfico 1: Acurácia de Inventário -->
+                <div class="chart-card">
+                    <div class="chart-title">📈 Acuracidade dos Inventários Diários (%)</div>
+                    <canvas id="chartAcuracia"></canvas>
+                </div>
+
+                <!-- Gráfico 2: Curva ABC -->
+                <div class="chart-card">
+                    <div class="chart-title">📊 Proporção do Valor em Estoque (Curva ABC)</div>
+                    <canvas id="chartABC"></canvas>
+                </div>
+
+                <!-- Gráfico 3: Entradas e Saídas -->
+                <div class="chart-card">
+                    <div class="chart-title">🔄 Fluxo de Movimentação (Entradas vs Saídas)</div>
+                    <canvas id="chartMovimentacao"></canvas>
+                </div>
+
+                <!-- Gráfico 4: Pontos Críticos -->
+                <div class="chart-card">
+                    <div class="chart-title">⚠️ Distribuição de Pontos Críticos</div>
+                    <canvas id="chartCriticos"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. GERENCIAL: CURVA ABC -->
         <div id="view-abc" class="view-section">
             <div class="card">
                 <div class="card-header-title">📊 Curva ABC por Valor</div>
-                <p style="color: var(--text-muted);">Classificação de materiais por representatividade de valor financeiro acumulado.</p>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NM</th>
+                                <th>Descrição do Material</th>
+                                <th>Valor Total (R$)</th>
+                                <th>% Acumulado</th>
+                                <th>Categoria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Carregando dados da curva ABC...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- 5. GERENCIAL: HISTÓRICO DE ACURÁCIA -->
+        <!-- 7. GERENCIAL: HISTÓRICO DE ACURÁCIA -->
         <div id="view-acuracia" class="view-section">
             <div class="card">
-                <div class="card-header-title">📈 Histórico de Acurácia</div>
-                <p style="color: var(--text-muted);">Indicadores de convergência entre o estoque físico e o registro sistêmico.</p>
+                <div class="card-header-title">📈 Histórico de Acurácia dos Inventários</div>
+                <button class="btn-action" style="margin-bottom: 20px;" onclick="gerarRelatorioComparativo()">📊 Gerar Relatório Comparativo</button>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">Selecionar</th>
+                                <th>Data Inventário</th>
+                                <th>Depósito / Setor</th>
+                                <th>Total de Itens</th>
+                                <th>Divergências</th>
+                                <th>Acurácia (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum histórico de inventário registrado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- 6. GERENCIAL: PONTOS CRÍTICOS & ORDENS -->
+        <!-- 8. GERENCIAL: PONTOS CRÍTICOS & ORDENS -->
         <div id="view-criticos" class="view-section">
             <div class="card">
-                <div class="card-header-title">⚠️ Pontos Críticos & Ordens</div>
-                <p style="color: var(--text-muted);">Alertas de ruptura de estoque, ponto de ressuprimento e ordens pendentes.</p>
+                <div class="card-header-title">⚠️ Pontos Críticos & Análise de Anomalias</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NM</th>
+                                <th>Descrição</th>
+                                <th>Depósito</th>
+                                <th>Saldo Fis/Sist</th>
+                                <th>Impacto em Reservas</th>
+                                <th>Nível de Criticidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum ponto crítico identificado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- 7. GERENCIAL: SAÚDE TOTAL DO ESTOQUE -->
+        <!-- 9. GERENCIAL: SAÚDE TOTAL DO ESTOQUE -->
         <div id="view-saude" class="view-section">
             <div class="card">
                 <div class="card-header-title">🛡️ Saúde Total do Estoque</div>
-                <p style="color: var(--text-muted);">Visão macro de giro de estoque, materiais sem movimentação e depósitos.</p>
+                <div class="metric-grid">
+                    <div class="metric-card" style="grid-column: span 2;">
+                        <div style="font-size: 13px; color: var(--text-muted);">Índice Geral de Saúde do Estoque</div>
+                        <div class="metric-val" style="font-size: 36px;">100%</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 8. GERENCIAL: ALIMENTAR SISTEMA -->
+        <!-- 10. GERENCIAL: ALIMENTAR SISTEMA -->
         <div id="view-alimentar" class="view-section">
             <div class="card">
                 <div class="card-header-title">⚡ Alimentar Sistema (Carga SAP)</div>
@@ -361,7 +540,7 @@
             </div>
         </div>
 
-        <!-- 9. GERENCIAL: LOGS -->
+        <!-- 11. GERENCIAL: LOGS -->
         <div id="view-logs" class="view-section">
             <div class="card">
                 <div class="card-header-title">📜 Log de Alterações SAP</div>
@@ -389,22 +568,86 @@
 
         // Navegação de Telas
         function navegarPara(idView) {
-            // Remove classe ativa das opções do menu
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-            
-            // Esconde todas as seções
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
 
-            // Ativa a seção clicada
             const targetView = document.getElementById(`view-${idView}`);
             if (targetView) {
                 targetView.classList.add('active');
             }
 
-            // Destaque visual no item do menu
             if (event && event.currentTarget) {
                 event.currentTarget.classList.add('active');
             }
+
+            // Renderiza os gráficos quando a aba Dashboard for aberta
+            if(idView === 'dashboard') {
+                inicializarGraficos();
+            }
+        }
+
+        // Renderização dos Gráficos com Chart.js
+        let chartsInicializados = false;
+        function inicializarGraficos() {
+            if (chartsInicializados) return;
+            chartsInicializados = true;
+
+            // 1. Gráfico de Acuracidade
+            new Chart(document.getElementById('chartAcuracia'), {
+                type: 'line',
+                data: {
+                    labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                    datasets: [{
+                        label: 'Acurácia (%)',
+                        data: [94.2, 95.8, 93.5, 97.1, 98.4, 99.0],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // 2. Gráfico da Curva ABC
+            new Chart(document.getElementById('chartABC'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Classe A (80% Valor)', 'Classe B (15% Valor)', 'Classe C (5% Valor)'],
+                    datasets: [{
+                        data: [80, 15, 5],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // 3. Gráfico de Entradas vs Saídas
+            new Chart(document.getElementById('chartMovimentacao'), {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [
+                        { label: 'Entradas', data: [120, 190, 150, 220, 180, 250], backgroundColor: '#10b981' },
+                        { label: 'Saídas', data: [90, 140, 130, 200, 160, 210], backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: { responsive: true }
+            });
+
+            // 4. Gráfico de Pontos Críticos
+            new Chart(document.getElementById('chartCriticos'), {
+                type: 'bar',
+                data: {
+                    labels: ['Itens em Falta', 'Sobra / Divergência', 'Reservas Pendentes', 'Ponto Ressuprimento'],
+                    datasets: [{
+                        label: 'Qtd de Ocorrências',
+                        data: [12, 5, 8, 19],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6']
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } }
+            });
         }
 
         // Função de Logout
