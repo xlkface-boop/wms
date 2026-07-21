@@ -6,8 +6,9 @@
     <title>WMS Inteligente - Painel de Controle</title>
     <!-- SweetAlert2 para Alertas e Assinatura Digital -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO -->
     <script>
-        // 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO
         (function() {
             const perfilLogado = localStorage.getItem('wms_perfil');
             if (!perfilLogado) {
@@ -15,20 +16,45 @@
             }
         })();
     </script>
+
+    <!-- Firebase SDKs Compat Versão 9/10 -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // 🔑 CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE
+        const firebaseConfig = {
+          apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
+          authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
+          projectId: "bolao-copa-2026-d264f",
+          storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
+          messagingSenderId: "802924891915",
+          appId: "1:802924891915:web:d9c641161733b510559c0e",
+          measurementId: "G-QQ210F367M"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body {
-            /* 🖼️ SUA NOVA IMAGEM DE FUNDO CLARA PARA TODO O SISTEMA */
+            /* 🖼️ SUA IMAGEM DE FUNDO CLARA PARA TODO O SISTEMA */
             background: url('https://i.imgur.com/Gep2VOn.jpeg') no-repeat center center fixed;
             background-size: cover;
-            color: #1e293b; /* Texto escuro para dar contraste perfeito sobre o fundo claro */
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             overflow-x: hidden;
         }
 
-        /* 🍔 TOPBAR (Ajustada para combinar com a identidade visual) */
+        /* 🍔 TOPBAR */
         .topbar {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -58,7 +84,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* 🗂️ MENU LATERAL RETRÁTIL (Estilo Sidebar) */
+        /* 🗂️ MENU LATERAL RETRÁTIL (Sidebar) */
         .sidebar {
             position: fixed;
             top: 60px; left: -280px;
@@ -107,7 +133,7 @@
         .menu-item:hover { background: rgba(0,0,0,0.05); color: #0f172a; }
         .menu-item.admin-only { border-left: 3px solid #eab308; }
 
-        /* 📺 ÁREA DE CONTEÚDO MAXIMIZADA */
+        /* 📺 ÁREA DE CONTEÚDO */
         .conteudo-principal {
             margin-top: 60px;
             padding: 30px;
@@ -120,7 +146,7 @@
             .btn-menu-toggle { display: none; }
         }
 
-        /* COMPONENTES DE TELA (Brancos com opacidade sutil para deixar o fundo aparecer sem perder leitura) */
+        /* COMPONENTES DE TELA */
         .modulo-tela { display: none; }
         .modulo-tela.ativo { display: block; }
 
@@ -202,14 +228,57 @@
         </div>
     </div>
 
-    <!-- 📺 CONTEÚDO PRINCIPAL (MÓDULOS DE TELA CHEIA) -->
+    <!-- 📺 CONTEÚDO PRINCIPAL -->
     <div class="conteudo-principal">
 
         <!-- MÓDULO 1: CONSULTA DE MATERIAL -->
         <div id="telaConsulta" class="modulo-tela ativo">
             <div class="card-expandido">
                 <h2>🔍 Consulta Qualificada de Materiais</h2>
-                <p>Aqui você terá a busca limpa ocupando a tela inteira, ideal para exibir tabelas com as dimensões, pesos e localizações exatas no pátio.</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <div class="campo-grupo" style="max-width: 250px;">
+                        <label>Buscar por NM (Prioritário):</label>
+                        <input type="text" id="buscaNM" placeholder="Digite o NM..." oninput="consultarMateriais()">
+                    </div>
+                    <div class="campo-grupo" style="max-width: 200px;">
+                        <label>Filtrar por Depósito:</label>
+                        <select id="buscaDeposito" onchange="consultarMateriais()">
+                            <option value="">Todos os Depósitos</option>
+                            <option value="DP01">DP01</option>
+                            <option value="DP02">DP02</option>
+                            <option value="DP03">DP03</option>
+                            <option value="DP04">DP04</option>
+                            <option value="DP05">DP05</option>
+                            <option value="DPA1">DPA1</option>
+                            <option value="DPA2">DPA2</option>
+                            <option value="DPA3">DPA3</option>
+                        </select>
+                    </div>
+                    <div class="campo-grupo" style="max-width: 200px;">
+                        <label>Buscar por Endereço:</label>
+                        <input type="text" id="buscaEndereco" placeholder="Ex: A-12..." oninput="consultarMateriais()">
+                    </div>
+                </div>
+
+                <div class="tabela-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NM</th>
+                                <th>Descrição</th>
+                                <th>Depósito</th>
+                                <th>Endereço</th>
+                                <th>Saldo</th>
+                                <th>Unidade</th>
+                                <th>Peso</th>
+                                <th>Dimensão</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaConsultaMateriais">
+                            <tr><td colspan="8" style="text-align:center;">Use os filtros acima para consultar o estoque.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -217,7 +286,31 @@
         <div id="telaInventario" class="modulo-tela">
             <div class="card-expandido">
                 <h2>📋 Lançamento de Inventário Físico</h2>
-                <p>Área limpa e espaçada para o operador digitar as contagens sem errar a linha no tablet ou celular.</p>
+                
+                <!-- Alerta Obrigatório de Período Matutino -->
+                <div class="alerta-operacional" style="background: #e0f2fe; border-color: #0284c7; color: #0369a1;">
+                    <div><strong>🕒 AVISO OPERACIONAL:</strong> Este inventário deverá ser realizado durante o período da manhã.</div>
+                </div>
+
+                <div class="tabela-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Grupo</th>
+                                <th>NM</th>
+                                <th>Descrição</th>
+                                <th>Depósito</th>
+                                <th>Endereço</th>
+                                <th>Qtd. Contada</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaInventarioItens">
+                            <tr><td colspan="6" style="text-align:center;">Carregando materiais selecionados para contagem...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <button class="btn-acao" onclick="salvarInventario()">Salvar Contagem de Inventário</button>
             </div>
         </div>
 
@@ -228,11 +321,13 @@
                 <p style="margin-bottom: 20px;">Selecione o material e defina sua nova coordenada no pátio.</p>
 
                 <div class="campo-grupo">
-                    <label>Selecione o Material (NM)</label>
-                    <select id="trocaMaterial">
-                        <option value="1000142">NM 1000142 - VALVULA GLOBO 3 POL (Endereço Atual: A-12)</option>
-                        <option value="4001223">NM 4001223 - BOMBA CENTRIFUGA 5CV (Endereço Atual: B-05)</option>
-                    </select>
+                    <label>Número do Material (NM)</label>
+                    <input type="text" id="trocaMaterialNM" placeholder="Digite o NM para localizar..." onblur="localizarMaterialTroca()">
+                </div>
+                
+                <div id="infoMaterialTroca" style="display:none; margin-bottom: 15px; padding: 10px; background: #f1f5f9; border-radius: 6px;">
+                    <p><strong>Descrição:</strong> <span id="lblDescricaoNM">-</span></p>
+                    <p><strong>Endereço Atual:</strong> <span id="lblEndAtualNM" style="color:#d97706; font-weight:bold;">-</span></p>
                 </div>
 
                 <div class="campo-grupo">
@@ -243,12 +338,12 @@
                 <button class="btn-acao" onclick="confirmarTrocaWMS()">Mudar Endereço no WMS</button>
             </div>
 
-            <!-- Alerta Flutuante Condicional do SAP -->
+            <!-- Alerta Obrigatório do SAP -->
             <div id="alertaSAPSector" class="alerta-operacional" style="display: none;">
                 <div>
-                    <strong>⚠️ AVISO IMPORTANTE:</strong> Não esqueça de replicar e efetuar essa troca de endereço também dentro do <strong>SAP</strong> para manter o espelhamento.
+                    <strong>⚠️ ATENÇÃO:</strong> confirme que a alteração também foi realizada no SAP.
                 </div>
-                <button class="btn-acao btn-laranja" onclick="abrirModalAssinaturaSAP()">Já troquei no SAP</button>
+                <button class="btn-acao btn-laranja" onclick="abrirModalAssinaturaSAP()">Confirmar & Assinar</button>
             </div>
         </div>
 
@@ -261,10 +356,10 @@
                 <div class="tabela-wrapper">
                     <table>
                         <thead>
-                            <tr><th>Colaborador</th><th>Data/Hora</th><th>Material (NM)</th><th>Novo End.</th><th>Status SAP</th></tr>
+                            <tr><th>Colaborador</th><th>Data/Hora</th><th>Material (NM)</th><th>End. Antigo</th><th>Novo End.</th><th>Status SAP</th></tr>
                         </thead>
                         <tbody id="corpoLogEnderecos">
-                            <tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhuma alteração registrada nesta sessão.</td></tr>
+                            <tr><td colspan="6" style="text-align:center; color:#64748b;">Nenhuma alteração registrada até o momento.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -273,8 +368,11 @@
 
     </div>
 
+    <!-- LÓGICA DE NAVEGAÇÃO E SISTEMA INTEGRADO -->
     <script>
         const perfil = localStorage.getItem('wms_perfil');
+        const usuarioEmail = localStorage.getItem('wms_usuario') || 'Operador Pátio';
+
         if (perfil === 'ADMIN') {
             document.querySelectorAll('.admin-field').forEach(el => el.style.display = 'flex');
         }
@@ -286,7 +384,10 @@
         function navegarPara(idTela) {
             document.querySelectorAll('.modulo-tela').forEach(t => t.classList.remove('ativo'));
             document.getElementById(idTela).classList.add('ativo');
-            if(window.innerWidth < 1024) toggleSidebar();
+            
+            if (idTela === 'telaInventario') carregarMateriaisInventario();
+            if (idTela === 'telaAdminLogEnderecos') carregarLogsFirestore();
+            if (window.innerWidth < 1024) toggleSidebar();
         }
 
         function logoutSessao() {
@@ -294,14 +395,89 @@
             window.location.replace("index.html");
         }
 
-        let materialEmMudanca = "";
+        // ==========================================
+        // 1. MÓDULO CONSULTA MATERIAL
+        // ==========================================
+        async function consultarMateriais() {
+            const nm = document.getElementById('buscaNM').value.trim();
+            const deposito = document.getElementById('buscaDeposito').value;
+            const endereco = document.getElementById('buscaEndereco').value.trim();
+            const tbody = document.getElementById('tabelaConsultaMateriais');
+
+            let query = db.collection('materiais');
+
+            if (nm) {
+                query = query.where('nm', '==', nm);
+            } else {
+                if (deposito) query = query.where('deposito', '==', deposito);
+                if (endereco) query = query.where('endereco', '==', endereco);
+            }
+
+            try {
+                const snapshot = await query.limit(50).get();
+                tbody.innerHTML = "";
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Nenhum material encontrado.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${item.nm || '-'}</strong></td>
+                            <td>${item.descricao || '-'}</td>
+                            <td>${item.deposito || '-'}</td>
+                            <td><span style="color:#2563eb; font-weight:bold;">${item.endereco || '-'}</span></td>
+                            <td>${item.saldo || 0}</td>
+                            <td>${item.unidade || 'UN'}</td>
+                            <td>${item.peso || '-'}</td>
+                            <td>${item.dimensao || '-'}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Erro ao consultar materiais:", error);
+            }
+        }
+
+        // ==========================================
+        // 2. MÓDULO TROCA DE ENDEREÇO
+        // ==========================================
+        let materialEmMudanca = null;
         let enderecoEmMudanca = "";
 
-        function confirmarTrocaWMS() {
-            materialEmMudanca = document.getElementById('trocaMaterial').value;
-            enderecoEmMudanca = document.getElementById('trocaNovoEndereco').value;
+        async function localizarMaterialTroca() {
+            const nm = document.getElementById('trocaMaterialNM').value.trim();
+            if (!nm) return;
 
-            if(!enderecoEmMudanca) {
+            try {
+                const snapshot = await db.collection('materiais').where('nm', '==', nm).get();
+                if (!snapshot.empty) {
+                    const doc = snapshot.docs[0];
+                    materialEmMudanca = { id: doc.id, ...doc.data() };
+                    document.getElementById('lblDescricaoNM').innerText = materialEmMudanca.descricao || 'Sem descrição';
+                    document.getElementById('lblEndAtualNM').innerText = materialEmMudanca.endereco || 'Sem Endereço';
+                    document.getElementById('infoMaterialTroca').style.display = 'block';
+                } else {
+                    Swal.fire('Aviso', 'NM não encontrado no cadastro de materiais.', 'warning');
+                    document.getElementById('infoMaterialTroca').style.display = 'none';
+                    materialEmMudanca = null;
+                }
+            } catch (e) {
+                console.error("Erro ao localizar material:", e);
+            }
+        }
+
+        function confirmarTrocaWMS() {
+            if (!materialEmMudanca) {
+                Swal.fire('Erro', 'Informe um NM válido para alterar.', 'error');
+                return;
+            }
+
+            enderecoEmMudanca = document.getElementById('trocaNovoEndereco').value.trim();
+            if (!enderecoEmMudanca) {
                 Swal.fire('Erro', 'Insira o novo endereço do pátio.', 'error');
                 return;
             }
@@ -309,7 +485,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Atualizado no WMS!',
-                text: `O endereço do NM ${materialEmMudanca} foi alterado para ${enderecoEmMudanca} com sucesso.`,
+                text: `O endereço do NM ${materialEmMudanca.nm} foi preparado para alteração de ${materialEmMudanca.endereco} para ${enderecoEmMudanca}.`,
                 confirmButtonColor: '#2563eb'
             }).then(() => {
                 document.getElementById('alertaSAPSector').style.display = 'flex';
@@ -321,7 +497,7 @@
                 title: 'Confirmação de Registro no SAP',
                 html: `
                     <p style="color:#334155; font-size:14px; text-align:left; margin-bottom:10px;">
-                        Eu, <b>${perfil === 'ADMIN' ? 'Dário João Torres' : 'Colaborador Padrão'}</b>, afirmo sob responsabilidade técnica que realizei a troca do endereço do NM <b>${materialEmMudanca}</b> para <b>${enderecoEmMudanca}</b> na plataforma oficial do SAP.
+                        Eu, <b>${usuarioEmail}</b>, afirmo sob responsabilidade técnica que realizei a troca do endereço do NM <b>${materialEmMudanca.nm}</b> para <b>${enderecoEmMudanca}</b> na plataforma oficial do SAP.
                     </p>
                     <label style="color:#334155; font-size:12px; font-weight:bold; display:block; text-align:left;">Assine na caixa abaixo:</label>
                     <canvas id="canvasAssinatura" class="canvas-assinatura" width="400" height="150"></canvas>
@@ -335,7 +511,7 @@
                     const ctx = canvas.getContext('2d');
                     let desenhando = false;
 
-                    ctx.strokeStyle = "#000000"; /* Cor do traço preta para legibilidade no fundo claro */
+                    ctx.strokeStyle = "#000000";
                     ctx.lineWidth = 2;
 
                     canvas.addEventListener('mousedown', () => desenhando = true);
@@ -347,32 +523,178 @@
                         ctx.stroke();
                     });
                 }
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
+                    const canvas = document.getElementById('canvasAssinatura');
+                    const assinaturaBase64 = canvas ? canvas.toDataURL() : '';
                     const dataAtual = new Date();
-                    const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-                    const nomeUsuario = perfil === 'ADMIN' ? 'Dário João Torres' : 'Operador Pátio';
 
-                    const tabelaLog = document.getElementById('corpoLogEnderecos');
-                    if(tabelaLog.innerText.includes("Nenhuma alteração")) tabelaLog.innerHTML = "";
+                    const dadosTroca = {
+                        usuario: usuarioEmail,
+                        data: dataAtual.toLocaleDateString('pt-BR'),
+                        hora: dataAtual.toLocaleTimeString('pt-BR'),
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        nm: materialEmMudanca.nm,
+                        enderecoAntigo: materialEmMudanca.endereco || 'N/A',
+                        enderecoNovo: enderecoEmMudanca,
+                        statusSAP: 'CONFIRMADO_PELO_OPERADOR'
+                    };
 
-                    tabelaLog.innerHTML += `
-                        <tr>
-                            <td><strong>${nomeUsuario}</strong></td>
-                            <td>${dataFormatada}</td>
-                            <td>NM ${materialEmMudanca}</td>
-                            <td><span style="color:#16a34a; font-weight:bold;">${enderecoEmMudanca}</span></td>
-                            <td><span style="padding:4px 8px; background:rgba(22,163,74,0.1); color:#16a34a; border:1px solid #16a34a; font-size:11px; font-weight:bold; border-radius:4px;">✓ SINCRO SAP</span></td>
-                        </tr>
-                    `;
+                    try {
+                        // 1. Atualiza endereço no Firestore
+                        await db.collection('materiais').doc(materialEmMudanca.id).update({
+                            endereco: enderecoEmMudanca
+                        });
 
-                    Swal.fire('Documento Registrado!', 'O comprovante assinado digitalmente foi armazenado e enviado à auditoria gerencial.', 'success');
-                    document.getElementById('alertaSAPSector').style.display = 'none';
-                    document.getElementById('trocaNovoEndereco').value = "";
+                        // 2. Registra na coleção troca_endereco
+                        const refTroca = await db.collection('troca_endereco').add(dadosTroca);
+
+                        // 3. Registra na coleção assinaturas
+                        await db.collection('assinaturas').add({
+                            idTroca: refTroca.id,
+                            usuario: usuarioEmail,
+                            assinaturaImg: assinaturaBase64,
+                            dataHora: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        // 4. Salva histórico em logs
+                        await db.collection('logs').add({
+                            acao: 'TROCA_ENDERECO',
+                            detalhes: `NM ${materialEmMudanca.nm} alterado de ${materialEmMudanca.endereco} para ${enderecoEmMudanca}`,
+                            usuario: usuarioEmail,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        Swal.fire('Documento Registrado!', 'Alteração salva no WMS e comprovante gravado no Firestore com sucesso.', 'success');
+                        document.getElementById('alertaSAPSector').style.display = 'none';
+                        document.getElementById('trocaNovoEndereco').value = "";
+                        document.getElementById('trocaMaterialNM').value = "";
+                        document.getElementById('infoMaterialTroca').style.display = 'none';
+
+                    } catch (err) {
+                        console.error("Erro ao gravar alteração:", err);
+                        Swal.fire('Erro', 'Ocorreu uma falha ao gravar no Firestore.', 'error');
+                    }
                 }
             });
         }
 
+        async function carregarLogsFirestore() {
+            const tbody = document.getElementById('corpoLogEnderecos');
+            try {
+                const snapshot = await db.collection('troca_endereco').orderBy('timestamp', 'desc').limit(20).get();
+                tbody.innerHTML = "";
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Nenhuma alteração registrada até o momento.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const log = doc.data();
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${log.usuario}</strong></td>
+                            <td>${log.data} ${log.hora}</td>
+                            <td>NM ${log.nm}</td>
+                            <td>${log.enderecoAntigo}</td>
+                            <td><span style="color:#16a34a; font-weight:bold;">${log.enderecoNovo}</span></td>
+                            <td><span style="padding:4px 8px; background:rgba(22,163,74,0.1); color:#16a34a; border:1px solid #16a34a; font-size:11px; font-weight:bold; border-radius:4px;">✓ SINCRO SAP</span></td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                console.error("Erro ao carregar logs:", e);
+            }
+        }
+
+        // ==========================================
+        // 3. MÓDULO INVENTÁRIO
+        // ==========================================
+        async function carregarMateriaisInventario() {
+            const tbody = document.getElementById('tabelaInventarioItens');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Buscando itens para inventário...</td></tr>';
+
+            try {
+                const snapMov = await db.collection('movimentacoes').limit(5).get();
+                let nmsGrupo1 = [];
+                snapMov.forEach(d => nmsGrupo1.push(d.data().nm));
+
+                const snapMateriais = await db.collection('materiais').limit(10).get();
+                tbody.innerHTML = "";
+
+                if (snapMateriais.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhum material cadastrado para inventário.</td></tr>';
+                    return;
+                }
+
+                let idx = 0;
+                snapMateriais.forEach(doc => {
+                    const mat = doc.data();
+                    const eGrupo1 = nmsGrupo1.includes(mat.nm) || idx < 3;
+                    const grupoLabel = eGrupo1 ? 'Grupo 1 (MB51 - Recente)' : 'Grupo 2 (Aleatório)';
+                    const grupoCor = eGrupo1 ? '#ea580c' : '#2563eb';
+
+                    tbody.innerHTML += `
+                        <tr class="item-inventario-row" data-id="${doc.id}" data-nm="${mat.nm}">
+                            <td><span style="color:${grupoCor}; font-weight:bold; font-size:11px;">${grupoLabel}</span></td>
+                            <td><strong>${mat.nm}</strong></td>
+                            <td>${mat.descricao || '-'}</td>
+                            <td>${mat.deposito || '-'}</td>
+                            <td>${mat.endereco || '-'}</td>
+                            <td><input type="number" class="input-qtd-contada" placeholder="Qtd. contada" style="width:120px;"></td>
+                        </tr>
+                    `;
+                    idx++;
+                });
+
+            } catch (e) {
+                console.error("Erro ao carregar inventário:", e);
+            }
+        }
+
+        async function salvarInventario() {
+            const linhas = document.querySelectorAll('.item-inventario-row');
+            const dataAtual = new Date();
+            const batch = db.batch();
+            let possuiContagem = false;
+
+            linhas.forEach(linha => {
+                const idDoc = linha.getAttribute('data-id');
+                const nm = linha.getAttribute('data-nm');
+                const qtdInput = linha.querySelector('.input-qtd-contada').value;
+
+                if (qtdInput !== "") {
+                    possuiContagem = true;
+                    const refInv = db.collection('inventarios').doc();
+                    batch.set(refInv, {
+                        materialId: idDoc,
+                        nm: nm,
+                        quantidadeContada: Number(qtdInput),
+                        usuario: usuarioEmail,
+                        data: dataAtual.toLocaleDateString('pt-BR'),
+                        hora: dataAtual.toLocaleTimeString('pt-BR'),
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+
+            if (!possuiContagem) {
+                Swal.fire('Aviso', 'Preencha ao menos uma quantidade contada.', 'warning');
+                return;
+            }
+
+            try {
+                await batch.commit();
+                Swal.fire('Sucesso!', 'Contagem de inventário registrada com sucesso.', 'success');
+                carregarMateriaisInventario();
+            } catch (e) {
+                console.error("Erro ao salvar inventário:", e);
+                Swal.fire('Erro', 'Não foi possível salvar o inventário.', 'error');
+            }
+        }
+
+        // Cronômetro de Inatividade
         let cronometroInatividade;
         function resetarCronometroSessao() {
             clearTimeout(cronometroInatividade);
