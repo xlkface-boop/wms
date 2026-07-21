@@ -263,14 +263,16 @@
             font-size: 13px;
         }
 
-        .status-badge {
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: bold;
+        .btn-secondary {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
         }
-        .status-success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-        .status-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
         /* Tabelas */
         .table-responsive {
@@ -369,7 +371,7 @@
     <!-- MAIN CONTENT AREA -->
     <div class="content-area">
 
-        <!-- 1. CONSULTA NM (Filtro por Depósito Restaurado) -->
+        <!-- 1. CONSULTA NM (Filtro por Depósito Atualizado: DP01 a DP05, DPA1 a DPA3) -->
         <div id="view-consulta" class="view-section active">
             <div class="card">
                 <div class="card-header-title">🔍 Consulta Qualificada de Materiais</div>
@@ -380,15 +382,16 @@
                     </div>
                     <div class="form-group">
                         <label>Filtrar por Depósito:</label>
-                        <select class="form-control">
+                        <select class="form-control" id="selectDeposito">
                             <option value="">Todos os Depósitos</option>
-                            <option value="1001">1001 - Depósito Central</option>
-                            <option value="1002">1002 - Almoxarifado Principal</option>
-                            <option value="1003">1003 - Tubulações e Conexões</option>
-                            <option value="1004">1004 - Válvulas e Instrumentação</option>
-                            <option value="1005">1005 - Equipamentos de Segurança (EPI)</option>
-                            <option value="1006">1006 - Químicos e Lubrificantes</option>
-                            <option value="1007">1007 - Sucata e Desfazimento</option>
+                            <option value="DP01">DP01</option>
+                            <option value="DP02">DP02</option>
+                            <option value="DP03">DP03</option>
+                            <option value="DP04">DP04</option>
+                            <option value="DP05">DP05</option>
+                            <option value="DPA1">DPA1</option>
+                            <option value="DPA2">DPA2</option>
+                            <option value="DPA3">DPA3</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -418,11 +421,32 @@
             </div>
         </div>
 
-        <!-- 2. REALIZAR INVENTÁRIO -->
+        <!-- 2. REALIZAR INVENTÁRIO (Sorteio Diário Automático) -->
         <div id="view-inventario" class="view-section">
             <div class="card">
-                <div class="card-header-title">📋 Realizar Inventário</div>
-                <p style="color: var(--text-muted);">Módulo de contagem física e atualização de contagem em tempo real.</p>
+                <div class="card-header-title">📋 Inventário Diário (Atribuído do Dia)</div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    O sistema distribui os itens diariamente de forma aleatória para os operadores logados realizarem a contagem cega.
+                </p>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NM</th>
+                                <th>Descrição</th>
+                                <th>Depósito</th>
+                                <th>Endereço</th>
+                                <th>Qtd Contada</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyInventarioDiario">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum inventário pendente atribuído para o seu usuário hoje.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -452,32 +476,28 @@
             </div>
         </div>
 
-        <!-- 4. TROCA DE ENDEREÇO (Criado Form Completo) -->
+        <!-- 4. TROCA DE ENDEREÇO (Apenas NM, Novo Endereço e Quantidade) -->
         <div id="view-troca" class="view-section">
             <div class="card">
                 <div class="card-header-title">📦 Transferência & Troca de Endereço</div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Informe o NM do material e redefina a localização física dentro do almoxarifado.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Informe o material e o novo endereço de destino no depósito.</p>
 
                 <div class="filter-grid">
                     <div class="form-group">
                         <label>Código do Material (NM):</label>
-                        <input type="text" class="form-control" placeholder="Ex: 10029384">
+                        <input type="text" class="form-control" id="trocaNM" placeholder="Ex: 10029384">
                     </div>
                     <div class="form-group">
-                        <label>Endereço Atual (Origem):</label>
-                        <input type="text" class="form-control" placeholder="Ex: A-01-02">
-                    </div>
-                    <div class="form-group">
-                        <label>Novo Endereço (Destino):</label>
-                        <input type="text" class="form-control" placeholder="Ex: B-04-01">
+                        <label>Novo Endereço:</label>
+                        <input type="text" class="form-control" id="trocaNovoEnd" placeholder="Ex: B-04-01">
                     </div>
                     <div class="form-group">
                         <label>Quantidade Movimentada:</label>
-                        <input type="number" class="form-control" placeholder="Ex: 10">
+                        <input type="number" class="form-control" id="trocaQtd" placeholder="Ex: 10">
                     </div>
                 </div>
 
-                <button class="btn-action">Confirmar Troca de Endereço</button>
+                <button class="btn-action" id="btnConfirmarTroca">Confirmar Troca de Endereço</button>
             </div>
         </div>
 
@@ -529,26 +549,32 @@
             </div>
         </div>
 
-        <!-- 7. GERENCIAL: HISTÓRICO DE ACURÁCIA -->
+        <!-- 7. GERENCIAL: HISTÓRICO DE ACURÁCIA (Com Opção de Recontagem Aleatória) -->
         <div id="view-acuracia" class="view-section">
             <div class="card">
-                <div class="card-header-title">📈 Histórico de Acurácia dos Inventários</div>
-                <button class="btn-action" style="margin-bottom: 20px;" onclick="gerarRelatorioComparativo()">📊 Gerar Relatório Comparativo</button>
+                <div class="card-header-title">📈 Histórico de Acurácia & Validação de Inventários</div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn-action" onclick="gerarRelatorioComparativo()">📊 Gerar Relatório Comparativo</button>
+                    <button class="btn-secondary" onclick="solicitarRecontagemAleatoria()">🔄 Enviar Divergência para Recontagem</button>
+                </div>
+
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th style="width: 40px;">Selecionar</th>
-                                <th>Data Inventário</th>
-                                <th>Depósito / Setor</th>
-                                <th>Total de Itens</th>
-                                <th>Divergências</th>
+                                <th>Data / Hora</th>
+                                <th>NM</th>
+                                <th>Operador Responsável</th>
+                                <th>Saldo Fis / Sist</th>
                                 <th>Acurácia (%)</th>
+                                <th>Status / Validação</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbodyHistoricoAcuracia">
                             <tr>
-                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum histórico de inventário registrado.</td>
+                                <td colspan="7" style="text-align: center; color: var(--text-muted);">Nenhum registro de inventário realizado para análise.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -595,7 +621,7 @@
             </div>
         </div>
 
-        <!-- 10. GERENCIAL: ALIMENTAR SISTEMA (3 Opções Separadas) -->
+        <!-- 10. GERENCIAL: ALIMENTAR SISTEMA -->
         <div id="view-alimentar" class="view-section">
             <div class="card">
                 <div class="card-header-title">⚡ Alimentar Sistema (Importação SAP)</div>
@@ -629,11 +655,11 @@
             </div>
         </div>
 
-        <!-- 11. GERENCIAL: LOG DE ALTERAÇÕES SAP (Detalhamento) -->
+        <!-- 11. GERENCIAL: LOG DE ALTERAÇÕES SAP (Tabela Limpa para População Automática) -->
         <div id="view-logs" class="view-section">
             <div class="card">
                 <div class="card-header-title">📜 Log de Alterações e Auditoria SAP</div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Rastreabilidade de todas as cargas de arquivos, alterações manuais e contagens realizadas.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Rastreabilidade automática de todas as cargas de arquivos, alterações manuais e contagens realizadas.</p>
                 
                 <div class="table-responsive">
                     <table>
@@ -647,22 +673,9 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbodyLogAlteracoes">
                             <tr>
-                                <td>21/07/2026 20:45</td>
-                                <td>Dário Torres</td>
-                                <td>Carga de Planilha</td>
-                                <td>ZQMM_0026A.xlsx</td>
-                                <td>1.450 itens</td>
-                                <td><span class="status-badge status-success">Sucesso</span></td>
-                            </tr>
-                            <tr>
-                                <td>21/07/2026 18:30</td>
-                                <td>Operador WMS</td>
-                                <td>Troca de Endereço</td>
-                                <td>Manual (Sistêmica)</td>
-                                <td>1 item (NM 10293)</td>
-                                <td><span class="status-badge status-success">Sucesso</span></td>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum log registrado até o momento. As alterações automáticas aparecerão aqui.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -673,7 +686,7 @@
     </div>
 
     <script>
-        // Validação de Sessão Antecipada
+        // Validação de Sessão
         const usuarioAtivo = localStorage.getItem('wms_usuario');
         const perfilAtivo = localStorage.getItem('wms_perfil');
 
@@ -705,6 +718,11 @@
             if(idView === 'dashboard') {
                 inicializarGraficos();
             }
+        }
+
+        // Lógica de Recontagem Aleatória (Disparador Gerencial)
+        function solicitarRecontagemAleatoria() {
+            alert("A solicitação de recontagem enviará o material divergente de forma aleatória para outro operador logado no sistema.");
         }
 
         // Renderização dos Gráficos com Chart.js
