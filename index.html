@@ -113,7 +113,6 @@
         <form id="authForm">
             <div class="form-group">
                 <label>E-mail Corporativo:</label>
-                <!-- Placeholder alterado para não vir preenchido -->
                 <input type="email" id="email" placeholder="exemplo@transpetro.com.br" required autocomplete="off">
             </div>
             <div class="form-group">
@@ -210,18 +209,41 @@
             try {
                 if (modoLogin) {
                     // LOGIN
-                    await auth.signInWithEmailAndPassword(email, senha);
+                    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+                    
+                    // Busca perfil no Firestore
+                    let perfilUsuario = "OPERACIONAL";
+                    if (email === ADM_EMAIL) {
+                        perfilUsuario = "ADMIN";
+                    } else {
+                        const userDoc = await db.collection("usuarios").doc(email).get();
+                        if (userDoc.exists && (userDoc.data().perfil === "GERENCIAL" || userDoc.data().perfil === "ADMIN")) {
+                            perfilUsuario = "ADMIN";
+                        }
+                    }
+
+                    // 🔑 GRAVA SESSÃO NO LOCALSTORAGE
+                    localStorage.setItem('wms_usuario', email);
+                    localStorage.setItem('wms_perfil', perfilUsuario);
+
                     await db.collection("logs_acesso").add({ usuario: email, status: "LOGIN_SUCESSO", ...dadosSeg });
                     exibirAlerta(`🔓 Bem-vindo!\nAcesso liberado.`);
-                    setTimeout(() => { window.location.replace('menu.html'); }, 1500);
+                    
+                    setTimeout(() => { 
+                        window.location.replace('menu.html'); 
+                    }, 1000);
+
                 } else {
                     // CADASTRO
                     await auth.createUserWithEmailAndPassword(email, senha);
+                    const perfilDefinido = (email === ADM_EMAIL ? "GERENCIAL" : "OPERACIONAL");
+                    
                     await db.collection("usuarios").doc(email).set({
                         email: email,
-                        perfil: (email === ADM_EMAIL ? "GERENCIAL" : "OPERACIONAL"),
+                        perfil: perfilDefinido,
                         dataCadastro: new Date().toISOString()
                     });
+
                     await db.collection("logs_acesso").add({ usuario: email, status: "CADASTRO_SUCESSO", ...dadosSeg });
                     exibirAlerta("✅ Cadastro realizado!\nAgora você já pode entrar.");
                     alternarModo();
