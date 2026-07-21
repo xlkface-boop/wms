@@ -3,264 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Painel de Controle</title>
-    <!-- SweetAlert2 para Alertas e Assinatura Digital -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO -->
-    <script>
-        (function() {
-            const perfilLogado = localStorage.getItem('wms_perfil');
-            if (!perfilLogado) {
-                window.location.replace("index.html");
-            }
-        })();
-    </script>
-
-    <!-- Firebase SDKs Compat Versão 9/10 -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-    <script>
-        // 🔑 CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE
-        const firebaseConfig = {
-          apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
-          authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
-          projectId: "bolao-copa-2026-d264f",
-          storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
-          messagingSenderId: "802924891915",
-          appId: "1:802924891915:web:d9c641161733b510559c0e",
-          measurementId: "G-QQ210F367M"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
-    </script>
+    <title>WMS Inteligente - Painel</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --primary-color: #10b981;
+            --hover-bg: #f3f4f6;
+            --input-bg: #f9fafb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0b101d;
+                --bg-sidebar: #111827;
+                --bg-card: #1f2937;
+                --text-main: #f9fafb;
+                --text-muted: #9ca3af;
+                --border-color: #374151;
+                --primary-color: #10b981;
+                --hover-bg: #1f2937;
+                --input-bg: #374151;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
         body {
-            /* 🖼️ SUA IMAGEM DE FUNDO CLARA PARA TODO O SISTEMA */
-            background: url('https://i.imgur.com/Gep2VOn.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            color: #1e293b;
-            min-height: 100vh;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             display: flex;
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* 🍔 TOPBAR */
-        .topbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            background: #ffffff;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .btn-menu-toggle {
-            background: none;
-            border: none;
-            color: #1e293b;
-            font-size: 24px;
-            cursor: pointer;
-            margin-right: 20px;
-        }
-
-        .logo-sistema {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
-            letter-spacing: 0.5px;
-        }
-
-        /* 🗂️ MENU LATERAL RETRÁTIL (Sidebar) */
+        /* Sidebar Left Navigation */
         .sidebar {
-            position: fixed;
-            top: 60px; left: -280px;
-            width: 280px; height: calc(100vh - 60px);
-            background: #ffffff;
-            border-right: 1px solid rgba(0,0,0,0.1);
-            transition: left 0.3s ease;
-            z-index: 999;
-            padding: 20px 10px;
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.02);
+            padding: 20px 15px;
+            flex-shrink: 0;
         }
 
-        .sidebar.aberta { left: 0; }
+        .brand-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            padding-left: 10px;
+        }
 
-        .menu-grupo { display: flex; flex-direction: column; gap: 8px; }
-        .menu-titulo-setor {
+        .brand-title span {
+            color: var(--primary-color);
+            font-size: 12px;
+            display: block;
+            font-weight: normal;
+        }
+
+        .menu-group-title {
             font-size: 11px;
             text-transform: uppercase;
-            color: #64748b;
-            font-weight: 700;
-            padding-left: 10px;
-            margin-top: 15px;
-            margin-bottom: 5px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin: 15px 0 8px 10px;
+            font-weight: bold;
         }
 
         .menu-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            color: #334155;
+            gap: 10px;
+            padding: 10px 12px;
+            color: var(--text-main);
             text-decoration: none;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        .menu-item:hover { background: rgba(0,0,0,0.05); color: #0f172a; }
-        .menu-item.admin-only { border-left: 3px solid #eab308; }
-
-        /* 📺 ÁREA DE CONTEÚDO */
-        .conteudo-principal {
-            margin-top: 60px;
-            padding: 30px;
-            width: 100%;
-            transition: margin-left 0.3s ease;
-        }
-        @media(min-width: 1024px) {
-            .sidebar { left: 0; }
-            .conteudo-principal { margin-left: 280px; }
-            .btn-menu-toggle { display: none; }
-        }
-
-        /* COMPONENTES DE TELA */
-        .modulo-tela { display: none; }
-        .modulo-tela.ativo { display: block; }
-
-        .card-expandido {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-
-        h2 { font-size: 24px; margin-bottom: 20px; color: #0f172a; }
-        p { color: #475569; font-size: 14px; line-height: 1.6; }
-
-        /* ALERTAS INTERNOS */
-        .alerta-operacional {
-            background: #ffedd5;
-            border: 1px solid #ea580c;
-            color: #7c2d12;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
             font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: var(--hover-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .menu-item-danger {
+            color: #ef4444;
+            margin-top: auto;
+        }
+
+        .menu-item-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        /* Área do Conteúdo Principal */
+        .content-area {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-header-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
 
-        /* TABELAS */
-        .tabela-wrapper { overflow-x: auto; margin-top: 15px; background: #ffffff; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th { padding: 14px; background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.05); }
-        td { padding: 14px; border-bottom: 1px solid rgba(0,0,0,0.05); color: #334155; }
-
-        .btn-acao {
-            background: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 6px;
-            font-weight: 600; cursor: pointer; font-size: 13px; transition: 0.2s;
+        /* Filtros e Inputs */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
-        .btn-acao:hover { background: #1d4ed8; }
-        .btn-laranja { background: #ea580c; } .btn-laranja:hover { background: #c2410c; }
 
-        /* INPUTS */
-        .campo-grupo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; width: 100%; max-width: 400px; }
-        label { font-size: 13px; color: #334155; font-weight: 600; }
-        select, input { background: #ffffff; border: 1px solid rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; color: #0f172a; font-size: 14px; }
-        select:focus, input:focus { border-color: #2563eb; outline: none; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
 
-        .canvas-assinatura { border: 2px dashed rgba(0,0,0,0.3); background: #f8fafc; border-radius: 6px; cursor: crosshair; margin-top: 10px; }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        /* Tabelas */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        /* Utilitários */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 🍔 TOPBAR -->
-    <div class="topbar">
-        <button class="btn-menu-toggle" onclick="toggleSidebar()">☰</button>
-        <div class="logo-sistema">WMS Inteligente <span style="font-size:12px; color:#15803d; font-weight:bold;">| Transpetro</span></div>
-    </div>
-
-    <!-- 🗂️ SIDEBAR MENU -->
-    <div class="sidebar" id="sidebarMenu">
-        <div class="menu-grupo">
-            <div class="menu-titulo-setor">Operacional</div>
-            <button class="menu-item" onclick="navegarPara('telaConsulta')">🔍 Consulta de NM</button>
-            <button class="menu-item" onclick="navegarPara('telaInventario')">📋 Realizar Inventário</button>
-            <button class="menu-item" onclick="navegarPara('telaTrocaEndereco')">🔄 Troca de Endereço</button>
-
-            <div class="menu-titulo-setor admin-field" style="display:none;">Gerencial (Admin)</div>
-            <button class="menu-item admin-only admin-field" style="display:none;" onclick="window.location.replace('auditoria.html')">📊 Relatórios & Curva ABC</button>
-            <button class="menu-item admin-only admin-field" style="display:none;" onclick="window.location.replace('carga.html')">⚡ Alimentar Sistema (SAP)</button>
-            <button class="menu-item admin-only admin-field" style="display:none;" onclick="navegarPara('telaAdminLogEnderecos')">📜 Log de Alterações SAP</button>
+    <!-- SIDEBAR LEFT -->
+    <div class="sidebar">
+        <div class="brand-title">
+            WMS Inteligente
+            <span>Transpetro</span>
         </div>
 
-        <div class="menu-grupo">
-            <button class="menu-item" style="color: #ef4444;" onclick="logoutSessao()">🚪 Sair do Sistema</button>
-            <div style="font-size:10px; color:#64748b; text-align:center; padding: 10px 0;">&copy; 2026 Dário João Torres</div>
+        <!-- OPERACIONAL -->
+        <div class="menu-group-title">Operacional</div>
+        <div class="menu-item active" onclick="navegarPara('consulta')">
+            🔍 Consulta de NM
+        </div>
+        <div class="menu-item" onclick="navegarPara('inventario')">
+            📋 Realizar Inventário
+        </div>
+        <div class="menu-item" onclick="navegarPara('troca')">
+            📦 Troca de Endereço
+        </div>
+
+        <!-- GERENCIAL (ADMIN) -->
+        <div class="menu-group-title" id="secGerencialTitle">Gerencial (Admin)</div>
+        <div class="menu-item gerencial-item" onclick="navegarPara('abc')">
+            📊 Curva ABC por Valor
+        </div>
+        <div class="menu-item gerencial-item" onclick="navegarPara('acuracia')">
+            📈 Histórico de Acurácia
+        </div>
+        <div class="menu-item gerencial-item" onclick="navegarPara('criticos')">
+            ⚠️ Pontos Críticos & Ordens
+        </div>
+        <div class="menu-item gerencial-item" onclick="navegarPara('saude')">
+            🛡️ Saúde Total do Estoque
+        </div>
+
+        <div class="menu-item gerencial-item" onclick="navegarPara('alimentar')">
+            ⚡ Alimentar Sistema (SAP)
+        </div>
+        <div class="menu-item gerencial-item" onclick="navegarPara('logs')">
+            📜 Log de Alterações SAP
+        </div>
+
+        <!-- SAIR -->
+        <div class="menu-item menu-item-danger" onclick="logout()">
+            🚪 Sair do Sistema
+        </div>
+
+        <div class="sidebar-footer">
+            &copy; 2026 Dário João Torres
         </div>
     </div>
 
-    <!-- 📺 CONTEÚDO PRINCIPAL -->
-    <div class="conteudo-principal">
+    <!-- MAIN CONTENT AREA -->
+    <div class="content-area">
 
-        <!-- MÓDULO 1: CONSULTA DE MATERIAL -->
-        <div id="telaConsulta" class="modulo-tela ativo">
-            <div class="card-expandido">
-                <h2>🔍 Consulta Qualificada de Materiais</h2>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
-                    <div class="campo-grupo" style="max-width: 250px;">
+        <!-- 1. CONSULTA NM -->
+        <div id="view-consulta" class="view-section active">
+            <div class="card">
+                <div class="card-header-title">🔍 Consulta Qualificada de Materiais</div>
+                <div class="filter-grid">
+                    <div class="form-group">
                         <label>Buscar por NM (Prioritário):</label>
-                        <input type="text" id="buscaNM" placeholder="Digite o NM..." oninput="consultarMateriais()">
+                        <input type="text" class="form-control" placeholder="Digite o NM...">
                     </div>
-                    <div class="campo-grupo" style="max-width: 200px;">
+                    <div class="form-group">
                         <label>Filtrar por Depósito:</label>
-                        <select id="buscaDeposito" onchange="consultarMateriais()">
-                            <option value="">Todos os Depósitos</option>
-                            <option value="DP01">DP01</option>
-                            <option value="DP02">DP02</option>
-                            <option value="DP03">DP03</option>
-                            <option value="DP04">DP04</option>
-                            <option value="DP05">DP05</option>
-                            <option value="DPA1">DPA1</option>
-                            <option value="DPA2">DPA2</option>
-                            <option value="DPA3">DPA3</option>
+                        <select class="form-control">
+                            <option>Todos os Depósitos</option>
                         </select>
                     </div>
-                    <div class="campo-grupo" style="max-width: 200px;">
+                    <div class="form-group">
                         <label>Buscar por Endereço:</label>
-                        <input type="text" id="buscaEndereco" placeholder="Ex: A-12..." oninput="consultarMateriais()">
+                        <input type="text" class="form-control" placeholder="Ex: A-12...">
                     </div>
                 </div>
-
-                <div class="tabela-wrapper">
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -274,438 +295,124 @@
                                 <th>Dimensão</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelaConsultaMateriais">
-                            <tr><td colspan="8" style="text-align:center;">Use os filtros acima para consultar o estoque.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- MÓDULO 2: INVENTÁRIO -->
-        <div id="telaInventario" class="modulo-tela">
-            <div class="card-expandido">
-                <h2>📋 Lançamento de Inventário Físico</h2>
-                
-                <!-- Alerta Obrigatório de Período Matutino -->
-                <div class="alerta-operacional" style="background: #e0f2fe; border-color: #0284c7; color: #0369a1;">
-                    <div><strong>🕒 AVISO OPERACIONAL:</strong> Este inventário deverá ser realizado durante o período da manhã.</div>
-                </div>
-
-                <div class="tabela-wrapper">
-                    <table>
-                        <thead>
+                        <tbody>
                             <tr>
-                                <th>Grupo</th>
-                                <th>NM</th>
-                                <th>Descrição</th>
-                                <th>Depósito</th>
-                                <th>Endereço</th>
-                                <th>Qtd. Contada</th>
+                                <td colspan="8" style="text-align: center; color: var(--text-muted);">Use os filtros acima para consultar o estoque.</td>
                             </tr>
-                        </thead>
-                        <tbody id="tabelaInventarioItens">
-                            <tr><td colspan="6" style="text-align:center;">Carregando materiais selecionados para contagem...</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <br>
-                <button class="btn-acao" onclick="salvarInventario()">Salvar Contagem de Inventário</button>
             </div>
         </div>
 
-        <!-- MÓDULO 3: TROCA DE ENDEREÇO -->
-        <div id="telaTrocaEndereco" class="modulo-tela">
-            <div class="card-expandido">
-                <h2>🔄 Solicitação de Troca de Endereço no WMS</h2>
-                <p style="margin-bottom: 20px;">Selecione o material e defina sua nova coordenada no pátio.</p>
-
-                <div class="campo-grupo">
-                    <label>Número do Material (NM)</label>
-                    <input type="text" id="trocaMaterialNM" placeholder="Digite o NM para localizar..." onblur="localizarMaterialTroca()">
-                </div>
-                
-                <div id="infoMaterialTroca" style="display:none; margin-bottom: 15px; padding: 10px; background: #f1f5f9; border-radius: 6px;">
-                    <p><strong>Descrição:</strong> <span id="lblDescricaoNM">-</span></p>
-                    <p><strong>Endereço Atual:</strong> <span id="lblEndAtualNM" style="color:#d97706; font-weight:bold;">-</span></p>
-                </div>
-
-                <div class="campo-grupo">
-                    <label>Novo Endereço no Pátio</label>
-                    <input type="text" id="trocaNovoEndereco" placeholder="Ex: C-14">
-                </div>
-
-                <button class="btn-acao" onclick="confirmarTrocaWMS()">Mudar Endereço no WMS</button>
-            </div>
-
-            <!-- Alerta Obrigatório do SAP -->
-            <div id="alertaSAPSector" class="alerta-operacional" style="display: none;">
-                <div>
-                    <strong>⚠️ ATENÇÃO:</strong> confirme que a alteração também foi realizada no SAP.
-                </div>
-                <button class="btn-acao btn-laranja" onclick="abrirModalAssinaturaSAP()">Confirmar & Assinar</button>
+        <!-- 2. REALIZAR INVENTÁRIO -->
+        <div id="view-inventario" class="view-section">
+            <div class="card">
+                <div class="card-header-title">📋 Realizar Inventário</div>
+                <p style="color: var(--text-muted);">Módulo de contagem física e atualização de contagem em tempo real.</p>
             </div>
         </div>
 
-        <!-- MÓDULO 4: ADMIN LOG DE ALTERAÇÕES DE ENDEREÇO -->
-        <div id="telaAdminLogEnderecos" class="modulo-tela">
-            <div class="card-expandido">
-                <h2>📜 Registro de Alterações e Declarações do SAP</h2>
-                <p>Auditoria em tempo real de documentos eletrônicos assinados pelos operadores atestando modificações no SAP.</p>
-                
-                <div class="tabela-wrapper">
-                    <table>
-                        <thead>
-                            <tr><th>Colaborador</th><th>Data/Hora</th><th>Material (NM)</th><th>End. Antigo</th><th>Novo End.</th><th>Status SAP</th></tr>
-                        </thead>
-                        <tbody id="corpoLogEnderecos">
-                            <tr><td colspan="6" style="text-align:center; color:#64748b;">Nenhuma alteração registrada até o momento.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- 3. TROCA DE ENDEREÇO -->
+        <div id="view-troca" class="view-section">
+            <div class="card">
+                <div class="card-header-title">📦 Troca de Endereço de Material</div>
+                <p style="color: var(--text-muted);">Módulo de transferência de localizador dentro do depósito.</p>
+            </div>
+        </div>
+
+        <!-- 4. GERENCIAL: CURVA ABC -->
+        <div id="view-abc" class="view-section">
+            <div class="card">
+                <div class="card-header-title">📊 Curva ABC por Valor</div>
+                <p style="color: var(--text-muted);">Classificação de materiais por representatividade de valor financeiro acumulado.</p>
+            </div>
+        </div>
+
+        <!-- 5. GERENCIAL: HISTÓRICO DE ACURÁCIA -->
+        <div id="view-acuracia" class="view-section">
+            <div class="card">
+                <div class="card-header-title">📈 Histórico de Acurácia</div>
+                <p style="color: var(--text-muted);">Indicadores de convergência entre o estoque físico e o registro sistêmico.</p>
+            </div>
+        </div>
+
+        <!-- 6. GERENCIAL: PONTOS CRÍTICOS & ORDENS -->
+        <div id="view-criticos" class="view-section">
+            <div class="card">
+                <div class="card-header-title">⚠️ Pontos Críticos & Ordens</div>
+                <p style="color: var(--text-muted);">Alertas de ruptura de estoque, ponto de ressuprimento e ordens pendentes.</p>
+            </div>
+        </div>
+
+        <!-- 7. GERENCIAL: SAÚDE TOTAL DO ESTOQUE -->
+        <div id="view-saude" class="view-section">
+            <div class="card">
+                <div class="card-header-title">🛡️ Saúde Total do Estoque</div>
+                <p style="color: var(--text-muted);">Visão macro de giro de estoque, materiais sem movimentação e depósitos.</p>
+            </div>
+        </div>
+
+        <!-- 8. GERENCIAL: ALIMENTAR SISTEMA -->
+        <div id="view-alimentar" class="view-section">
+            <div class="card">
+                <div class="card-header-title">⚡ Alimentar Sistema (Carga SAP)</div>
+                <p style="color: var(--text-muted);">Upload de planilhas e carga de dados brutos extraídos do SAP.</p>
+            </div>
+        </div>
+
+        <!-- 9. GERENCIAL: LOGS -->
+        <div id="view-logs" class="view-section">
+            <div class="card">
+                <div class="card-header-title">📜 Log de Alterações SAP</div>
+                <p style="color: var(--text-muted);">Histórico detalhado de movimentações e sincronizações executadas.</p>
             </div>
         </div>
 
     </div>
 
-    <!-- LÓGICA DE NAVEGAÇÃO E SISTEMA INTEGRADO -->
     <script>
-        const perfil = localStorage.getItem('wms_perfil');
-        const usuarioEmail = localStorage.getItem('wms_usuario') || 'Operador Pátio';
+        // Validação de Sessão Antecipada
+        const usuarioAtivo = localStorage.getItem('wms_usuario');
+        const perfilAtivo = localStorage.getItem('wms_perfil');
 
-        if (perfil === 'ADMIN') {
-            document.querySelectorAll('.admin-field').forEach(el => el.style.display = 'flex');
+        if (!usuarioAtivo || !perfilAtivo) {
+            window.location.replace('index.html');
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebarMenu').classList.toggle('aberta');
+        // Bloqueio visual para usuários Operacionais
+        if (perfilAtivo !== 'ADMIN' && perfilAtivo !== 'GERENCIAL') {
+            document.querySelectorAll('.gerencial-item').forEach(el => el.style.display = 'none');
+            const titleG = document.getElementById('secGerencialTitle');
+            if(titleG) titleG.style.display = 'none';
         }
 
-        function navegarPara(idTela) {
-            document.querySelectorAll('.modulo-tela').forEach(t => t.classList.remove('ativo'));
-            document.getElementById(idTela).classList.add('ativo');
+        // Navegação de Telas
+        function navegarPara(idView) {
+            // Remove classe ativa das opções do menu
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
             
-            if (idTela === 'telaInventario') carregarMateriaisInventario();
-            if (idTela === 'telaAdminLogEnderecos') carregarLogsFirestore();
-            if (window.innerWidth < 1024) toggleSidebar();
-        }
+            // Esconde todas as seções
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
 
-        function logoutSessao() {
-            localStorage.clear();
-            window.location.replace("index.html");
-        }
-
-        // ==========================================
-        // 1. MÓDULO CONSULTA MATERIAL
-        // ==========================================
-        async function consultarMateriais() {
-            const nm = document.getElementById('buscaNM').value.trim();
-            const deposito = document.getElementById('buscaDeposito').value;
-            const endereco = document.getElementById('buscaEndereco').value.trim();
-            const tbody = document.getElementById('tabelaConsultaMateriais');
-
-            let query = db.collection('materiais');
-
-            if (nm) {
-                query = query.where('nm', '==', nm);
-            } else {
-                if (deposito) query = query.where('deposito', '==', deposito);
-                if (endereco) query = query.where('endereco', '==', endereco);
+            // Ativa a seção clicada
+            const targetView = document.getElementById(`view-${idView}`);
+            if (targetView) {
+                targetView.classList.add('active');
             }
 
-            try {
-                const snapshot = await query.limit(50).get();
-                tbody.innerHTML = "";
-
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Nenhum material encontrado.</td></tr>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const item = doc.data();
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${item.nm || '-'}</strong></td>
-                            <td>${item.descricao || '-'}</td>
-                            <td>${item.deposito || '-'}</td>
-                            <td><span style="color:#2563eb; font-weight:bold;">${item.endereco || '-'}</span></td>
-                            <td>${item.saldo || 0}</td>
-                            <td>${item.unidade || 'UN'}</td>
-                            <td>${item.peso || '-'}</td>
-                            <td>${item.dimensao || '-'}</td>
-                        </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Erro ao consultar materiais:", error);
+            // Destaque visual no item do menu
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
             }
         }
 
-        // ==========================================
-        // 2. MÓDULO TROCA DE ENDEREÇO
-        // ==========================================
-        let materialEmMudanca = null;
-        let enderecoEmMudanca = "";
-
-        async function localizarMaterialTroca() {
-            const nm = document.getElementById('trocaMaterialNM').value.trim();
-            if (!nm) return;
-
-            try {
-                const snapshot = await db.collection('materiais').where('nm', '==', nm).get();
-                if (!snapshot.empty) {
-                    const doc = snapshot.docs[0];
-                    materialEmMudanca = { id: doc.id, ...doc.data() };
-                    document.getElementById('lblDescricaoNM').innerText = materialEmMudanca.descricao || 'Sem descrição';
-                    document.getElementById('lblEndAtualNM').innerText = materialEmMudanca.endereco || 'Sem Endereço';
-                    document.getElementById('infoMaterialTroca').style.display = 'block';
-                } else {
-                    Swal.fire('Aviso', 'NM não encontrado no cadastro de materiais.', 'warning');
-                    document.getElementById('infoMaterialTroca').style.display = 'none';
-                    materialEmMudanca = null;
-                }
-            } catch (e) {
-                console.error("Erro ao localizar material:", e);
-            }
+        // Função de Logout
+        function logout() {
+            localStorage.removeItem('wms_usuario');
+            localStorage.removeItem('wms_perfil');
+            window.location.replace('index.html');
         }
-
-        function confirmarTrocaWMS() {
-            if (!materialEmMudanca) {
-                Swal.fire('Erro', 'Informe um NM válido para alterar.', 'error');
-                return;
-            }
-
-            enderecoEmMudanca = document.getElementById('trocaNovoEndereco').value.trim();
-            if (!enderecoEmMudanca) {
-                Swal.fire('Erro', 'Insira o novo endereço do pátio.', 'error');
-                return;
-            }
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Atualizado no WMS!',
-                text: `O endereço do NM ${materialEmMudanca.nm} foi preparado para alteração de ${materialEmMudanca.endereco} para ${enderecoEmMudanca}.`,
-                confirmButtonColor: '#2563eb'
-            }).then(() => {
-                document.getElementById('alertaSAPSector').style.display = 'flex';
-            });
-        }
-
-        function abrirModalAssinaturaSAP() {
-            Swal.fire({
-                title: 'Confirmação de Registro no SAP',
-                html: `
-                    <p style="color:#334155; font-size:14px; text-align:left; margin-bottom:10px;">
-                        Eu, <b>${usuarioEmail}</b>, afirmo sob responsabilidade técnica que realizei a troca do endereço do NM <b>${materialEmMudanca.nm}</b> para <b>${enderecoEmMudanca}</b> na plataforma oficial do SAP.
-                    </p>
-                    <label style="color:#334155; font-size:12px; font-weight:bold; display:block; text-align:left;">Assine na caixa abaixo:</label>
-                    <canvas id="canvasAssinatura" class="canvas-assinatura" width="400" height="150"></canvas>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Emitir Documento & Salvar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#15803d',
-                didOpen: () => {
-                    const canvas = document.getElementById('canvasAssinatura');
-                    const ctx = canvas.getContext('2d');
-                    let desenhando = false;
-
-                    ctx.strokeStyle = "#000000";
-                    ctx.lineWidth = 2;
-
-                    canvas.addEventListener('mousedown', () => desenhando = true);
-                    canvas.addEventListener('mouseup', () => desenhando = false);
-                    canvas.addEventListener('mousemove', (e) => {
-                        if (!desenhando) return;
-                        const rect = canvas.getBoundingClientRect();
-                        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-                        ctx.stroke();
-                    });
-                }
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    const canvas = document.getElementById('canvasAssinatura');
-                    const assinaturaBase64 = canvas ? canvas.toDataURL() : '';
-                    const dataAtual = new Date();
-
-                    const dadosTroca = {
-                        usuario: usuarioEmail,
-                        data: dataAtual.toLocaleDateString('pt-BR'),
-                        hora: dataAtual.toLocaleTimeString('pt-BR'),
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        nm: materialEmMudanca.nm,
-                        enderecoAntigo: materialEmMudanca.endereco || 'N/A',
-                        enderecoNovo: enderecoEmMudanca,
-                        statusSAP: 'CONFIRMADO_PELO_OPERADOR'
-                    };
-
-                    try {
-                        // 1. Atualiza endereço no Firestore
-                        await db.collection('materiais').doc(materialEmMudanca.id).update({
-                            endereco: enderecoEmMudanca
-                        });
-
-                        // 2. Registra na coleção troca_endereco
-                        const refTroca = await db.collection('troca_endereco').add(dadosTroca);
-
-                        // 3. Registra na coleção assinaturas
-                        await db.collection('assinaturas').add({
-                            idTroca: refTroca.id,
-                            usuario: usuarioEmail,
-                            assinaturaImg: assinaturaBase64,
-                            dataHora: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                        // 4. Salva histórico em logs
-                        await db.collection('logs').add({
-                            acao: 'TROCA_ENDERECO',
-                            detalhes: `NM ${materialEmMudanca.nm} alterado de ${materialEmMudanca.endereco} para ${enderecoEmMudanca}`,
-                            usuario: usuarioEmail,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                        Swal.fire('Documento Registrado!', 'Alteração salva no WMS e comprovante gravado no Firestore com sucesso.', 'success');
-                        document.getElementById('alertaSAPSector').style.display = 'none';
-                        document.getElementById('trocaNovoEndereco').value = "";
-                        document.getElementById('trocaMaterialNM').value = "";
-                        document.getElementById('infoMaterialTroca').style.display = 'none';
-
-                    } catch (err) {
-                        console.error("Erro ao gravar alteração:", err);
-                        Swal.fire('Erro', 'Ocorreu uma falha ao gravar no Firestore.', 'error');
-                    }
-                }
-            });
-        }
-
-        async function carregarLogsFirestore() {
-            const tbody = document.getElementById('corpoLogEnderecos');
-            try {
-                const snapshot = await db.collection('troca_endereco').orderBy('timestamp', 'desc').limit(20).get();
-                tbody.innerHTML = "";
-
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Nenhuma alteração registrada até o momento.</td></tr>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const log = doc.data();
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${log.usuario}</strong></td>
-                            <td>${log.data} ${log.hora}</td>
-                            <td>NM ${log.nm}</td>
-                            <td>${log.enderecoAntigo}</td>
-                            <td><span style="color:#16a34a; font-weight:bold;">${log.enderecoNovo}</span></td>
-                            <td><span style="padding:4px 8px; background:rgba(22,163,74,0.1); color:#16a34a; border:1px solid #16a34a; font-size:11px; font-weight:bold; border-radius:4px;">✓ SINCRO SAP</span></td>
-                        </tr>
-                    `;
-                });
-            } catch (e) {
-                console.error("Erro ao carregar logs:", e);
-            }
-        }
-
-        // ==========================================
-        // 3. MÓDULO INVENTÁRIO
-        // ==========================================
-        async function carregarMateriaisInventario() {
-            const tbody = document.getElementById('tabelaInventarioItens');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Buscando itens para inventário...</td></tr>';
-
-            try {
-                const snapMov = await db.collection('movimentacoes').limit(5).get();
-                let nmsGrupo1 = [];
-                snapMov.forEach(d => nmsGrupo1.push(d.data().nm));
-
-                const snapMateriais = await db.collection('materiais').limit(10).get();
-                tbody.innerHTML = "";
-
-                if (snapMateriais.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhum material cadastrado para inventário.</td></tr>';
-                    return;
-                }
-
-                let idx = 0;
-                snapMateriais.forEach(doc => {
-                    const mat = doc.data();
-                    const eGrupo1 = nmsGrupo1.includes(mat.nm) || idx < 3;
-                    const grupoLabel = eGrupo1 ? 'Grupo 1 (MB51 - Recente)' : 'Grupo 2 (Aleatório)';
-                    const grupoCor = eGrupo1 ? '#ea580c' : '#2563eb';
-
-                    tbody.innerHTML += `
-                        <tr class="item-inventario-row" data-id="${doc.id}" data-nm="${mat.nm}">
-                            <td><span style="color:${grupoCor}; font-weight:bold; font-size:11px;">${grupoLabel}</span></td>
-                            <td><strong>${mat.nm}</strong></td>
-                            <td>${mat.descricao || '-'}</td>
-                            <td>${mat.deposito || '-'}</td>
-                            <td>${mat.endereco || '-'}</td>
-                            <td><input type="number" class="input-qtd-contada" placeholder="Qtd. contada" style="width:120px;"></td>
-                        </tr>
-                    `;
-                    idx++;
-                });
-
-            } catch (e) {
-                console.error("Erro ao carregar inventário:", e);
-            }
-        }
-
-        async function salvarInventario() {
-            const linhas = document.querySelectorAll('.item-inventario-row');
-            const dataAtual = new Date();
-            const batch = db.batch();
-            let possuiContagem = false;
-
-            linhas.forEach(linha => {
-                const idDoc = linha.getAttribute('data-id');
-                const nm = linha.getAttribute('data-nm');
-                const qtdInput = linha.querySelector('.input-qtd-contada').value;
-
-                if (qtdInput !== "") {
-                    possuiContagem = true;
-                    const refInv = db.collection('inventarios').doc();
-                    batch.set(refInv, {
-                        materialId: idDoc,
-                        nm: nm,
-                        quantidadeContada: Number(qtdInput),
-                        usuario: usuarioEmail,
-                        data: dataAtual.toLocaleDateString('pt-BR'),
-                        hora: dataAtual.toLocaleTimeString('pt-BR'),
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-            });
-
-            if (!possuiContagem) {
-                Swal.fire('Aviso', 'Preencha ao menos uma quantidade contada.', 'warning');
-                return;
-            }
-
-            try {
-                await batch.commit();
-                Swal.fire('Sucesso!', 'Contagem de inventário registrada com sucesso.', 'success');
-                carregarMateriaisInventario();
-            } catch (e) {
-                console.error("Erro ao salvar inventário:", e);
-                Swal.fire('Erro', 'Não foi possível salvar o inventário.', 'error');
-            }
-        }
-
-        // Cronômetro de Inatividade
-        let cronometroInatividade;
-        function resetarCronometroSessao() {
-            clearTimeout(cronometroInatividade);
-            cronometroInatividade = setTimeout(() => {
-                localStorage.clear();
-                window.location.replace("index.html");
-            }, 300000);
-        }
-        document.addEventListener('mousemove', resetarCronometroSessao);
-        document.addEventListener('click', resetarCronometroSessao);
-        document.addEventListener('keypress', resetarCronometroSessao);
     </script>
 </body>
 </html>
