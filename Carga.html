@@ -205,6 +205,69 @@
             border-color: var(--primary-color);
         }
 
+        /* Diagnostic Box (Diagnóstico de Compatibilidade) */
+        .diagnostic-box {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .diagnostic-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .diagnostic-section {
+            margin-bottom: 8px;
+        }
+
+        .diagnostic-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .diagnostic-list {
+            list-style: none;
+            font-size: 11px;
+        }
+
+        .diagnostic-list li {
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .compat-badge-container {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .compat-text {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .compat-percentage {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
         /* Barra de Progresso Visual */
         .progress-container {
             width: 100%;
@@ -358,6 +421,14 @@
                         <div id="mappingFieldsMB51"></div>
                     </div>
 
+                    <!-- Painel de Diagnóstico de Compatibilidade MB51 -->
+                    <div class="diagnostic-box" id="diagContainerMB51">
+                        <div class="diagnostic-title">
+                            <span>🔍 DIAGNÓSTICO DE COMPATIBILIDADE</span>
+                        </div>
+                        <div id="diagContentMB51"></div>
+                    </div>
+
                     <!-- Prévia dos Dados -->
                     <div class="file-preview" id="previewContainerMB51" style="display: none; margin-top: 10px;">
                         <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA COM MAPEAMENTO (3 LINHAS):</div>
@@ -410,6 +481,14 @@
                         <div id="mappingFieldsMB25"></div>
                     </div>
 
+                    <!-- Painel de Diagnóstico de Compatibilidade MB25 -->
+                    <div class="diagnostic-box" id="diagContainerMB25">
+                        <div class="diagnostic-title">
+                            <span>🔍 DIAGNÓSTICO DE COMPATIBILIDADE</span>
+                        </div>
+                        <div id="diagContentMB25"></div>
+                    </div>
+
                     <!-- Prévia dos Dados -->
                     <div class="file-preview" id="previewContainerMB25" style="display: none; margin-top: 10px;">
                         <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA COM MAPEAMENTO (3 LINHAS):</div>
@@ -460,6 +539,14 @@
                             <span style="font-size: 10px; color: var(--primary-color);" id="statusMappingZQMM">Auto-detectado</span>
                         </div>
                         <div id="mappingFieldsZQMM"></div>
+                    </div>
+
+                    <!-- Painel de Diagnóstico de Compatibilidade ZQMM_026A -->
+                    <div class="diagnostic-box" id="diagContainerZQMM">
+                        <div class="diagnostic-title">
+                            <span>🔍 DIAGNÓSTICO DE COMPATIBILIDADE</span>
+                        </div>
+                        <div id="diagContentZQMM"></div>
                     </div>
 
                     <!-- Prévia dos Dados -->
@@ -565,6 +652,7 @@
             document.getElementById(`msgSucesso${tipo}`).style.display = 'none';
             document.getElementById(`msgErro${tipo}`).style.display = 'none';
             document.getElementById(`mappingContainer${tipo}`).style.display = 'none';
+            document.getElementById(`diagContainer${tipo}`).style.display = 'none';
             document.getElementById(`previewContainer${tipo}`).style.display = 'none';
 
             if (!file) return;
@@ -613,10 +701,11 @@
                     
                     document.getElementById(`linhas${tipo}`).innerText = `${jsonResult.length} registros`;
 
-                    // Gerar a interface de mapeamento
+                    // Gerar a interface de mapeamento e executar o diagnóstico
                     gerarInterfaceMapeamento(tipo, colunasEncontradas);
 
                     document.getElementById(`mappingContainer${tipo}`).style.display = 'block';
+                    document.getElementById(`diagContainer${tipo}`).style.display = 'block';
                     document.getElementById(`previewContainer${tipo}`).style.display = 'block';
                     document.getElementById(`btnEnviar${tipo}`).style.display = 'block';
 
@@ -669,12 +758,74 @@
 
                 container.appendChild(row);
             });
+
+            // Executar Diagnóstico de Compatibilidade
+            gerarDiagnosticoCompatibilidade(tipo);
         }
 
-        // ATUALIZA MAPEAMENTO QUANDO O USUÁRIO ALTERA O SELECT
+        // ALTERA O MAPEAMENTO E ATUALIZA DIAGNÓSTICO E PRÉVIA
         function alterarMapeamento(tipo, campoId, novaColuna) {
             dadosLidosEmMemoria[tipo].map[campoId] = novaColuna;
+            gerarDiagnosticoCompatibilidade(tipo);
             atualizarPreviaComMapeamento(tipo);
+        }
+
+        // GERA O DIAGNÓSTICO DE COMPATIBILIDADE DA PLANILHA
+        function gerarDiagnosticoCompatibilidade(tipo) {
+            const diagContainer = document.getElementById(`diagContent${tipo}`);
+            const camposReq = camposObrigatoriosWMS[tipo];
+            const mapa = dadosLidosEmMemoria[tipo].map;
+
+            const encontrados = [];
+            const ausentes = [];
+
+            camposReq.forEach(campo => {
+                if (mapa[campo.id] && mapa[campo.id] !== '') {
+                    encontrados.push(campo.label);
+                } else {
+                    ausentes.push(campo.label);
+                }
+            });
+
+            const totalCampos = camposReq.length;
+            const qtdEncontrados = encontrados.length;
+            const percentual = Math.round((qtdEncontrados / totalCampos) * 100);
+
+            // Definição da cor com base no percentual de compatibilidade
+            let corPercentual = 'var(--primary-color)';
+            if (percentual < 60) {
+                corPercentual = '#ef4444';
+            } else if (percentual < 100) {
+                corPercentual = '#f59e0b';
+            }
+
+            let htmlEncontrados = encontrados.map(item => `<li>✅ ${item}</li>`).join('');
+            if (encontrados.length === 0) {
+                htmlEncontrados = '<li style="color: var(--text-muted); italic;">Nenhum campo mapeado.</li>';
+            }
+
+            let htmlAusentes = ausentes.map(item => `<li style="color: #ef4444;">❌ ${item}</li>`).join('');
+
+            diagContainer.innerHTML = `
+                <div class="diagnostic-section">
+                    <div class="diagnostic-section-title">Campos Encontrados:</div>
+                    <ul class="diagnostic-list">
+                        ${htmlEncontrados}
+                    </ul>
+                </div>
+                ${ausentes.length > 0 ? `
+                <div class="diagnostic-section">
+                    <div class="diagnostic-section-title">Campo${ausentes.length > 1 ? 's' : ''} Ausente${ausentes.length > 1 ? 's' : ''}:</div>
+                    <ul class="diagnostic-list">
+                        ${htmlAusentes}
+                    </ul>
+                </div>
+                ` : ''}
+                <div class="compat-badge-container">
+                    <span class="compat-text">Compatibilidade:</span>
+                    <span class="compat-percentage" style="color: ${corPercentual};">${percentual}%</span>
+                </div>
+            `;
         }
 
         // RENDERIZAR PRÉVIA DAS 3 PRIMEIRAS LINHAS USANDO O MAPEAMENTO ATUAL
