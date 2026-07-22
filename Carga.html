@@ -648,6 +648,24 @@
         function processarArquivo(tipo, input) {
             const file = input.files[0];
             
+            if (!file) return;
+
+            // --- DIAGNÓSTICO TEMPORÁRIO INÍCIO ---
+            alert("Arquivo selecionado com sucesso.");
+
+            const extensaoArquivo = file.name.split('.').pop().toLowerCase();
+            console.log("=== DIAGNÓSTICO DE ARQUIVO SELECIONADO ===");
+            console.log("Nome do arquivo:", file.name);
+            console.log("Extensão:", extensaoArquivo);
+            console.log("Tamanho (bytes):", file.size);
+
+            if (typeof XLSX === "undefined") {
+                alert("Erro: biblioteca XLSX não encontrada.");
+            } else {
+                alert("Biblioteca XLSX carregada com sucesso.");
+            }
+            // --- DIAGNÓSTICO TEMPORÁRIO FIM ---
+
             // Ocultar elementos de estado prévio
             document.getElementById(`msgSucesso${tipo}`).style.display = 'none';
             document.getElementById(`msgErro${tipo}`).style.display = 'none';
@@ -655,13 +673,10 @@
             document.getElementById(`diagContainer${tipo}`).style.display = 'none';
             document.getElementById(`previewContainer${tipo}`).style.display = 'none';
 
-            if (!file) return;
-
             // Validação da Extensão
             const extPermitidas = ['xlsx', 'xls', 'csv'];
-            const extensao = file.name.split('.').pop().toLowerCase();
 
-            if (!extPermitidas.includes(extensao)) {
+            if (!extPermitidas.includes(extensaoArquivo)) {
                 document.getElementById(`msgErro${tipo}`).innerText = "❌ Extensão inválida! Envie .xlsx, .xls ou .csv.";
                 document.getElementById(`msgErro${tipo}`).style.display = 'block';
                 document.getElementById(`info${tipo}`).style.display = 'none';
