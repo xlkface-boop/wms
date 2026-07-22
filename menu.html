@@ -725,23 +725,24 @@
         <div id="view-logs" class="view-section">
             <div class="card">
                 <div class="card-header-title">📜 Log de Alterações e Auditoria SAP</div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Rastreabilidade automática de todas as cargas de arquivos, alterações manuais e contagens realizadas.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Rastreabilidade centralizada de todas as operações: inventários, recontagens, trocas de endereço, confirmações SAP e importações de planilhas (MB51, MB25, ZQMM_0026A).</p>
                 
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>Data / Hora</th>
-                                <th>Usuário</th>
-                                <th>Ação Realizada</th>
-                                <th>Arquivo / Origem</th>
-                                <th>Registros Afetados</th>
-                                <th>Status</th>
+                                <th>Tipo de Operação</th>
+                                <th>NM / Documento</th>
+                                <th>Usuário / Operador</th>
+                                <th>Detalhes / Transição</th>
+                                <th>Qtd / Reg.</th>
+                                <th>Status SAP</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyLogAlteracoes">
                             <tr>
-                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum log registrado até o momento. As alterações automáticas aparecerão aqui.</td>
+                                <td colspan="7" style="text-align: center; color: var(--text-muted);">Aguardando sincronização com o Firestore...</td>
                             </tr>
                         </tbody>
                     </table>
