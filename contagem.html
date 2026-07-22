@@ -374,10 +374,10 @@
 
         <!-- OPERACIONAL -->
         <div class="menu-group-title">Operacional</div>
-        <div class="menu-item active" onclick="navegarPara('consulta')">
+        <a href="consulta.html" class="menu-item">
             🔍 Consulta de NM
-        </div>
-        <div class="menu-item" onclick="navegarPara('inventario')">
+        </a>
+        <div class="menu-item active" onclick="navegarPara('inventario')">
             📋 Realizar Inventário
         </div>
         <div class="menu-item" onclick="navegarPara('reservas')">
@@ -395,9 +395,9 @@
         <div class="menu-item gerencial-item" onclick="navegarPara('abc')">
             📊 Curva ABC por Valor
         </div>
-        <div class="menu-item gerencial-item" onclick="navegarPara('acuracia')">
+        <a href="auditoria.html" class="menu-item gerencial-item">
             📈 Histórico de Acurácia
-        </div>
+        </a>
         <div class="menu-item gerencial-item" onclick="navegarPara('criticos')">
             ⚠️ Pontos Críticos & Ordens
         </div>
@@ -405,9 +405,9 @@
             🛡️ Saúde Total do Estoque
         </div>
 
-        <div class="menu-item gerencial-item" onclick="navegarPara('alimentar')">
+        <a href="Carga.html" class="menu-item gerencial-item">
             ⚡ Alimentar Sistema (SAP)
-        </div>
+        </a>
         <div class="menu-item gerencial-item" onclick="navegarPara('logs')">
             📜 Log de Alterações SAP
         </div>
@@ -426,7 +426,7 @@
     <div class="content-area">
 
         <!-- 1. CONSULTA NM -->
-        <div id="view-consulta" class="view-section active">
+        <div id="view-consulta" class="view-section">
             <div class="card">
                 <div class="card-header-title">🔍 Consulta Qualificada de Materiais</div>
                 <div class="filter-grid">
@@ -476,7 +476,7 @@
         </div>
 
         <!-- 2. REALIZAR INVENTÁRIO -->
-        <div id="view-inventario" class="view-section">
+        <div id="view-inventario" class="view-section active">
             <div class="card">
                 <div class="card-header-title">📋 Realizar Inventário Cego Diário</div>
                 <p style="color: var(--text-muted); margin-bottom: 20px; text-align: center;">
