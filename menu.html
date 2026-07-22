@@ -3,35 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Menu Principal</title>
+    <title>WMS Inteligente - Sistema de Gestão de Estoque</title>
 
     <style>
         :root {
             --bg-body: #f3f4f6;
             --bg-card: #ffffff;
+            --bg-sidebar: #1f2937;
+            --sidebar-text: #9ca3af;
+            --sidebar-hover-bg: #374151;
+            --sidebar-hover-text: #ffffff;
+            --sidebar-active-bg: #10b981;
+            --sidebar-active-text: #ffffff;
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border-color: #e5e7eb;
             --primary-color: #10b981;
-            --hover-bg: #f3f4f6;
             --input-bg: #f9fafb;
-            --accent-blue: #2563eb;
-            --active-bg: rgba(16, 185, 129, 0.12);
-            --active-border: #10b981;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-body: #0b101d;
                 --bg-card: #1f2937;
+                --bg-sidebar: #111827;
+                --sidebar-text: #9ca3af;
+                --sidebar-hover-bg: #1f2937;
+                --sidebar-hover-text: #ffffff;
+                --sidebar-active-bg: #10b981;
+                --sidebar-active-text: #ffffff;
                 --text-main: #f9fafb;
                 --text-muted: #9ca3af;
                 --border-color: #374151;
                 --primary-color: #10b981;
-                --hover-bg: #374151;
                 --input-bg: #374151;
-                --active-bg: rgba(16, 185, 129, 0.2);
-                --active-border: #10b981;
             }
         }
 
@@ -45,386 +50,299 @@
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
-            padding: 30px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* HEADER DO MENU */
-        .menu-header {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .menu-title {
-            font-size: 22px;
+        /* BARRA LATERAL (SIDEBAR) */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 18px;
             font-weight: bold;
+            color: #ffffff;
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--text-main);
         }
 
-        .menu-subtitle {
-            color: var(--text-muted);
-            font-size: 13px;
+        .sidebar-subtitle {
+            font-size: 11px;
+            color: var(--sidebar-text);
             margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .user-badge {
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--text-muted);
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px 0;
+            flex-grow: 1;
+        }
+
+        .menu-section-label {
+            padding: 12px 20px 6px 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-item {
+            margin-bottom: 2px;
+        }
+
+        .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        .status-dot {
+        .sidebar-link:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-hover-text);
+        }
+
+        /* ITEM ATIVO DESTAQUE */
+        .sidebar-link.active {
+            background-color: var(--sidebar-active-bg);
+            color: var(--sidebar-active-text);
+            font-weight: 600;
+        }
+
+        .sidebar-link.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .sidebar-link.disabled:hover {
+            background-color: transparent;
+            color: var(--sidebar-text);
+        }
+
+        .sidebar-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .badge-soon {
+            font-size: 9px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
+            color: #ffffff;
+        }
+
+        .sidebar-footer {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--sidebar-text);
+            font-size: 13px;
+        }
+
+        .user-status {
             width: 8px;
             height: 8px;
             background-color: var(--primary-color);
             border-radius: 50%;
-            display: inline-block;
         }
 
-        /* NAVEGAÇÃO / CENTRAL DE MÓDULOS */
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            padding-left: 4px;
+        /* ÁREA PRINCIPAL DE CONTEÚDO */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
         }
 
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        /* CARDS DE NAVEGAÇÃO DE MÓDULOS */
-        .nav-card {
+        .content-header {
             background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            text-decoration: none;
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-card:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.08);
-        }
-
-        /* DESTAKE DE PÁGINA ATIVA */
-        .nav-card.active {
-            border-color: var(--active-border);
-            background-color: var(--active-bg);
-            box-shadow: 0 0 0 1px var(--active-border);
-        }
-
-        .nav-card.active::before {
-            content: "● ATIVO";
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--primary-color);
-            letter-spacing: 0.5px;
-        }
-
-        /* MÓDULOS EM DESENVOLVIMENTO (FUTUROS) */
-        .nav-card.disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            border-style: dashed;
-        }
-
-        .nav-card.disabled:hover {
-            transform: none;
-            border-color: var(--border-color);
-            box-shadow: none;
-        }
-
-        .nav-card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .nav-icon {
-            font-size: 26px;
-            line-height: 1;
-        }
-
-        .nav-card-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .nav-card-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        .badge-futuro {
-            font-size: 10px;
-            background: var(--input-bg);
             border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+        }
+
+        .content-title {
+            font-size: 20px;
             font-weight: bold;
-            margin-left: auto;
-        }
-
-        /* BARRA SUPERIOR DE NAVEGAÇÃO COMPARTILHADA (NAVBAR MÍNIMA) */
-        .wms-navbar {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: -30px -30px 25px -30px;
-        }
-
-        .wms-navbar-brand {
-            font-weight: 800;
-            font-size: 16px;
             color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .wms-navbar-menu {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-        }
-
-        .wms-nav-item {
-            padding: 8px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: var(--text-muted);
+        .content-desc {
             font-size: 13px;
-            font-weight: 600;
-            transition: background 0.15s, color 0.15s;
-            white-space: nowrap;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
-        .wms-nav-item:hover {
-            background: var(--hover-bg);
-            color: var(--text-main);
-        }
-
-        .wms-nav-item.active {
-            background: var(--active-bg);
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
+        .placeholder-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-
-        <!-- CABEÇALHO DO MENU -->
-        <div class="menu-header">
-            <div>
-                <div class="menu-title">
+    <!-- BARRA LATERAL (MENU ESQUERDO REUTILIZÁVEL E ORIGINAL) -->
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
                     <span>📦 WMS Inteligente</span>
                 </div>
-                <div class="menu-subtitle">Central de Navegação Operacional e Gestão de Estoque SAP</div>
+                <div class="sidebar-subtitle">Gestão de Estoque SAP</div>
             </div>
-            <div class="user-badge">
-                <span class="status-dot"></span>
-                <span id="txtUsuario">Operador Logístico</span>
-            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-section-label">Módulos</li>
+
+                <!-- 🔍 CONSULTA DE NM -->
+                <li class="sidebar-item">
+                    <a href="consulta.html" class="sidebar-link" id="linkConsulta" target="_self">
+                        <span class="sidebar-icon">🔍</span>
+                        <span>Consulta de NM</span>
+                    </a>
+                </li>
+
+                <!-- 📋 REALIZAR INVENTÁRIO -->
+                <li class="sidebar-item">
+                    <a href="contagem.html" class="sidebar-link" id="linkContagem" target="_self">
+                        <span class="sidebar-icon">📋</span>
+                        <span>Realizar Inventário</span>
+                    </a>
+                </li>
+
+                <!-- 📈 HISTÓRICO DE ACURÁCIA -->
+                <li class="sidebar-item">
+                    <a href="auditoria.html" class="sidebar-link" id="linkAuditoria" target="_self">
+                        <span class="sidebar-icon">📈</span>
+                        <span>Histórico de Acurácia</span>
+                    </a>
+                </li>
+
+                <!-- ⚡ ALIMENTAR SISTEMA (SAP) -->
+                <li class="sidebar-item">
+                    <a href="Carga.html" class="sidebar-link" id="linkCarga" target="_self">
+                        <span class="sidebar-icon">⚡</span>
+                        <span>Alimentar Sistema (SAP)</span>
+                    </a>
+                </li>
+
+                <li class="menu-section-label" style="margin-top: 15px;">Em Breve</li>
+
+                <!-- 📊 DASHBOARD -->
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link disabled" onclick="alertaEmBreve('Dashboard'); return false;">
+                        <span class="sidebar-icon">📊</span>
+                        <span>Dashboard</span>
+                        <span class="badge-soon">Breve</span>
+                    </a>
+                </li>
+
+                <!-- 📑 RESERVAS -->
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link disabled" onclick="alertaEmBreve('Reservas'); return false;">
+                        <span class="sidebar-icon">📑</span>
+                        <span>Reservas</span>
+                        <span class="badge-soon">Breve</span>
+                    </a>
+                </li>
+
+                <!-- 🔄 MOVIMENTAÇÃO -->
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link disabled" onclick="alertaEmBreve('Movimentação'); return false;">
+                        <span class="sidebar-icon">🔄</span>
+                        <span>Movimentação</span>
+                        <span class="badge-soon">Breve</span>
+                    </a>
+                </li>
+            </ul>
         </div>
 
-        <!-- SEÇÃO: MÓDULOS OPERACIONAIS ATIVOS -->
-        <div class="section-title">Módulos Principais</div>
-        <div class="nav-grid">
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <span class="user-status"></span>
+                <span>Operador Logístico</span>
+            </div>
+        </div>
+    </aside>
 
-            <!-- 🔍 CONSULTA DE NM -->
-            <a href="consulta.html" class="nav-card" id="btnNavConsulta" target="_self">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">🔍</span>
-                        <span class="nav-card-title">Consulta de NM</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Localização rápida de materiais, posições, saldos e consulta de endereçamentos físicos.
-                    </div>
-                </div>
-            </a>
-
-            <!-- 📋 REALIZAR INVENTÁRIO -->
-            <a href="contagem.html" class="nav-card" id="btnNavContagem" target="_self">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">📋</span>
-                        <span class="nav-card-title">Realizar Inventário</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Lançamento de contagens de inventário cego, conferência de itens e bipagem de posições.
-                    </div>
-                </div>
-            </a>
-
-            <!-- 📈 HISTÓRICO DE ACURÁCIA -->
-            <a href="auditoria.html" class="nav-card" id="btnNavAuditoria" target="_self">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">📈</span>
-                        <span class="nav-card-title">Histórico de Acurácia</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Relatórios detalhados de auditoria, conciliação física vs. SAP e acurácia do estoque.
-                    </div>
-                </div>
-            </a>
-
-            <!-- ⚡ ALIMENTAR SISTEMA (SAP) -->
-            <a href="Carga.html" class="nav-card" id="btnNavCarga" target="_self">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">⚡</span>
-                        <span class="nav-card-title">Alimentar Sistema (SAP)</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Importação e processamento de planilhas de movimentações, reservas e saldos (MB51, MB25, ZQMM).
-                    </div>
-                </div>
-            </a>
-
+    <!-- ÁREA PRINCIPAL DE CONTEÚDO -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1 class="content-title">Painel Principal WMS</h1>
+            <p class="content-desc">Selecione um dos módulos no menu lateral para iniciar as operações.</p>
         </div>
 
-        <!-- SEÇÃO: MÓDULOS FUTUROS (PREPARADO PARA ESCALABILIDADE) -->
-        <div class="section-title">Próximos Módulos</div>
-        <div class="nav-grid">
-
-            <!-- 📊 DASHBOARD -->
-            <div class="nav-card disabled" id="btnNavDashboard" onclick="alertaModuloEmBreve('Dashboard Gerencial')">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">📊</span>
-                        <span class="nav-card-title">Dashboard</span>
-                        <span class="badge-futuro">EM BREVE</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Painel indicador com taxas de ocupação, giro de estoque e alertas em tempo real.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 📑 RESERVAS -->
-            <div class="nav-card disabled" id="btnNavReservas" onclick="alertaModuloEmBreve('Gestão de Reservas')">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">📑</span>
-                        <span class="nav-card-title">Reservas</span>
-                        <span class="badge-futuro">EM BREVE</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Controle e acompanhamento de requisições e reservas abertas provenientes do SAP.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🔄 MOVIMENTAÇÃO -->
-            <div class="nav-card disabled" id="btnNavMovimentacao" onclick="alertaModuloEmBreve('Movimentações de Estoque')">
-                <div>
-                    <div class="nav-card-header">
-                        <span class="nav-icon">🔄</span>
-                        <span class="nav-card-title">Movimentação</span>
-                        <span class="badge-futuro">EM BREVE</span>
-                    </div>
-                    <div class="nav-card-desc">
-                        Transferências internas entre posições e registro de baixas e entradas operacionais.
-                    </div>
-                </div>
-            </div>
-
+        <div class="placeholder-card">
+            <p>Selecione uma opção no menu à esquerda para carregar o módulo correspondente.</p>
         </div>
-
-    </div>
+    </main>
 
     <script>
-        // IDENTIFICAÇÃO E DESTAQUE AUTOMÁTICO DA PÁGINA ATIVA
+        // IDENTIFICA E DESTACA AUTOMATICAMENTE O ITEM DO MENU LATERAL CORRESPONDENTE Á PÁGINA ABERTA
         document.addEventListener("DOMContentLoaded", function () {
-            destacarModuloAtivo();
+            highlightActiveMenuItem();
         });
 
-        function destacarModuloAtivo() {
-            // Obter o nome do arquivo atual a partir do caminho do navegador
+        function highlightActiveMenuItem() {
             const path = window.location.pathname;
             const paginaAtual = path.substring(path.lastIndexOf('/') + 1).toLowerCase();
 
-            // Mapeamento das páginas para os IDs dos Cards
-            const mapaPaginas = {
-                'consulta.html': 'btnNavConsulta',
-                'contagem.html': 'btnNavContagem',
-                'auditoria.html': 'btnNavAuditoria',
-                'carga.html': 'btnNavCarga',
-                'dashboard.html': 'btnNavDashboard',
-                'reservas.html': 'btnNavReservas',
-                'movimentacao.html': 'btnNavMovimentacao'
+            const mapaLinks = {
+                'consulta.html': 'linkConsulta',
+                'contagem.html': 'linkContagem',
+                'auditoria.html': 'linkAuditoria',
+                'carga.html': 'linkCarga'
             };
 
-            // Remover destaque prévio
-            document.querySelectorAll('.nav-card').forEach(card => card.classList.remove('active'));
+            // Remove destaque anterior
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
 
-            // Aplicar classe active caso corresponda a algum módulo
-            const elementId = mapaPaginas[paginaAtual];
-            if (elementId) {
-                const activeCard = document.getElementById(elementId);
-                if (activeCard) {
-                    activeCard.classList.add('active');
+            // Aplica a classe .active no item atual
+            const activeLinkId = mapaLinks[paginaAtual];
+            if (activeLinkId) {
+                const activeElement = document.getElementById(activeLinkId);
+                if (activeElement) {
+                    activeElement.classList.add('active');
                 }
             }
         }
 
-        // ALERTA PARA MÓDULOS EM DESENVOLVIMENTO
-        function alertaModuloEmBreve(nomeModulo) {
-            alert(`O módulo "${nomeModulo}" está em fase de preparação e estará disponível em breve.`);
+        function alertaEmBreve(modulo) {
+            alert(`O módulo "${modulo}" está em desenvolvimento.`);
         }
     </script>
 </body>
