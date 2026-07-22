@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMS Inteligente - Carga de Planilhas SAP</title>
+    
+    <!-- SheetJS para Leitura/Parse de Excel (.xlsx, .xls) e CSV -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
         :root {
             --bg-body: #f3f4f6;
@@ -286,23 +290,38 @@
                 </div>
 
                 <div>
-                    <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" style="display: none;" onchange="selecionarArquivo('MB51', this)">
+                    <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" style="display: none;" onchange="processarArquivo('MB51', this)">
                     <button class="btn-action" onclick="document.getElementById('fileMB51').click()">📁 Selecionar MB51</button>
 
                     <div class="file-info" id="infoMB51">
                         <div class="file-info-row"><span><strong>Nome:</strong></span> <span id="nomeMB51">--</span></div>
                         <div class="file-info-row"><span><strong>Tamanho:</strong></span> <span id="tamanhoMB51">--</span></div>
                         <div class="file-info-row"><span><strong>Data/Hora:</strong></span> <span id="dataMB51">--</span></div>
+                        <div class="file-info-row"><span><strong>Linhas Lidas:</strong></span> <span id="linhasMB51" style="color: var(--primary-color); font-weight: bold;">--</span></div>
+                    </div>
+
+                    <!-- Prévia dos Dados -->
+                    <div class="file-preview" id="previewContainerMB51" style="display: none; margin-top: 10px;">
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">COLUNAS IDENTIFICADAS:</div>
+                        <div id="colunasMB51" style="font-size: 11px; color: var(--text-main); margin-bottom: 8px; word-break: break-all; background: var(--bg-card); padding: 6px; border-radius: 4px; border: 1px solid var(--border-color);"></div>
+                        
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA DOS PRIMEIRA REGISTROS (3 LINHAS):</div>
+                        <div class="table-responsive" style="max-height: 120px; overflow-y: auto;">
+                            <table style="font-size: 10px;" id="tabelaPreviewMB51">
+                                <thead></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="progress-container" id="progContainerMB51">
                         <div class="progress-bar" id="progBarMB51"></div>
                     </div>
 
-                    <div class="msg-box msg-success" id="msgSucessoMB51">✅ Arquivo processado com sucesso!</div>
-                    <div class="msg-box msg-error" id="msgErroMB51">❌ Formato inválido ou erro na carga.</div>
+                    <div class="msg-box msg-success" id="msgSucessoMB51">✅ Arquivo lido e validado com sucesso!</div>
+                    <div class="msg-box msg-error" id="msgErroMB51">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB51" onclick="simularCarga('MB51')">🚀 Iniciar Carga MB51</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB51" onclick="simularCarga('MB51')">🚀 Confirmar Leitura MB51</button>
                 </div>
             </div>
 
@@ -317,23 +336,38 @@
                 </div>
 
                 <div>
-                    <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" style="display: none;" onchange="selecionarArquivo('MB25', this)">
+                    <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" style="display: none;" onchange="processarArquivo('MB25', this)">
                     <button class="btn-action" onclick="document.getElementById('fileMB25').click()">📁 Selecionar MB25</button>
 
                     <div class="file-info" id="infoMB25">
                         <div class="file-info-row"><span><strong>Nome:</strong></span> <span id="nomeMB25">--</span></div>
                         <div class="file-info-row"><span><strong>Tamanho:</strong></span> <span id="tamanhoMB25">--</span></div>
                         <div class="file-info-row"><span><strong>Data/Hora:</strong></span> <span id="dataMB25">--</span></div>
+                        <div class="file-info-row"><span><strong>Linhas Lidas:</strong></span> <span id="linhasMB25" style="color: var(--primary-color); font-weight: bold;">--</span></div>
+                    </div>
+
+                    <!-- Prévia dos Dados -->
+                    <div class="file-preview" id="previewContainerMB25" style="display: none; margin-top: 10px;">
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">COLUNAS IDENTIFICADAS:</div>
+                        <div id="colunasMB25" style="font-size: 11px; color: var(--text-main); margin-bottom: 8px; word-break: break-all; background: var(--bg-card); padding: 6px; border-radius: 4px; border: 1px solid var(--border-color);"></div>
+                        
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA DOS PRIMEIRA REGISTROS (3 LINHAS):</div>
+                        <div class="table-responsive" style="max-height: 120px; overflow-y: auto;">
+                            <table style="font-size: 10px;" id="tabelaPreviewMB25">
+                                <thead></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="progress-container" id="progContainerMB25">
                         <div class="progress-bar" id="progBarMB25"></div>
                     </div>
 
-                    <div class="msg-box msg-success" id="msgSucessoMB25">✅ Arquivo processado com sucesso!</div>
-                    <div class="msg-box msg-error" id="msgErroMB25">❌ Formato inválido ou erro na carga.</div>
+                    <div class="msg-box msg-success" id="msgSucessoMB25">✅ Arquivo lido e validado com sucesso!</div>
+                    <div class="msg-box msg-error" id="msgErroMB25">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB25" onclick="simularCarga('MB25')">🚀 Iniciar Carga MB25</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB25" onclick="simularCarga('MB25')">🚀 Confirmar Leitura MB25</button>
                 </div>
             </div>
 
@@ -348,23 +382,38 @@
                 </div>
 
                 <div>
-                    <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" style="display: none;" onchange="selecionarArquivo('ZQMM', this)">
+                    <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" style="display: none;" onchange="processarArquivo('ZQMM', this)">
                     <button class="btn-action" onclick="document.getElementById('fileZQMM').click()">📁 Selecionar ZQMM_026A</button>
 
                     <div class="file-info" id="infoZQMM">
                         <div class="file-info-row"><span><strong>Nome:</strong></span> <span id="nomeZQMM">--</span></div>
                         <div class="file-info-row"><span><strong>Tamanho:</strong></span> <span id="tamanhoZQMM">--</span></div>
                         <div class="file-info-row"><span><strong>Data/Hora:</strong></span> <span id="dataZQMM">--</span></div>
+                        <div class="file-info-row"><span><strong>Linhas Lidas:</strong></span> <span id="linhasZQMM" style="color: var(--primary-color); font-weight: bold;">--</span></div>
+                    </div>
+
+                    <!-- Prévia dos Dados -->
+                    <div class="file-preview" id="previewContainerZQMM" style="display: none; margin-top: 10px;">
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">COLUNAS IDENTIFICADAS:</div>
+                        <div id="colunasZQMM" style="font-size: 11px; color: var(--text-main); margin-bottom: 8px; word-break: break-all; background: var(--bg-card); padding: 6px; border-radius: 4px; border: 1px solid var(--border-color);"></div>
+                        
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA DOS PRIMEIRA REGISTROS (3 LINHAS):</div>
+                        <div class="table-responsive" style="max-height: 120px; overflow-y: auto;">
+                            <table style="font-size: 10px;" id="tabelaPreviewZQMM">
+                                <thead></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="progress-container" id="progContainerZQMM">
                         <div class="progress-bar" id="progBarZQMM"></div>
                     </div>
 
-                    <div class="msg-box msg-success" id="msgSucessoZQMM">✅ Arquivo processado com sucesso!</div>
-                    <div class="msg-box msg-error" id="msgErroZQMM">❌ Formato inválido ou erro na carga.</div>
+                    <div class="msg-box msg-success" id="msgSucessoZQMM">✅ Arquivo lido e validado com sucesso!</div>
+                    <div class="msg-box msg-error" id="msgErroZQMM">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarZQMM" onclick="simularCarga('ZQMM')">🚀 Iniciar Carga ZQMM</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarZQMM" onclick="simularCarga('ZQMM')">🚀 Confirmar Leitura ZQMM</button>
                 </div>
             </div>
 
@@ -397,8 +446,15 @@
     </div>
 
     <script>
-        // Array local para armazenar o histórico de cargas da sessão
+        // Historico em memoria local
         const historicoCargas = [];
+
+        // Armazenamento em memória dos dados lidos de cada arquivo (Sem gravar em banco ainda)
+        const dadosLidosEmMemoria = {
+            MB51: null,
+            MB25: null,
+            ZQMM: null
+        };
 
         // FORMATADOR DE TAMANHO DE ARQUIVO
         function formatarTamanho(bytes) {
@@ -409,17 +465,18 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // SELEÇÃO DO ARQUIVO E EXIBIÇÃO DAS INFORMAÇÕES
-        function selecionarArquivo(tipo, input) {
+        // LEITURA REAL DE ARQUIVOS (EXCEL E CSV) VIA SHEETJS
+        function processarArquivo(tipo, input) {
             const file = input.files[0];
             
-            // Ocultar mensagens anteriores
+            // Ocultar elementos de estado prévio
             document.getElementById(`msgSucesso${tipo}`).style.display = 'none';
             document.getElementById(`msgErro${tipo}`).style.display = 'none';
+            document.getElementById(`previewContainer${tipo}`).style.display = 'none';
 
             if (!file) return;
 
-            // Validação simples de extensão (.xlsx, .xls, .csv)
+            // Validação da Extensão
             const extPermitidas = ['xlsx', 'xls', 'csv'];
             const extensao = file.name.split('.').pop().toLowerCase();
 
@@ -432,16 +489,76 @@
                 return;
             }
 
-            // Exibir dados do arquivo
+            // Exibir Metadata Inicial
             document.getElementById(`nome${tipo}`).innerText = file.name;
             document.getElementById(`tamanho${tipo}`).innerText = formatarTamanho(file.size);
             document.getElementById(`data${tipo}`).innerText = new Date().toLocaleString('pt-BR');
-
             document.getElementById(`info${tipo}`).style.display = 'block';
-            document.getElementById(`btnEnviar${tipo}`).style.display = 'block';
+
+            // Leitura Assíncrona do Arquivo
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    // Pegar a primeira aba da planilha
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+
+                    // Converter conteúdo para Array de Objetos JSON
+                    const jsonResult = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+                    if (jsonResult.length === 0) {
+                        throw new Error("O arquivo está vazio ou não possui dados válidos.");
+                    }
+
+                    // Guardar dados em memória temporária
+                    dadosLidosEmMemoria[tipo] = jsonResult;
+
+                    // Mapeamento das Colunas
+                    const colunas = Object.keys(jsonResult[0]);
+                    
+                    // Exibir Quantidade de Linhas e Colunas
+                    document.getElementById(`linhas${tipo}`).innerText = `${jsonResult.length} registros`;
+                    document.getElementById(`colunas${tipo}`).innerText = colunas.join(" | ");
+
+                    // Montar Tabela de Prévia (3 Primeiras Linhas)
+                    renderizarPreviaTabela(tipo, colunas, jsonResult.slice(0, 3));
+
+                    // Exibir painel de prévia e botão de confirmação
+                    document.getElementById(`previewContainer${tipo}`).style.display = 'block';
+                    document.getElementById(`btnEnviar${tipo}`).style.display = 'block';
+
+                } catch (err) {
+                    document.getElementById(`msgErro${tipo}`).innerText = "❌ Erro ao ler arquivo: " + err.message;
+                    document.getElementById(`msgErro${tipo}`).style.display = 'block';
+                    document.getElementById(`btnEnviar${tipo}`).style.display = 'none';
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
         }
 
-        // SIMULAÇÃO DA BARRA DE PROGRESSO E PROCESSAMENTO DA CARGA
+        // RENDERIZADOR DA PRÉVIA DOS REGISTROS DA PLANILHA
+        function renderizarPreviaTabela(tipo, colunas, registros) {
+            const table = document.getElementById(`tabelaPreview${tipo}`);
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            // Renderizar Cabeçalho
+            thead.innerHTML = `<tr>${colunas.map(c => `<th style="padding: 4px 6px;">${c}</th>`).join('')}</tr>`;
+
+            // Renderizar Linhas da Prévia
+            tbody.innerHTML = registros.map(row => `
+                <tr>
+                    ${colunas.map(c => `<td style="padding: 4px 6px;">${row[c]}</td>`).join('')}
+                </tr>
+            `).join('');
+        }
+
+        // SIMULAÇÃO DA BARRA DE PROGRESSO E CONFIRMAÇÃO DA LEITURA
         function simularCarga(tipo) {
             const btn = document.getElementById(`btnEnviar${tipo}`);
             const progContainer = document.getElementById(`progContainer${tipo}`);
@@ -457,13 +574,12 @@
 
             let progresso = 0;
             const intervalo = setInterval(() => {
-                progresso += 15;
+                progresso += 20;
                 progBar.style.width = progresso + '%';
 
                 if (progresso >= 100) {
                     clearInterval(intervalo);
                     
-                    // Sucesso na simulação
                     setTimeout(() => {
                         progContainer.style.display = 'none';
                         document.getElementById(`msgSucesso${tipo}`).style.display = 'block';
@@ -476,14 +592,14 @@
                             tipo === 'ZQMM' ? 'ZQMM_026A' : tipo,
                             file.name,
                             formatarTamanho(file.size),
-                            'Concluído'
+                            'Lido com Sucesso'
                         );
 
                         // Reset do input
                         input.value = '';
-                    }, 400);
+                    }, 300);
                 }
-            }, 150);
+            }, 100);
         }
 
         // ADICIONAR REGISTRO NA TABELA DE HISTÓRICO
