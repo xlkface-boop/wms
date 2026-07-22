@@ -168,7 +168,7 @@
         .inventory-field strong {
             color: var(--text-muted);
             display: inline-block;
-            width: 110px;
+            width: 130px;
         }
 
         /* Modal da Assinatura Digital */
@@ -537,15 +537,28 @@
         <div id="view-troca" class="view-section">
             <div class="card">
                 <div class="card-header-title">📦 Transferência & Troca de Endereço</div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Informe o material e o novo endereço de destino no depósito.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Busque o material pelo NM para visualizar os dados atuais e informe o novo endereço de destino.</p>
+
+                <div class="filter-grid">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Buscar Código do Material (NM):</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" class="form-control" id="trocaNM" placeholder="Digite o NM (Ex: 10029384)...">
+                            <button class="btn-action" style="padding: 10px 15px;" onclick="buscarMaterialTroca()">🔍 Buscar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DADOS DO MATERIAL ENCONTRADO -->
+                <div class="inventory-card" style="max-width: 100%; margin-bottom: 20px;">
+                    <div class="inventory-field"><strong>Descrição:</strong> <span id="trocaDesc">Aguardando busca de NM...</span></div>
+                    <div class="inventory-field"><strong>Depósito:</strong> <span id="trocaDep">--</span></div>
+                    <div class="inventory-field"><strong>Endereço Atual:</strong> <span id="trocaEndAtual">--</span></div>
+                </div>
 
                 <div class="filter-grid">
                     <div class="form-group">
-                        <label>Código do Material (NM):</label>
-                        <input type="text" class="form-control" id="trocaNM" placeholder="Ex: 10029384">
-                    </div>
-                    <div class="form-group">
-                        <label>Novo Endereço:</label>
+                        <label>Novo Endereço de Destino:</label>
                         <input type="text" class="form-control" id="trocaNovoEnd" placeholder="Ex: B-04-01">
                     </div>
                     <div class="form-group">
@@ -784,6 +797,20 @@
             if(idView === 'dashboard') inicializarGraficos();
         }
 
+        // BUSCA SIMULADA DE MATERIAL PARA TROCA DE ENDEREÇO (SEM FIREBASE AINDA)
+        function buscarMaterialTroca() {
+            const nm = document.getElementById('trocaNM').value.trim();
+            if (!nm) {
+                alert("Por favor, digite o NM para realizar a busca.");
+                return;
+            }
+
+            // Exemplo simulado de retorno visual antes da integração com o banco
+            document.getElementById('trocaDesc').innerText = "VÁLVULA DE ESFERA 2 POL (Simulação)";
+            document.getElementById('trocaDep').innerText = "DP01";
+            document.getElementById('trocaEndAtual').innerText = "A-04-02";
+        }
+
         // LÓGICA DE ASSINATURA DIGITAL (CANVAS TOUCH & MOUSE)
         let tipoAcaoAtual = ''; // 'INVENTARIO' ou 'TROCA'
         const canvas = document.getElementById('canvasAssinatura');
@@ -846,13 +873,19 @@
                 alert("Inventário concluído, assinado digitalmente e comprovante gerado com sucesso!");
             } else if (tipoAcaoAtual === 'TROCA') {
                 const nm = document.getElementById('trocaNM').value || '10029384';
+                const desc = document.getElementById('trocaDesc').innerText;
+                const dep = document.getElementById('trocaDep').innerText;
+                const endAtual = document.getElementById('trocaEndAtual').innerText;
                 const novoEnd = document.getElementById('trocaNovoEnd').value || 'B-01-01';
                 const qtd = document.getElementById('trocaQtd').value || 0;
 
                 gerarPDFComprovante("Comprovante de Transferência de Endereço", [
                     ["Tipo de Operação:", "Troca / Transferência de Localização"],
                     ["Código do Material (NM):", nm],
-                    ["Novo Endereço de Destino:", novoEnd],
+                    ["Descrição:", desc],
+                    ["Depósito:", dep],
+                    ["Endereço Origem (Atual):", endAtual],
+                    ["Novo Endereço (Destino):", novoEnd],
                     ["Quantidade Movimentada:", qtd],
                     ["Operador Responsável:", usuarioAtivo],
                     ["Data e Hora da Assinatura:", dataHora]
