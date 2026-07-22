@@ -90,7 +90,7 @@
         /* Grid dos Uploads */
         .upload-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
             margin-bottom: 25px;
         }
@@ -154,6 +154,55 @@
 
         .file-info-row:last-child {
             margin-bottom: 0;
+        }
+
+        /* Estilos do Mapeamento de Colunas */
+        .mapping-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .mapping-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mapping-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .mapping-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            width: 45%;
+        }
+
+        .mapping-select {
+            width: 53%;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 11px;
+            outline: none;
+        }
+
+        .mapping-select:focus {
+            border-color: var(--primary-color);
         }
 
         /* Barra de Progresso Visual */
@@ -268,7 +317,7 @@
 
     <div class="card">
         <div class="card-header-title">⚡ Carga de Planilhas Extraídas do SAP</div>
-        <p class="card-subtitle">Módulo operacional para importação de bases de dados do SAP (.xlsx, .xls, .csv).</p>
+        <p class="card-subtitle">Módulo operacional para importação e mapeamento de bases de dados do SAP (.xlsx, .xls, .csv).</p>
 
         <!-- AVISO INSTITUCIONAL DE ARQUITETURA -->
         <div class="info-box">
@@ -300,12 +349,18 @@
                         <div class="file-info-row"><span><strong>Linhas Lidas:</strong></span> <span id="linhasMB51" style="color: var(--primary-color); font-weight: bold;">--</span></div>
                     </div>
 
+                    <!-- Mapeamento de Colunas MB51 -->
+                    <div class="mapping-box" id="mappingContainerMB51">
+                        <div class="mapping-title">
+                            <span>🎯 MAPEAMENTO DE COLUNAS</span>
+                            <span style="font-size: 10px; color: var(--primary-color);" id="statusMappingMB51">Auto-detectado</span>
+                        </div>
+                        <div id="mappingFieldsMB51"></div>
+                    </div>
+
                     <!-- Prévia dos Dados -->
                     <div class="file-preview" id="previewContainerMB51" style="display: none; margin-top: 10px;">
-                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">COLUNAS IDENTIFICADAS:</div>
-                        <div id="colunasMB51" style="font-size: 11px; color: var(--text-main); margin-bottom: 8px; word-break: break-all; background: var(--bg-card); padding: 6px; border-radius: 4px; border: 1px solid var(--border-color);"></div>
-                        
-                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA DOS PRIMEIRA REGISTROS (3 LINHAS):</div>
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA COM MAPEAMENTO (3 LINHAS):</div>
                         <div class="table-responsive" style="max-height: 120px; overflow-y: auto;">
                             <table style="font-size: 10px;" id="tabelaPreviewMB51">
                                 <thead></thead>
@@ -318,10 +373,10 @@
                         <div class="progress-bar" id="progBarMB51"></div>
                     </div>
 
-                    <div class="msg-box msg-success" id="msgSucessoMB51">✅ Arquivo lido e validado com sucesso!</div>
+                    <div class="msg-box msg-success" id="msgSucessoMB51">✅ Colunas mapeadas e leitura validada!</div>
                     <div class="msg-box msg-error" id="msgErroMB51">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB51" onclick="simularCarga('MB51')">🚀 Confirmar Leitura MB51</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB51" onclick="simularCarga('MB51')">🚀 Confirmar e Importar MB51</button>
                 </div>
             </div>
 
@@ -346,12 +401,18 @@
                         <div class="file-info-row"><span><strong>Linhas Lidas:</strong></span> <span id="linhasMB25" style="color: var(--primary-color); font-weight: bold;">--</span></div>
                     </div>
 
+                    <!-- Mapeamento de Colunas MB25 -->
+                    <div class="mapping-box" id="mappingContainerMB25">
+                        <div class="mapping-title">
+                            <span>🎯 MAPEAMENTO DE COLUNAS</span>
+                            <span style="font-size: 10px; color: var(--primary-color);" id="statusMappingMB25">Auto-detectado</span>
+                        </div>
+                        <div id="mappingFieldsMB25"></div>
+                    </div>
+
                     <!-- Prévia dos Dados -->
                     <div class="file-preview" id="previewContainerMB25" style="display: none; margin-top: 10px;">
-                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">COLUNAS IDENTIFICADAS:</div>
-                        <div id="colunasMB25" style="font-size: 11px; color: var(--text-main); margin-bottom: 8px; word-break: break-all; background: var(--bg-card); padding: 6px; border-radius: 4px; border: 1px solid var(--border-color);"></div>
-                        
-                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA DOS PRIMEIRA REGISTROS (3 LINHAS):</div>
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA COM MAPEAMENTO (3 LINHAS):</div>
                         <div class="table-responsive" style="max-height: 120px; overflow-y: auto;">
                             <table style="font-size: 10px;" id="tabelaPreviewMB25">
                                 <thead></thead>
@@ -364,10 +425,10 @@
                         <div class="progress-bar" id="progBarMB25"></div>
                     </div>
 
-                    <div class="msg-box msg-success" id="msgSucessoMB25">✅ Arquivo lido e validado com sucesso!</div>
+                    <div class="msg-box msg-success" id="msgSucessoMB25">✅ Colunas mapeadas e leitura validada!</div>
                     <div class="msg-box msg-error" id="msgErroMB25">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB25" onclick="simularCarga('MB25')">🚀 Confirmar Leitura MB25</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB25" onclick="simularCarga('MB25')">🚀 Confirmar e Importar MB25</button>
                 </div>
             </div>
 
@@ -392,12 +453,18 @@
                         <div class="file-info-row"><span><strong>Linhas Lidas:</strong></span> <span id="linhasZQMM" style="color: var(--primary-color); font-weight: bold;">--</span></div>
                     </div>
 
+                    <!-- Mapeamento de Colunas ZQMM_026A -->
+                    <div class="mapping-box" id="mappingContainerZQMM">
+                        <div class="mapping-title">
+                            <span>🎯 MAPEAMENTO DE COLUNAS</span>
+                            <span style="font-size: 10px; color: var(--primary-color);" id="statusMappingZQMM">Auto-detectado</span>
+                        </div>
+                        <div id="mappingFieldsZQMM"></div>
+                    </div>
+
                     <!-- Prévia dos Dados -->
                     <div class="file-preview" id="previewContainerZQMM" style="display: none; margin-top: 10px;">
-                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">COLUNAS IDENTIFICADAS:</div>
-                        <div id="colunasZQMM" style="font-size: 11px; color: var(--text-main); margin-bottom: 8px; word-break: break-all; background: var(--bg-card); padding: 6px; border-radius: 4px; border: 1px solid var(--border-color);"></div>
-                        
-                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA DOS PRIMEIRA REGISTROS (3 LINHAS):</div>
+                        <div style="font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 5px;">PRÉVIA COM MAPEAMENTO (3 LINHAS):</div>
                         <div class="table-responsive" style="max-height: 120px; overflow-y: auto;">
                             <table style="font-size: 10px;" id="tabelaPreviewZQMM">
                                 <thead></thead>
@@ -410,10 +477,10 @@
                         <div class="progress-bar" id="progBarZQMM"></div>
                     </div>
 
-                    <div class="msg-box msg-success" id="msgSucessoZQMM">✅ Arquivo lido e validado com sucesso!</div>
+                    <div class="msg-box msg-success" id="msgSucessoZQMM">✅ Colunas mapeadas e leitura validada!</div>
                     <div class="msg-box msg-error" id="msgErroZQMM">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarZQMM" onclick="simularCarga('ZQMM')">🚀 Confirmar Leitura ZQMM</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarZQMM" onclick="simularCarga('ZQMM')">🚀 Confirmar e Importar ZQMM</button>
                 </div>
             </div>
 
@@ -449,11 +516,36 @@
         // Historico em memoria local
         const historicoCargas = [];
 
-        // Armazenamento em memória dos dados lidos de cada arquivo (Sem gravar em banco ainda)
+        // Estrutura das colunas requeridas pelo WMS por cada arquivo SAP
+        const camposObrigatoriosWMS = {
+            ZQMM: [
+                { id: 'nm', label: 'NM', alias: ['nm', 'material', 'código', 'codigo', 'num_material'] },
+                { id: 'descricao', label: 'Descrição', alias: ['descrição', 'descricao', 'texto_breve', 'denominacao', 'denomi'] },
+                { id: 'deposito', label: 'Depósito', alias: ['depósito', 'deposito', 'dep', 'armazenamento'] },
+                { id: 'endereco', label: 'Endereço', alias: ['endereço', 'endereco', 'posicao', 'posição', 'rua', 'loc'] },
+                { id: 'saldo', label: 'Saldo', alias: ['saldo', 'quantidade', 'qtd', 'estoque', 'utilizacao_livre'] }
+            ],
+            MB25: [
+                { id: 'reserva', label: 'Reserva', alias: ['reserva', 'num_reserva', 'n_reserva'] },
+                { id: 'nm', label: 'NM', alias: ['nm', 'material', 'código', 'codigo'] },
+                { id: 'quantidade', label: 'Quantidade', alias: ['quantidade', 'qtd', 'qtd_necessaria', 'necessaria'] },
+                { id: 'solicitante', label: 'Solicitante', alias: ['solicitante', 'usuario', 'usuário', 'requisitante'] },
+                { id: 'data', label: 'Data', alias: ['data', 'dt_necessidade', 'data_reserva'] }
+            ],
+            MB51: [
+                { id: 'data', label: 'Data', alias: ['data', 'dt_lançamento', 'data_lancamento', 'dt_doc'] },
+                { id: 'documento', label: 'Documento', alias: ['documento', 'doc_material', 'doc_mat', 'n_doc'] },
+                { id: 'nm', label: 'NM', alias: ['nm', 'material', 'código', 'codigo'] },
+                { id: 'tipoMovimento', label: 'Tipo Movimento', alias: ['tipo movimento', 'tipo_mov', 'movimento', 'tm', 'tp_mov'] },
+                { id: 'quantidade', label: 'Quantidade', alias: ['quantidade', 'qtd', 'qtd_um', 'qnt'] }
+            ]
+        };
+
+        // Armazenamento temporário dos dados e mapeamentos selecionados
         const dadosLidosEmMemoria = {
-            MB51: null,
-            MB25: null,
-            ZQMM: null
+            MB51: { json: null, map: {} },
+            MB25: { json: null, map: {} },
+            ZQMM: { json: null, map: {} }
         };
 
         // FORMATADOR DE TAMANHO DE ARQUIVO
@@ -472,6 +564,7 @@
             // Ocultar elementos de estado prévio
             document.getElementById(`msgSucesso${tipo}`).style.display = 'none';
             document.getElementById(`msgErro${tipo}`).style.display = 'none';
+            document.getElementById(`mappingContainer${tipo}`).style.display = 'none';
             document.getElementById(`previewContainer${tipo}`).style.display = 'none';
 
             if (!file) return;
@@ -503,7 +596,6 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
 
-                    // Pegar a primeira aba da planilha
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
 
@@ -514,22 +606,22 @@
                         throw new Error("O arquivo está vazio ou não possui dados válidos.");
                     }
 
-                    // Guardar dados em memória temporária
-                    dadosLidosEmMemoria[tipo] = jsonResult;
+                    dadosLidosEmMemoria[tipo].json = jsonResult;
 
-                    // Mapeamento das Colunas
-                    const colunas = Object.keys(jsonResult[0]);
+                    // Colunas encontradas no arquivo importado
+                    const colunasEncontradas = Object.keys(jsonResult[0]);
                     
-                    // Exibir Quantidade de Linhas e Colunas
                     document.getElementById(`linhas${tipo}`).innerText = `${jsonResult.length} registros`;
-                    document.getElementById(`colunas${tipo}`).innerText = colunas.join(" | ");
 
-                    // Montar Tabela de Prévia (3 Primeiras Linhas)
-                    renderizarPreviaTabela(tipo, colunas, jsonResult.slice(0, 3));
+                    // Gerar a interface de mapeamento
+                    gerarInterfaceMapeamento(tipo, colunasEncontradas);
 
-                    // Exibir painel de prévia e botão de confirmação
+                    document.getElementById(`mappingContainer${tipo}`).style.display = 'block';
                     document.getElementById(`previewContainer${tipo}`).style.display = 'block';
                     document.getElementById(`btnEnviar${tipo}`).style.display = 'block';
+
+                    // Atualizar Prévia inicial
+                    atualizarPreviaComMapeamento(tipo);
 
                 } catch (err) {
                     document.getElementById(`msgErro${tipo}`).innerText = "❌ Erro ao ler arquivo: " + err.message;
@@ -541,25 +633,93 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // RENDERIZADOR DA PRÉVIA DOS REGISTROS DA PLANILHA
-        function renderizarPreviaTabela(tipo, colunas, registros) {
+        // MONTA A INTERFACE DE SELEÇÃO E AUTO-DETECTA AS COLUNAS
+        function gerarInterfaceMapeamento(tipo, colunasEncontradas) {
+            const container = document.getElementById(`mappingFields${tipo}`);
+            const camposReq = camposObrigatoriosWMS[tipo];
+            container.innerHTML = '';
+
+            dadosLidosEmMemoria[tipo].map = {};
+
+            camposReq.forEach(campo => {
+                // Tenta auto-detectar procurando pelos aliases
+                let colunaAutoDetectada = colunasEncontradas.find(col => {
+                    const colNorm = col.toLowerCase().trim();
+                    return campo.alias.some(al => colNorm.includes(al));
+                }) || '';
+
+                // Guardar mapeamento padrão
+                dadosLidosEmMemoria[tipo].map[campo.id] = colunaAutoDetectada;
+
+                // Montar o Select
+                const row = document.createElement('div');
+                row.className = 'mapping-row';
+
+                const optionsHtml = colunasEncontradas.map(col => 
+                    `<option value="${col}" ${col === colunaAutoDetectada ? 'selected' : ''}>${col}</option>`
+                ).join('');
+
+                row.innerHTML = `
+                    <span class="mapping-label">${campo.label}:</span>
+                    <select class="mapping-select" onchange="alterarMapeamento('${tipo}', '${campo.id}', this.value)">
+                        <option value="">-- Não Mapeado --</option>
+                        ${optionsHtml}
+                    </select>
+                `;
+
+                container.appendChild(row);
+            });
+        }
+
+        // ATUALIZA MAPEAMENTO QUANDO O USUÁRIO ALTERA O SELECT
+        function alterarMapeamento(tipo, campoId, novaColuna) {
+            dadosLidosEmMemoria[tipo].map[campoId] = novaColuna;
+            atualizarPreviaComMapeamento(tipo);
+        }
+
+        // RENDERIZAR PRÉVIA DAS 3 PRIMEIRAS LINHAS USANDO O MAPEAMENTO ATUAL
+        function atualizarPreviaComMapeamento(tipo) {
+            const json = dadosLidosEmMemoria[tipo].json;
+            const mapa = dadosLidosEmMemoria[tipo].map;
+            const camposReq = camposObrigatoriosWMS[tipo];
+
+            if (!json || json.length === 0) return;
+
             const table = document.getElementById(`tabelaPreview${tipo}`);
             const thead = table.querySelector('thead');
             const tbody = table.querySelector('tbody');
 
-            // Renderizar Cabeçalho
-            thead.innerHTML = `<tr>${colunas.map(c => `<th style="padding: 4px 6px;">${c}</th>`).join('')}</tr>`;
+            // Renderizar Cabeçalho Mapeado
+            thead.innerHTML = `<tr>${camposReq.map(c => `<th style="padding: 4px 6px;">${c.label}</th>`).join('')}</tr>`;
 
-            // Renderizar Linhas da Prévia
-            tbody.innerHTML = registros.map(row => `
+            // Pegar as 3 primeiras linhas
+            const primeirasLinhas = json.slice(0, 3);
+
+            tbody.innerHTML = primeirasLinhas.map(row => `
                 <tr>
-                    ${colunas.map(c => `<td style="padding: 4px 6px;">${row[c]}</td>`).join('')}
+                    ${camposReq.map(c => {
+                        const colOriginal = mapa[c.id];
+                        const valor = colOriginal ? row[colOriginal] : '<span style="color:#ef4444;">--</span>';
+                        return `<td style="padding: 4px 6px;">${valor}</td>`;
+                    }).join('')}
                 </tr>
             `).join('');
         }
 
         // SIMULAÇÃO DA BARRA DE PROGRESSO E CONFIRMAÇÃO DA LEITURA
         function simularCarga(tipo) {
+            const mapa = dadosLidosEmMemoria[tipo].map;
+            const camposReq = camposObrigatoriosWMS[tipo];
+
+            // Validar se todos os campos obrigatórios foram mapeados
+            const camposFaltantes = camposReq.filter(c => !mapa[c.id]);
+
+            if (camposFaltantes.length > 0) {
+                const nomesFaltantes = camposFaltantes.map(c => c.label).join(', ');
+                alert(`⚠️ Por favor, selecione as colunas correspondentes para: ${nomesFaltantes}`);
+                return;
+            }
+
             const btn = document.getElementById(`btnEnviar${tipo}`);
             const progContainer = document.getElementById(`progContainer${tipo}`);
             const progBar = document.getElementById(`progBar${tipo}`);
@@ -592,7 +752,7 @@
                             tipo === 'ZQMM' ? 'ZQMM_026A' : tipo,
                             file.name,
                             formatarTamanho(file.size),
-                            'Lido com Sucesso'
+                            'Mapeado e Pronto'
                         );
 
                         // Reset do input
