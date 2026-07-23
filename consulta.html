@@ -7,32 +7,106 @@
     <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-gold: #ffd700;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --sidebar-width: 260px;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body { 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
-            color: white; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%); 
+            color: var(--text-main); 
+            min-height: 100vh;
+            display: flex;
         }
-        
-        .main-container { width: 100%; max-width: 500px; }
-        
+
+        /* SIDEBAR FIXA LATERAL */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            height: 100vh;
+            background: #0b1120;
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .sidebar-title { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: var(--accent-gold); 
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px 0;
+            flex: 1;
+        }
+
+        .sidebar-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: #cbd5e0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-item a:hover, .sidebar-item.active a {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        /* ÁREA PRINCIPAL DE CONTEÚDO */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px;
+            flex: 1;
+        }
+
+        .main-container { width: 100%; max-width: 600px; }
+
+        /* CARD DA CONSULTA */
         .card-consulta { 
-            background: rgba(255, 255, 255, 0.08); 
+            background: var(--card-bg); 
             backdrop-filter: blur(15px); 
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.12); 
+            border: 1px solid var(--card-border); 
             padding: 25px; 
             border-radius: 16px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
             width: 100%;
             margin-bottom: 20px;
         }
-        
+
         .header-box { 
             display: flex;
             justify-content: center;
@@ -41,7 +115,7 @@
             padding-bottom: 15px; 
             margin-bottom: 25px; 
         }
-        
+
         .titulo-central {
             text-align: center;
             font-size: 19px;
@@ -56,97 +130,121 @@
             width: 100%; padding: 14px; background: #ffffff; border: 1px solid transparent; border-radius: 8px;
             font-size: 15px; outline: none; color: #1e293b;
         }
-        .input-filtro:focus { border-color: #3b82f6; }
+        .input-filtro:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
 
         /* TABELA DE RESULTADOS */
         .tabela-card {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             width: 100%;
             overflow: hidden;
         }
         .tabela-wrapper { overflow-x: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 450px; }
-        th { padding: 14px; background: rgba(0,0,0,0.3); color: #94a3b8; font-size: 11px; text-transform: uppercase; text-align: left; }
+        th { padding: 14px; background: rgba(0,0,0,0.3); color: var(--text-muted); font-size: 11px; text-transform: uppercase; text-align: left; }
         td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; vertical-align: middle; }
         
-        .col-nm { color: #ffd700; font-weight: bold; }
+        .col-nm { color: var(--accent-gold); font-weight: bold; }
 
-        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: 25px; }
+        .direitos-box { max-width: 600px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: auto; }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <!-- CARD DA CONSULTA MMBE -->
-        <div class="card-consulta">
-            <div class="header-box">
-                <div class="titulo-central">Consulta de Estoque (MMBE)</div>
+    <!-- SIDEBAR FIXA IDENTICA AO CONTAGEM.HTML -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">WMS Inteligente</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="contagem.html">📦 Contagem / Operação</a>
+            </li>
+            <li class="sidebar-item active">
+                <a href="consulta.html">🔍 Consulta MMBE</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="auditoria.html">📊 Painel Gerencial / Auditoria</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="Carga.html">🚀 Carga de Base MMBE</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DA PÁGINA (SUBSTITUI APENAS O CONTEÚDO CENTRAL) -->
+    <main class="main-wrapper">
+        <div class="main-container">
+            <!-- CARD DA CONSULTA MMBE -->
+            <div class="card-consulta">
+                <div class="header-box">
+                    <div class="titulo-central">Consulta de Estoque (MMBE)</div>
+                </div>
+
+                <!-- FILTROS DE PESQUISA -->
+                <div class="campo-grupo">
+                    <label class="label-filtro">NM (SAP)</label>
+                    <input type="text" id="filtroNM" class="input-filtro" placeholder="Digite o NM..." oninput="filtrarTabela()">
+                </div>
+                
+                <div class="campo-grupo">
+                    <label class="label-filtro">Descrição (*Contém*)</label>
+                    <input type="text" id="filtroDesc" class="input-filtro" placeholder="Buscar na descrição..." oninput="filtrarTabela()">
+                </div>
+
+                <div class="campo-grupo">
+                    <label class="label-filtro">Depósito (DP01-DP05, DPA1-DPA2)</label>
+                    <input type="text" id="filtroDeposito" class="input-filtro" placeholder="Ex: DP01..." oninput="filtrarTabela()">
+                </div>
             </div>
 
-            <!-- FILTROS DE PESQUISA -->
-            <div class="campo-grupo">
-                <label class="label-filtro">NM (SAP)</label>
-                <input type="text" id="filtroNM" class="input-filtro" placeholder="Digite o NM..." oninput="filtrarTabela()">
-            </div>
-            
-            <div class="campo-grupo">
-                <label class="label-filtro">Descrição (*Contém*)</label>
-                <input type="text" id="filtroDesc" class="input-filtro" placeholder="Buscar na descrição..." oninput="filtrarTabela()">
-            </div>
-
-            <div class="campo-grupo">
-                <label class="label-filtro">Depósito (DP01-DP05, DPA1-DPA2)</label>
-                <input type="text" id="filtroDeposito" class="input-filtro" placeholder="Ex: DP01..." oninput="filtrarTabela()">
+            <!-- REGRID DE DADOS DA TABELA ABAIXO -->
+            <div class="tabela-card">
+                <div class="tabela-wrapper">
+                    <table id="tabelaEstoque">
+                        <thead>
+                            <tr>
+                                <th>NM (SAP)</th>
+                                <th>Depósito</th>
+                                <th>Descrição Operacional</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-nm">1000142</td>
+                                <td>DP01</td>
+                                <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
+                            </tr>
+                            <tr>
+                                <td class="col-nm">2000551</td>
+                                <td>DP03</td>
+                                <td>MANOMETRO PRESSAO FLANGEADO 1/2</td>
+                            </tr>
+                            <tr>
+                                <td class="col-nm">1000142</td>
+                                <td>DP02</td>
+                                <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
+                            </tr>
+                            <tr>
+                                <td class="col-nm">3000889</td>
+                                <td>DPA1</td>
+                                <td>TUBO ACO CARBONO 4 POL SEM COSTURA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- REGRID DE DADOS DA TABELA ABAIXO -->
-        <div class="tabela-card">
-            <div class="tabela-wrapper">
-                <table id="tabelaEstoque">
-                    <thead>
-                        <tr>
-                            <th>NM (SAP)</th>
-                            <th>Depósito</th>
-                            <th>Descrição Operacional</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col-nm">1000142</td>
-                            <td>DP01</td>
-                            <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                        </tr>
-                        <tr>
-                            <td class="col-nm">2000551</td>
-                            <td>DP03</td>
-                            <td>MANOMETRO PRESSAO FLANGEADO 1/2</td>
-                        </tr>
-                        <tr>
-                            <td class="col-nm">1000142</td>
-                            <td>DP02</td>
-                            <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                        </tr>
-                        <tr>
-                            <td class="col-nm">3000889</td>
-                            <td>DPA1</td>
-                            <td>TUBO ACO CARBONO 4 POL SEM COSTURA</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
+        <div class="direitos-box">
+            <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0;">
+                &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+                Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
+            </p>
         </div>
-    </div>
-
-    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-    <div class="direitos-box">
-        <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0;">
-            &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-            Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
-        </p>
-    </div>
+    </main>
 
     <script>
         // Função inteligente para filtrar as linhas da tabela em tempo real
