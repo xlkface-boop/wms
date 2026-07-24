@@ -543,12 +543,11 @@
             const tabTarget = document.getElementById(`tab${tipo}`);
             if (tabTarget) tabTarget.classList.add('active');
 
-            // Ativar Botão Correspondente
             const eventBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tipo));
             if (eventBtn) eventBtn.classList.add('active');
         }
 
-        // Leitura de Arquivo Excel/CSV
+        // Leitura de Arquivo Excel/CSV com Identificação de Cabeçalho SAP
         function processarArquivo(tipo, input) {
             const file = input.files[0];
             if (!file) return;
@@ -561,7 +560,22 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+                
+                // Converter primeiro para matriz bruta para localizar o cabeçalho real
+                const rawRows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                let rangeOffset = 0;
+
+                // Localizar automaticamente a linha de cabeçalho do SAP
+                for (let i = 0; i < Math.min(rawRows.length, 25); i++) {
+                    const rowStr = rawRows[i].map(c => String(c).toLowerCase()).join(' ');
+                    if (rowStr.includes('material') && (rowStr.includes('texto breve') || rowStr.includes('depósito') || rowStr.includes('deposito'))) {
+                        rangeOffset = i;
+                        break;
+                    }
+                }
+
+                // Extrair o JSON iniciando da linha do cabeçalho identificada
+                const json = XLSX.utils.sheet_to_json(worksheet, { range: rangeOffset, defval: '' });
 
                 if (!json || json.length === 0) {
                     exibirDiagnostico(tipo, "❌ Arquivo vazio ou sem linhas de dados válidas.", "danger");
@@ -597,7 +611,6 @@
             campos.forEach(campo => {
                 const tr = document.createElement('tr');
                 
-                // Encontrar automaticamente melhor correspondência
                 let colunaEncontrada = colunasPlanilha.find(c => 
                     campo.aliases.some(a => a.toLowerCase() === c.trim().toLowerCase())
                 ) || '';
@@ -656,7 +669,7 @@
 
             if (json.length === 0) return;
 
-            const colunas = Object.keys(json[0]).slice(0, 8); // Exibir até 8 colunas para scannability
+            const colunas = Object.keys(json[0]).slice(0, 8);
             let headerRow = '<tr>';
             colunas.forEach(col => headerRow += `<th>${col}</th>`);
             headerRow += '</tr>';
@@ -682,7 +695,7 @@
         }
 
         // =========================================================================
-        // FUNÇÕES ALTERADAS: PERSISTÊNCIA REAL NO FIRESTORE
+        // PERSISTÊNCIA REAL NO FIRESTORE COM LIMPEZA DE MEMÓRIA SELETIVA
         // =========================================================================
 
         async function executarIntegracaoIndividual(tipo) {
@@ -856,6 +869,9 @@
                         `${totalLinhas} Linhas`,
                         `Gravado em ${nomeColecao}`
                     );
+
+                    // Limpa exclusivamente a memória do tipo recém-processado
+                    dadosLidosEmMemoria[suf] = { json: [], map: {}, nome: '' };
                 }, 300);
 
             } catch (err) {
@@ -880,7 +896,6 @@
             const tbody = document.querySelector('#tableHistorico tbody');
             if (!tbody) return;
 
-            // Limpar linha zerada de placeholder se existir
             if (tbody.children.length === 1 && tbody.children[0].innerText.includes("Nenhuma carga")) {
                 tbody.innerHTML = '';
             }
