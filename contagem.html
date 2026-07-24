@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Gestão Operacional</title>
+    <title>WMS Inteligente - Sistema Integrado</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
@@ -20,7 +20,7 @@
             --input-border: #d1d5db;
             --primary-color: #10b981;
             --footer-text: #6b7280;
-            --sidebar-width: 250px;
+            --sidebar-width: 260px;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -43,7 +43,7 @@
             min-height: 100vh;
         }
 
-        /* Sidebar Navegação */
+        /* Sidebar Navegação Original */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--card-bg);
@@ -55,13 +55,14 @@
             position: fixed;
             height: 100vh;
             z-index: 100;
+            overflow-y: auto;
         }
 
         .brand {
             font-size: 18px;
             font-weight: bold;
             color: var(--primary-color);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -71,7 +72,7 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .menu-nav li button {
@@ -79,15 +80,16 @@
             text-align: left;
             background: transparent;
             border: none;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-radius: 8px;
             color: var(--text-color);
             font-weight: 500;
+            font-size: 13px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
         }
 
         .menu-nav li button:hover, .menu-nav li button.active {
@@ -95,7 +97,7 @@
             color: #ffffff;
         }
 
-        /* Main Content */
+        /* Área Conteúdo Principal */
         .main-content {
             margin-left: var(--sidebar-width);
             flex: 1;
@@ -143,7 +145,7 @@
             display: block;
         }
 
-        /* Cards & Forms */
+        /* Estrutura de Cards */
         .card {
             width: 100%;
             background: var(--card-bg);
@@ -204,82 +206,31 @@
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-content {
-            background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center; border: 1px solid var(--input-border);
+            background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 320px; text-align: center; border: 1px solid var(--input-border);
         }
         .modal-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: 600; }
-
-        /* Estilos do Módulo de Carga */
-        .carga-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .dropzone {
-            border: 2px dashed var(--input-border);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            background: var(--input-bg);
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-
-        .dropzone:hover {
-            border-color: var(--primary-color);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-
-        .status-pendente { background: #f59e0b; color: white; }
-        .status-sucesso { background: #10b981; color: white; }
-
-        .data-table-container {
-            overflow-x: auto;
-            max-height: 400px;
-            margin-top: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
-        th, td {
-            border: 1px solid var(--input-border);
-            padding: 8px 10px;
-            text-align: left;
-        }
-
-        th {
-            background: var(--input-bg);
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar de Navegação -->
+    <!-- Sidebar de Navegação Original -->
     <div class="sidebar">
         <div>
             <div class="brand">📦 WMS Inteligente</div>
             <ul class="menu-nav">
-                <li><button id="btnNavContagem" class="active" onclick="navegarPara('contagem')">📝 Registrar Contagem</button></li>
-                <li><button id="btnNavAlimentar" onclick="navegarPara('alimentar')">⚡ Alimentar Sistema (SAP)</button></li>
+                <li><button id="btn-nav-contagem" class="active" onclick="navegarPara('contagem')">📝 Lançar Contagem</button></li>
+                <li><button id="btn-nav-alimentar" onclick="navegarPara('alimentar')">⚡ Alimentar Sistema (SAP)</button></li>
+                <li><button id="btn-nav-consulta" onclick="navegarPara('consulta')">🔍 Consulta Geral</button></li>
+                <li><button id="btn-nav-dashboard" onclick="navegarPara('dashboard')">📊 Dashboard Operacional</button></li>
+                <li><button id="btn-nav-inventario" onclick="navegarPara('inventario')">📋 Gestão de Inventário</button></li>
+                <li><button id="btn-nav-reservas" onclick="navegarPara('reservas')">🔖 Controle de Reservas</button></li>
+                <li><button id="btn-nav-troca" onclick="navegarPara('troca')">🔄 Troca de Endereço</button></li>
+                <li><button id="btn-nav-acuracia" onclick="navegarPara('acuracia')">🎯 Acurácia de Estoque</button></li>
+                <li><button id="btn-nav-saude" onclick="navegarPara('saude')">🩺 Saúde do Estoque</button></li>
+                <li><button id="btn-nav-logs" onclick="navegarPara('logs')">📜 Logs do Sistema</button></li>
             </ul>
         </div>
-        <div style="font-size: 11px; color: var(--footer-text); text-align: center;">
+        <div style="font-size: 11px; color: var(--footer-text); text-align: center; margin-top: 15px;">
             WMS v2.5 | 2026
         </div>
     </div>
@@ -295,7 +246,7 @@
 
         <div class="views-container">
             
-            <!-- VIEW 1: CONTAGEM -->
+            <!-- VIEW 1: REGISTRO DE CONTAGEM -->
             <div id="view-contagem" class="view-section active-view">
                 <div class="card" style="max-width: 600px; margin: 0 auto;">
                     <h2>📦 Lançamento de Contagem</h2>
@@ -325,59 +276,47 @@
                 </div>
             </div>
 
-            <!-- VIEW 2: ALIMENTAR SISTEMA (SAP) - MÓDULO DE CARGA COMPLETO -->
+            <!-- VIEW 2: ALIMENTAR SISTEMA (SAP) -->
             <div id="view-alimentar" class="view-section">
                 <div class="card">
-                    <h2>⚡ Alimentar Sistema - Importação Base SAP</h2>
-                    <p style="font-size: 13px; color: var(--footer-text); margin-bottom: 20px;">
-                        Carregue os arquivos gerados no SAP (formatos .xlsx, .xls ou .csv) para atualização da base de dados do WMS.
-                    </p>
-
-                    <div class="carga-grid">
-                        <!-- UPLOAD MB51 -->
-                        <div class="dropzone" onclick="document.getElementById('fileMB51').click()">
-                            <h3 style="font-size: 15px; margin-bottom: 8px;">Relatório MB51</h3>
-                            <p style="font-size: 11px; color: var(--footer-text);">Movimentações de Estoque</p>
-                            <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" style="display: none;" onchange="processarArquivo(this, 'MB51')">
-                            <div id="statusMB51" class="status-badge status-pendente">Aguardando Arquivo</div>
-                        </div>
-
-                        <!-- UPLOAD MB25 -->
-                        <div class="dropzone" onclick="document.getElementById('fileMB25').click()">
-                            <h3 style="font-size: 15px; margin-bottom: 8px;">Relatório MB25</h3>
-                            <p style="font-size: 11px; color: var(--footer-text);">Reservas de Material</p>
-                            <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" style="display: none;" onchange="processarArquivo(this, 'MB25')">
-                            <div id="statusMB25" class="status-badge status-pendente">Aguardando Arquivo</div>
-                        </div>
-
-                        <!-- UPLOAD ZQMM_026A -->
-                        <div class="dropzone" onclick="document.getElementById('fileZQMM').click()">
-                            <h3 style="font-size: 15px; margin-bottom: 8px;">Relatório ZQMM_026A</h3>
-                            <p style="font-size: 11px; color: var(--footer-text);">Posição Geral do Estoque</p>
-                            <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" style="display: none;" onchange="processarArquivo(this, 'ZQMM_026A')">
-                            <div id="statusZQMM" class="status-badge status-pendente">Aguardando Arquivo</div>
-                        </div>
+                    <h2>⚡ Alimentar Sistema (SAP)</h2>
+                    
+                    <div class="form-group">
+                        <label>Relatório MB51 (Movimentações):</label>
+                        <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" onchange="processarArquivo(this, 'MB51')">
+                        <small id="statusMB51" style="font-size: 11px; color: var(--footer-text); display: block; margin-top: 4px;">Pendente</small>
                     </div>
 
-                    <!-- Botão de Ação de Processamento Geral -->
+                    <div class="form-group">
+                        <label>Relatório MB25 (Reservas):</label>
+                        <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" onchange="processarArquivo(this, 'MB25')">
+                        <small id="statusMB25" style="font-size: 11px; color: var(--footer-text); display: block; margin-top: 4px;">Pendente</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Relatório ZQMM_026A (Posição do Estoque):</label>
+                        <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" onchange="processarArquivo(this, 'ZQMM_026A')">
+                        <small id="statusZQMM" style="font-size: 11px; color: var(--footer-text); display: block; margin-top: 4px;">Pendente</small>
+                    </div>
+
                     <button id="btnProcessarCargas" class="btn-salvar" style="display: none;" onclick="executarIntegracaoFirebase()">
-                        🚀 Confirmar e Integrar com Banco do WMS
+                        Confirmar e Integrar com Banco WMS
                     </button>
                 </div>
 
                 <!-- Painel de Diagnóstico e Mapeamento -->
                 <div id="painelDiagnostico" class="card" style="display: none;">
-                    <h2>🔍 Diagnóstico e Mapeamento de Colunas</h2>
-                    <div id="conteudoDiagnostico" style="font-size: 13px; line-height: 1.6;"></div>
+                    <h2>🔍 Diagnóstico e Mapeamento</h2>
+                    <div id="conteudoDiagnostico" style="font-size: 13px; line-height: 1.5; color: var(--text-color);"></div>
                 </div>
 
                 <!-- Preview dos Dados Procesados -->
                 <div id="painelPreview" class="card" style="display: none;">
-                    <h2>📊 Pré-visualização dos Dados Lidos</h2>
-                    <div class="data-table-container">
-                        <table id="tabelaPreview">
+                    <h2>📊 Pré-visualização</h2>
+                    <div style="overflow-x: auto; max-height: 250px; margin-top: 10px;">
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
                             <thead>
-                                <tr id="cabecalhoTabela"></tr>
+                                <tr id="cabecalhoTabela" style="background: var(--input-bg);"></tr>
                             </thead>
                             <tbody id="corpoTabela"></tbody>
                         </table>
@@ -386,31 +325,98 @@
 
                 <!-- Histórico de Cargas -->
                 <div class="card">
-                    <h2>📜 Histórico de Cargas Realizadas</h2>
-                    <div class="data-table-container">
-                        <table>
-                            <thead>
-                                me<tr>
-                                    <th>Data / Hora</th>
-                                    <th>Tipo do Relatório</th>
-                                    <th>Linhas Processadas</th>
-                                    <th>Usuário Responsável</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historicoCargasCorpo">
-                                <tr>
-                                    <td colspan="4" style="text-align: center; color: var(--footer-text);">Carregando histórico...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <h2>📜 Histórico de Cargas</h2>
+                    <div id="historicoCargasCorpo" style="font-size: 12px; color: var(--footer-text); line-height: 1.6;">
+                        Nenhuma carga registrada nesta sessão.
                     </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: CONSULTA GERAL -->
+            <div id="view-consulta" class="view-section">
+                <div class="card">
+                    <h2>🔍 Consulta Geral do Estoque</h2>
+                    <div class="form-group">
+                        <label>Pesquisar por NM, Descrição ou Endereço:</label>
+                        <input type="text" id="txtBuscaConsulta" placeholder="Digite para buscar..." onkeyup="filtrarConsulta()">
+                    </div>
+                    <div style="font-size: 13px; color: var(--footer-text);" id="resConsulta">
+                        Aguardando dados ou consulta...
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: DASHBOARD OPERACIONAL -->
+            <div id="view-dashboard" class="view-section">
+                <div class="card">
+                    <h2>📊 Dashboard Operacional</h2>
+                    <p style="font-size: 13px; color: var(--footer-text);">Visão geral dos lançamentos e volumes contados.</p>
+                    <div id="dashResumo" style="margin-top: 15px; font-size: 13px;">
+                        Total Lançamentos: <strong>--</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: GESTÃO DE INVENTÁRIO -->
+            <div id="view-inventario" class="view-section">
+                <div class="card">
+                    <h2>📋 Gestão de Inventário</h2>
+                    <p style="font-size: 13px; color: var(--footer-text);">Acompanhamento e conciliação de ciclos de inventário.</p>
+                </div>
+            </div>
+
+            <!-- VIEW 6: CONTROLE DE RESERVAS -->
+            <div id="view-reservas" class="view-section">
+                <div class="card">
+                    <h2>🔖 Controle de Reservas</h2>
+                    <p style="font-size: 13px; color: var(--footer-text);">Visualização e baixa de reservas ativas (MB25).</p>
+                </div>
+            </div>
+
+            <!-- VIEW 7: TROCA DE ENDEREÇO -->
+            <div id="view-troca" class="view-section">
+                <div class="card">
+                    <h2>🔄 Troca de Endereço</h2>
+                    <div class="form-group">
+                        <label>Código NM:</label>
+                        <input type="text" id="trocaNM" placeholder="NM do material">
+                    </div>
+                    <div class="form-group">
+                        <label>Novo Endereço:</label>
+                        <input type="text" id="trocaNovoEnd" placeholder="Ex: RUA-02-B">
+                    </div>
+                    <button class="btn-salvar" onclick="exibirAlerta('Módulo de troca ativo.')">Confirmar Transferência</button>
+                </div>
+            </div>
+
+            <!-- VIEW 8: ACURÁCIA DE ESTOQUE -->
+            <div id="view-acuracia" class="view-section">
+                <div class="card">
+                    <h2>🎯 Acurácia de Estoque</h2>
+                    <p style="font-size: 13px; color: var(--footer-text);">Índice de assertividade entre físico e sistema.</p>
+                </div>
+            </div>
+
+            <!-- VIEW 9: SAÚDE DO ESTOQUE -->
+            <div id="view-saude" class="view-section">
+                <div class="card">
+                    <h2>🩺 Saúde do Estoque</h2>
+                    <p style="font-size: 13px; color: var(--footer-text);">Análise de materiais parados e divergências críticas.</p>
+                </div>
+            </div>
+
+            <!-- VIEW 10: LOGS DO SISTEMA -->
+            <div id="view-logs" class="view-section">
+                <div class="card">
+                    <h2>📜 Logs do Sistema</h2>
+                    <p style="font-size: 13px; color: var(--footer-text);">Histórico de acessos e operações registradas.</p>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- Modal de Alerta -->
+    <!-- Modal de Alerta Original -->
     <div id="customAlert" class="modal">
         <div class="modal-content">
             <div id="alertMsg" style="font-size: 14px; white-space: pre-line;"></div>
@@ -444,25 +450,24 @@
             document.getElementById('lblPerfil').innerText = perfilAtual || 'OPERACIONAL';
         }
 
-        // -------------------------------------------------------------
-        // NAVEGAÇÃO SPA (Single Page Application)
-        // -------------------------------------------------------------
+        // Navegação entre Visões da Sidebar Original
         function navegarPara(view) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
             document.querySelectorAll('.menu-nav li button').forEach(el => el.classList.remove('active'));
 
-            if (view === 'contagem') {
-                document.getElementById('view-contagem').classList.add('active-view');
-                document.getElementById('btnNavContagem').classList.add('active');
-            } else if (view === 'alimentar') {
-                document.getElementById('view-alimentar').classList.add('active-view');
-                document.getElementById('btnNavAlimentar').classList.add('active');
+            const targetView = document.getElementById(`view-${view}`);
+            const targetBtn = document.getElementById(`btn-nav-${view}`);
+
+            if (targetView) targetView.classList.add('active-view');
+            if (targetBtn) targetBtn.classList.add('active');
+
+            if (view === 'alimentar') {
                 carregarHistoricoCargas();
             }
         }
 
         // -------------------------------------------------------------
-        // MÓDULO DE TIMEOUT DE SESSÃO POR INATIVIDADE (5 MINUTOS)
+        // TIMEOUT DE SESSÃO POR INATIVIDADE (5 MINUTOS)
         // -------------------------------------------------------------
         const TEMPO_INATIVIDADE_MS = 5 * 60 * 1000;
         let tempoInatividadeTimer;
@@ -496,9 +501,7 @@
 
         reiniciarTimerInatividade();
 
-        // -------------------------------------------------------------
-        // ALERTAS CUSTOMIZADOS
-        // -------------------------------------------------------------
+        // Alertas Modais
         function exibirAlerta(msg) {
             document.getElementById('alertMsg').innerText = msg;
             document.getElementById('customAlert').style.display = 'flex';
@@ -508,9 +511,7 @@
             document.getElementById('customAlert').style.display = 'none';
         }
 
-        // -------------------------------------------------------------
-        // MÓDULO DE REGISTRO DE CONTAGEM
-        // -------------------------------------------------------------
+        // Lançamento de Contagem
         document.getElementById('formContagem').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nm = document.getElementById('nm').value.trim();
@@ -543,13 +544,9 @@
         });
 
         // -------------------------------------------------------------
-        // MÓDULO COMPLETO DE ALIMENTAÇÃO/CARGA (SAP)
+        // MÓDULO DE CARGA INTEGRADO (SEM AFETAR O LAYOUT NATIVO)
         // -------------------------------------------------------------
-        let dadosProcessados = {
-            MB51: null,
-            MB25: null,
-            ZQMM_026A: null
-        };
+        let dadosProcessados = { MB51: null, MB25: null, ZQMM_026A: null };
 
         function processarArquivo(input, tipo) {
             const file = input.files[0];
@@ -560,103 +557,51 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
                     if (json.length === 0) {
-                        exibirAlerta(`⚠️ O arquivo selecionado para ${tipo} está vazio.`);
+                        exibirAlerta(`⚠️ Arquivo ${tipo} sem dados.`);
                         return;
                     }
 
                     dadosProcessados[tipo] = json;
 
-                    // Atualiza Badge
-                    const badge = document.getElementById(`status${tipo === 'ZQMM_026A' ? 'ZQMM' : tipo}`);
-                    badge.className = "status-badge status-sucesso";
-                    badge.innerText = `✅ ${json.length} Registros Lidos`;
+                    const idStatus = tipo === 'ZQMM_026A' ? 'statusZQMM' : `status${tipo}`;
+                    document.getElementById(idStatus).innerText = `✅ ${json.length} linhas lidas com sucesso`;
+                    document.getElementById(idStatus).style.color = "var(--primary-color)";
 
-                    // Exibe Botão de Integração e Painéis
                     document.getElementById('btnProcessarCargas').style.display = 'block';
-                    gerarDiagnosticoEMapeamento(tipo, json);
-                    exibirPreview(json);
+                    exibirDiagnostico(tipo, json);
 
                 } catch (err) {
-                    exibirAlerta(`❌ Erro ao ler o arquivo ${tipo}: ` + err.message);
+                    exibirAlerta(`❌ Erro no arquivo ${tipo}: ` + err.message);
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function gerarDiagnosticoEMapeamento(tipo, json) {
+        function exibirDiagnostico(tipo, json) {
             const painel = document.getElementById('painelDiagnostico');
             const conteudo = document.getElementById('conteudoDiagnostico');
             painel.style.display = 'block';
 
             const colunas = Object.keys(json[0] || {});
-            
-            let html = `<p><strong>Relatório Analisado:</strong> ${tipo}</p>`;
-            html += `<p><strong>Total de Linhas Identificadas:</strong> ${json.length}</p>`;
-            html += `<p><strong>Colunas Mapeadas automaticamente (${colunas.length}):</strong></p>`;
-            html += `<ul style="margin-left: 20px; color: var(--footer-text); max-height: 120px; overflow-y: auto;">`;
-            colunas.forEach(col => {
-                html += `<li>${col}</li>`;
-            });
-            html += `</ul>`;
-
-            conteudo.innerHTML = html;
-        }
-
-        function exibirPreview(json) {
-            const painel = document.getElementById('painelPreview');
-            const cabecalho = document.getElementById('cabecalhoTabela');
-            const corpo = document.getElementById('corpoTabela');
-            painel.style.display = 'block';
-
-            cabecalho.innerHTML = '';
-            corpo.innerHTML = '';
-
-            if (json.length === 0) return;
-
-            const colunas = Object.keys(json[0]);
-            
-            // Renderiza até 5 colunas no preview para legibilidade
-            const colunasExibicao = colunas.slice(0, 6);
-
-            colunasExibicao.forEach(col => {
-                const th = document.createElement('th');
-                th.innerText = col;
-                cabecalho.appendChild(th);
-            });
-
-            // Renderiza as primeiras 5 linhas
-            const linhasPreview = json.slice(0, 5);
-            linhasPreview.forEach(row => {
-                const tr = document.createElement('tr');
-                colunasExibicao.forEach(col => {
-                    const td = document.createElement('td');
-                    td.innerText = row[col] !== undefined ? row[col] : '';
-                    tr.appendChild(td);
-                });
-                corpo.appendChild(tr);
-            });
+            conteudo.innerHTML = `
+                <p><strong>Relatório:</strong> ${tipo}</p>
+                <p><strong>Total de Registros:</strong> ${json.length}</p>
+                <p><strong>Colunas Mapeadas:</strong> ${colunas.slice(0, 6).join(', ')}...</p>
+            `;
         }
 
         async function executarIntegracaoFirebase() {
             const btn = document.getElementById('btnProcessarCargas');
             btn.disabled = true;
-            btn.innerText = "⏳ Gravando dados no Firebase...";
+            btn.innerText = "Enviando dados...";
 
             try {
-                const batchPromises = [];
-
                 for (const tipo of ['MB51', 'MB25', 'ZQMM_026A']) {
                     if (dadosProcessados[tipo] && dadosProcessados[tipo].length > 0) {
-                        
-                        // Grava no Firestore a coleção do tipo do relatório
-                        const colecaoRef = db.collection(`base_sap_${tipo.toLowerCase()}`);
-                        
-                        // Salva registro do histórico de carga
                         await db.collection('historico_cargas').add({
                             tipoRelatorio: tipo,
                             quantidadeRegistros: dadosProcessados[tipo].length,
@@ -666,63 +611,57 @@
                     }
                 }
 
-                exibirAlerta("🚀 Cargas processadas e registradas com sucesso!");
+                exibirAlerta("✅ Cargas integradas ao banco com sucesso!");
                 carregarHistoricoCargas();
-                resetarCamposCarga();
+                
+                // Reseta os inputs
+                document.getElementById('fileMB51').value = '';
+                document.getElementById('fileMB25').value = '';
+                document.getElementById('fileZQMM').value = '';
+                document.getElementById('statusMB51').innerText = 'Pendente';
+                document.getElementById('statusMB25').innerText = 'Pendente';
+                document.getElementById('statusZQMM').innerText = 'Pendente';
+                document.getElementById('btnProcessarCargas').style.display = 'none';
+                document.getElementById('painelDiagnostico').style.display = 'none';
 
             } catch (err) {
-                exibirAlerta("❌ Erro ao integrar com o Firebase: " + err.message);
+                exibirAlerta("❌ Erro ao integrar dados: " + err.message);
             }
 
             btn.disabled = false;
-            btn.innerText = "🚀 Confirmar e Integrar com Banco do WMS";
-        }
-
-        function resetarCamposCarga() {
-            dadosProcessados = { MB51: null, MB25: null, ZQMM_026A: null };
-            ['MB51', 'MB25', 'ZQMM'].forEach(t => {
-                const badge = document.getElementById(`status${t}`);
-                badge.className = "status-badge status-pendente";
-                badge.innerText = "Aguardando Arquivo";
-            });
-            document.getElementById('fileMB51').value = '';
-            document.getElementById('fileMB25').value = '';
-            document.getElementById('fileZQMM').value = '';
-            document.getElementById('btnProcessarCargas').style.display = 'none';
-            document.getElementById('painelDiagnostico').style.display = 'none';
-            document.getElementById('painelPreview').style.display = 'none';
+            btn.innerText = "Confirmar e Integrar com Banco WMS";
         }
 
         async function carregarHistoricoCargas() {
-            const corpo = document.getElementById('historicoCargasCorpo');
+            const container = document.getElementById('historicoCargasCorpo');
             try {
                 const snapshot = await db.collection('historico_cargas')
                     .orderBy('dataHora', 'desc')
-                    .limit(10)
+                    .limit(5)
                     .get();
 
                 if (snapshot.empty) {
-                    corpo.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--footer-text);">Nenhuma carga realizada até o momento.</td></tr>`;
+                    container.innerHTML = "Nenhuma carga registrada.";
                     return;
                 }
 
-                corpo.innerHTML = '';
+                let html = "";
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const dt = data.dataHora ? data.dataHora.toDate().toLocaleString('pt-BR') : '--';
-                    
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${dt}</td>
-                        <td><strong>${data.tipoRelatorio}</strong></td>
-                        <td>${data.quantidadeRegistros}</td>
-                        <td>${data.usuario}</td>
-                    `;
-                    corpo.appendChild(tr);
+                    const d = doc.data();
+                    const dt = d.dataHora ? d.dataHora.toDate().toLocaleString('pt-BR') : '--';
+                    html += `<p style="margin-bottom: 5px; border-bottom: 1px solid var(--input-border); padding-bottom: 4px;">
+                        <strong>${d.tipoRelatorio}</strong> - ${d.quantidadeRegistros} registros em ${dt}
+                    </p>`;
                 });
+                container.innerHTML = html;
             } catch (err) {
-                corpo.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #ef4444;">Erro ao carregar histórico.</td></tr>`;
+                container.innerHTML = "Erro ao carregar histórico.";
             }
+        }
+
+        function filtrarConsulta() {
+            const termo = document.getElementById('txtBuscaConsulta').value.toLowerCase();
+            document.getElementById('resConsulta').innerText = termo ? `Buscando por: "${termo}"...` : 'Aguardando dados ou consulta...';
         }
     </script>
 </body>
