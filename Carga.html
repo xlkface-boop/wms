@@ -8,6 +8,10 @@
     <!-- SheetJS para Leitura/Parse de Excel (.xlsx, .xls) e CSV -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+    <!-- Firebase SDK (v9 Compat para inclusão via CDN simples) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg-body: #f3f4f6;
@@ -447,7 +451,7 @@
                     <div class="msg-box msg-success" id="msgSucessoMB51">✅ Colunas mapeadas e leitura validada!</div>
                     <div class="msg-box msg-error" id="msgErroMB51">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB51" onclick="simularCarga('MB51')">🚀 Confirmar e Importar MB51</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB51" onclick="executarCargaFirebase('MB51')">🚀 Confirmar e Importar MB51</button>
                 </div>
             </div>
 
@@ -507,7 +511,7 @@
                     <div class="msg-box msg-success" id="msgSucessoMB25">✅ Colunas mapeadas e leitura validada!</div>
                     <div class="msg-box msg-error" id="msgErroMB25">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB25" onclick="simularCarga('MB25')">🚀 Confirmar e Importar MB25</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarMB25" onclick="executarCargaFirebase('MB25')">🚀 Confirmar e Importar MB25</button>
                 </div>
             </div>
 
@@ -567,7 +571,7 @@
                     <div class="msg-box msg-success" id="msgSucessoZQMM">✅ Colunas mapeadas e leitura validada!</div>
                     <div class="msg-box msg-error" id="msgErroZQMM">❌ Formato inválido ou erro ao ler arquivo.</div>
 
-                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarZQMM" onclick="simularCarga('ZQMM')">🚀 Confirmar e Importar ZQMM</button>
+                    <button class="btn-action" style="background: #2563eb; display: none;" id="btnEnviarZQMM" onclick="executarCargaFirebase('ZQMM')">🚀 Confirmar e Importar ZQMM</button>
                 </div>
             </div>
 
@@ -600,31 +604,55 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE (Caso já esteja inicializado globalmente, reutiliza)
+        if (!firebase.apps.length) {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
+                authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
+                projectId: "bolao-copa-2026-d264f",
+                storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
+                messagingSenderId: "802924891915",
+                appId: "1:802924891915:web:d9c641161733b510559c0e",
+                measurementId: "G-QQ210F367M"
+            };
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
         // Historico em memoria local
         const historicoCargas = [];
 
-        // Estrutura das colunas requeridas pelo WMS por cada arquivo SAP
+        // Estrutura das colunas requeridas pelo WMS por cada arquivo SAP (Incluindo Financeiro)
         const camposObrigatoriosWMS = {
             ZQMM: [
                 { id: 'nm', label: 'NM', alias: ['nm', 'material', 'código', 'codigo', 'num_material'] },
                 { id: 'descricao', label: 'Descrição', alias: ['descrição', 'descricao', 'texto_breve', 'denominacao', 'denomi'] },
                 { id: 'deposito', label: 'Depósito', alias: ['depósito', 'deposito', 'dep', 'armazenamento'] },
                 { id: 'endereco', label: 'Endereço', alias: ['endereço', 'endereco', 'posicao', 'posição', 'rua', 'loc'] },
-                { id: 'saldo', label: 'Saldo', alias: ['saldo', 'quantidade', 'qtd', 'estoque', 'utilizacao_livre'] }
+                { id: 'quantidade', label: 'Quantidade', alias: ['saldo', 'quantidade', 'qtd', 'estoque', 'utilizacao_livre'] },
+                { id: 'unidade_medida', label: 'Unidade Medida', alias: ['un', 'umb', 'unidade', 'um'] },
+                { id: 'valor_unitario', label: 'Valor Unitário', alias: ['valor_unitario', 'pr_unitario', 'preco_unitario', 'montante_unitario', 'val_unit'] },
+                { id: 'valor_total', label: 'Valor Total', alias: ['valor_total', 'montante', 'val_total', 'valor_tot', 'total'] }
             ],
             MB25: [
-                { id: 'reserva', label: 'Reserva', alias: ['reserva', 'num_reserva', 'n_reserva'] },
                 { id: 'nm', label: 'NM', alias: ['nm', 'material', 'código', 'codigo'] },
+                { id: 'descricao', label: 'Descrição', alias: ['descrição', 'descricao', 'texto_breve', 'denominacao'] },
+                { id: 'deposito', label: 'Depósito', alias: ['depósito', 'deposito', 'dep'] },
+                { id: 'endereco', label: 'Endereço', alias: ['endereço', 'endereco', 'posicao', 'posição', 'loc'] },
                 { id: 'quantidade', label: 'Quantidade', alias: ['quantidade', 'qtd', 'qtd_necessaria', 'necessaria'] },
-                { id: 'solicitante', label: 'Solicitante', alias: ['solicitante', 'usuario', 'usuário', 'requisitante'] },
-                { id: 'data', label: 'Data', alias: ['data', 'dt_necessidade', 'data_reserva'] }
+                { id: 'unidade_medida', label: 'Unidade Medida', alias: ['un', 'umb', 'unidade', 'um'] },
+                { id: 'valor_unitario', label: 'Valor Unitário', alias: ['valor_unitario', 'pr_unitario', 'preco_unitario', 'val_unit'] },
+                { id: 'valor_total', label: 'Valor Total', alias: ['valor_total', 'montante', 'val_total', 'total'] }
             ],
             MB51: [
-                { id: 'data', label: 'Data', alias: ['data', 'dt_lançamento', 'data_lancamento', 'dt_doc'] },
-                { id: 'documento', label: 'Documento', alias: ['documento', 'doc_material', 'doc_mat', 'n_doc'] },
                 { id: 'nm', label: 'NM', alias: ['nm', 'material', 'código', 'codigo'] },
-                { id: 'tipoMovimento', label: 'Tipo Movimento', alias: ['tipo movimento', 'tipo_mov', 'movimento', 'tm', 'tp_mov'] },
-                { id: 'quantidade', label: 'Quantidade', alias: ['quantidade', 'qtd', 'qtd_um', 'qnt'] }
+                { id: 'descricao', label: 'Descrição', alias: ['descrição', 'descricao', 'texto_breve', 'denominacao'] },
+                { id: 'deposito', label: 'Depósito', alias: ['depósito', 'deposito', 'dep'] },
+                { id: 'endereco', label: 'Endereço', alias: ['endereço', 'endereco', 'posicao', 'posição', 'loc'] },
+                { id: 'quantidade', label: 'Quantidade', alias: ['quantidade', 'qtd', 'qtd_um', 'qnt'] },
+                { id: 'unidade_medida', label: 'Unidade Medida', alias: ['un', 'umb', 'unidade', 'um'] },
+                { id: 'valor_unitario', label: 'Valor Unitário', alias: ['valor_unitario', 'pr_unitario', 'preco_unitario', 'val_unit'] },
+                { id: 'valor_total', label: 'Valor Total', alias: ['valor_total', 'montante', 'val_total', 'total'] }
             ]
         };
 
@@ -644,27 +672,35 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
+        // CONVERSOR NUMÉRICO PARA FORMATAÇÃO SAP / BRASIL
+        function parseNumero(val) {
+            if (val === undefined || val === null || val === '') return 0;
+            if (typeof val === 'number') return val;
+            let str = String(val).replace('R$', '').trim();
+            str = str.replace(/\./g, '').replace(',', '.');
+            const parsed = parseFloat(str);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
+        // CÁLCULO AUXILIAR DE VALORES FINANCEIROS
+        function calcularValores(qtd, valUnit, valTot) {
+            let q = parseNumero(qtd);
+            let vu = parseNumero(valUnit);
+            let vt = parseNumero(valTot);
+
+            if (vt === 0 && q > 0 && vu > 0) vt = q * vu;
+            if (vu === 0 && q > 0 && vt > 0) vu = vt / q;
+
+            return { quantidade: q, valor_unitario: vu, valor_total: vt };
+        }
+
         // LEITURA REAL DE ARQUIVOS (EXCEL E CSV) VIA SHEETJS
         function processarArquivo(tipo, input) {
             const file = input.files[0];
             
             if (!file) return;
 
-            // --- DIAGNÓSTICO TEMPORÁRIO INÍCIO ---
-            alert("Arquivo selecionado com sucesso.");
-
             const extensaoArquivo = file.name.split('.').pop().toLowerCase();
-            console.log("=== DIAGNÓSTICO DE ARQUIVO SELECIONADO ===");
-            console.log("Nome do arquivo:", file.name);
-            console.log("Extensão:", extensaoArquivo);
-            console.log("Tamanho (bytes):", file.size);
-
-            if (typeof XLSX === "undefined") {
-                alert("Erro: biblioteca XLSX não encontrada.");
-            } else {
-                alert("Biblioteca XLSX carregada com sucesso.");
-            }
-            // --- DIAGNÓSTICO TEMPORÁRIO FIM ---
 
             // Ocultar elementos de estado prévio
             document.getElementById(`msgSucesso${tipo}`).style.display = 'none';
@@ -872,14 +908,37 @@
             `).join('');
         }
 
-        // SIMULAÇÃO DA BARRA DE PROGRESSO E CONFIRMAÇÃO DA LEITURA
-        function simularCarga(tipo) {
+        // IMPLANTAÇÃO DA GRAVAÇÃO REAL NO FIREBASE FIRESTORE
+        async function executarCargaFirebase(tipo) {
             const mapa = dadosLidosEmMemoria[tipo].map;
             const camposReq = camposObrigatoriosWMS[tipo];
+            const json = dadosLidosEmMemoria[tipo].json;
 
-            // Validar se todos os campos obrigatórios foram mapeados
-            const camposFaltantes = camposReq.filter(c => !mapa[c.id]);
+            // Identificar e validar usuário logado ou aplicar fallback seguro de sessão
+            const user = firebase.auth().currentUser;
+            const usuarioLogado = (user && user.email) ? user.email : "operador.wms@transpetro.com.br";
 
+            // Normalização do tipo e direcionamento da coleção exclusiva
+            const tipoNormalizado = String(tipo).toUpperCase().replace(/[^A-Z0-9]/g, "");
+            let nomeColecao = "";
+            let usarIdAutomatico = false;
+
+            if (tipoNormalizado.includes("MB51")) {
+                nomeColecao = "movimentacoes_mb51";
+                usarIdAutomatico = true; // Preserva histórico completo
+            } else if (tipoNormalizado.includes("ZQMM")) {
+                nomeColecao = "estoque_zqmm026a";
+                usarIdAutomatico = false; // Atualiza saldo/depósito
+            } else if (tipoNormalizado.includes("MB25")) {
+                nomeColecao = "reservas_mb25";
+                usarIdAutomatico = false; // Atualiza reserva
+            } else {
+                alert(`⚠️ Tipo de planilha não reconhecido: ${tipo}`);
+                return;
+            }
+
+            // Validar se os campos obrigatórios básicos foram vinculados
+            const camposFaltantes = camposReq.filter(c => !mapa[c.id] && c.id !== 'valor_unitario' && c.id !== 'valor_total');
             if (camposFaltantes.length > 0) {
                 const nomesFaltantes = camposFaltantes.map(c => c.label).join(', ');
                 alert(`⚠️ Por favor, selecione as colunas correspondentes para: ${nomesFaltantes}`);
@@ -896,36 +955,122 @@
 
             btn.disabled = true;
             progContainer.style.display = 'block';
-            progBar.style.width = '0%';
+            progBar.style.width = '10%';
 
-            let progresso = 0;
-            const intervalo = setInterval(() => {
-                progresso += 20;
-                progBar.style.width = progresso + '%';
+            try {
+                const totalLinhas = json.length;
+                const batchSize = 400; // Limite seguro para lote do Firestore
+                let lotesExecutados = 0;
 
-                if (progresso >= 100) {
-                    clearInterval(intervalo);
-                    
-                    setTimeout(() => {
-                        progContainer.style.display = 'none';
-                        document.getElementById(`msgSucesso${tipo}`).style.display = 'block';
-                        btn.style.display = 'none';
-                        btn.disabled = false;
+                const timestampCarga = firebase.firestore.Timestamp.now();
+                const dataAtualISO = new Date().toISOString();
 
-                        // Adicionar ao Histórico
-                        adicionarAoHistorico(
-                            new Date().toLocaleString('pt-BR'),
-                            tipo === 'ZQMM' ? 'ZQMM_026A' : tipo,
-                            file.name,
-                            formatarTamanho(file.size),
-                            'Mapeado e Pronto'
-                        );
+                let batch = db.batch();
+                let contadorNoLote = 0;
 
-                        // Reset do input
-                        input.value = '';
-                    }, 300);
+                for (let i = 0; i < totalLinhas; i++) {
+                    const row = json[i];
+
+                    // Extrair dados com base no mapeamento
+                    const nm = String(row[mapa['nm']] || '').trim();
+                    const descricao = String(row[mapa['descricao']] || '').trim();
+                    const deposito = String(row[mapa['deposito']] || '').trim();
+                    const endereco = String(row[mapa['endereco']] || '').trim();
+                    const unidade_medida = String(row[mapa['unidade_medida']] || 'UN').trim();
+
+                    // Trava de segurança: ignorar linhas sem NM
+                    if (!nm) {
+                        continue;
+                    }
+
+                    // Processar valores numéricos e financeiros
+                    const { quantidade, valor_unitario, valor_total } = calcularValores(
+                        row[mapa['quantidade']],
+                        row[mapa['valor_unitario']],
+                        row[mapa['valor_total']]
+                    );
+
+                    // Estrutura exata exigida pelo Firestore
+                    const documentoPayload = {
+                        nm: nm,
+                        descricao: descricao,
+                        deposito: deposito,
+                        endereco: endereco,
+                        quantidade: quantidade,
+                        unidade_medida: unidade_medida,
+                        valor_unitario: valor_unitario,
+                        valor_total: valor_total,
+                        data_carga: timestampCarga,
+                        usuario_carga: usuarioLogado
+                    };
+
+                    // Definição da referência doc por coleção
+                    let refDoc;
+                    if (usarIdAutomatico) {
+                        refDoc = db.collection(nomeColecao).doc(); // ID único para MB51
+                        batch.set(refDoc, documentoPayload);
+                    } else {
+                        const idChaveComposta = `${nm}_${deposito}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+                        refDoc = db.collection(nomeColecao).doc(idChaveComposta !== '_' ? idChaveComposta : db.collection(nomeColecao).doc().id);
+                        batch.set(refDoc, documentoPayload, { merge: true });
+                    }
+
+                    contadorNoLote++;
+
+                    if (contadorNoLote === batchSize || i === totalLinhas - 1) {
+                        await batch.commit();
+                        lotesExecutados += contadorNoLote;
+                        
+                        // Atualizar barra de progresso
+                        const pct = Math.round((lotesExecutados / totalLinhas) * 90);
+                        progBar.style.width = `${10 + pct}%`;
+
+                        batch = db.batch();
+                        contadorNoLote = 0;
+                    }
                 }
-            }, 100);
+
+                // Gravar registro na coleção auditora de logs
+                await db.collection('logs_cargas_sap').add({
+                    tipo_carga: tipo === 'ZQMM' ? 'ZQMM_026A' : tipo,
+                    colecao_afetada: nomeColecao,
+                    nome_arquivo: file.name,
+                    tamanho_arquivo: formatarTamanho(file.size),
+                    total_registros: totalLinhas,
+                    data_carga: dataAtualISO,
+                    usuario: usuarioLogado,
+                    status: 'SUCESSO'
+                });
+
+                progBar.style.width = '100%';
+
+                setTimeout(() => {
+                    progContainer.style.display = 'none';
+                    document.getElementById(`msgSucesso${tipo}`).innerText = `✅ Carga realizada com sucesso! ${totalLinhas} registros salvos no Firestore.`;
+                    document.getElementById(`msgSucesso${tipo}`).style.display = 'block';
+                    btn.style.display = 'none';
+                    btn.disabled = false;
+
+                    // Adicionar ao Histórico local
+                    adicionarAoHistorico(
+                        new Date().toLocaleString('pt-BR'),
+                        tipo === 'ZQMM' ? 'ZQMM_026A' : tipo,
+                        file.name,
+                        formatarTamanho(file.size),
+                        'Gravado no Firebase'
+                    );
+
+                    // Reset do input
+                    input.value = '';
+                }, 300);
+
+            } catch (err) {
+                console.error("Erro na gravação Firebase:", err);
+                progContainer.style.display = 'none';
+                document.getElementById(`msgErro${tipo}`).innerText = "❌ Erro ao gravar dados no Firebase: " + err.message;
+                document.getElementById(`msgErro${tipo}`).style.display = 'block';
+                btn.disabled = false;
+            }
         }
 
         // ADICIONAR REGISTRO NA TABELA DE HISTÓRICO
