@@ -3,119 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS - Contagem de Estoque</title>
+    <title>Inventário Material - WMS Transpetro</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    
-    <!-- Biblioteca XLSX -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Ícones FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --input-border: #cccccc;
-            --footer-text: #777777;
-            --danger-color: #e74c3c;
-            --success-color: #2ecc71;
+            --bg-dark-blue: #003B5C;
+            --bg-main: #EFEFEF;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --green-accent: #107C41;
+            --red-accent: #D9534F;
+            --border-color: #D1D5DB;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-main);
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        header {
-            background-color: var(--primary-color);
+        /* BARRA SUPERIOR */
+        .top-header {
+            background-color: var(--bg-dark-blue);
             color: white;
-            padding: 1rem 2rem;
+            height: 50px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 14px;
         }
 
-        .logo-container h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        nav.menu-nav ul {
+        .brand-logo {
             display: flex;
-            list-style: none;
+            align-items: center;
             gap: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
-        nav.menu-nav a.btn-nav, nav.menu-nav button {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-logout {
+            background: #d9534f;
             color: white;
-            padding: 8px 16px;
+            border: none;
+            padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 0.9rem;
-        }
-
-        nav.menu-nav a.btn-nav:hover, nav.menu-nav button:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: white;
-        }
-
-        nav.menu-nav a.btn-nav.active, nav.menu-nav button.active {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
+            font-size: 12px;
             font-weight: bold;
         }
 
-        main {
+        /* ESTRUTURA PRINCIPAL */
+        .app-container {
+            display: flex;
             flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
+            overflow: hidden;
         }
 
-        .view-section {
-            display: none;
+        /* MENU LATERAL DA ESQUERDA */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-dark-blue);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .view-section.active-view {
-            display: block;
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
         }
 
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 4px 0 0 4px;
+            margin-left: 8px;
+        }
+
+        /* ÁREA CENTRAL DE CONTEÚDO */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .dashboard-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* CARDS DO SEU FORMULÁRIO PRESERVADOS */
         .card {
             background: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 1.5rem;
         }
 
         .card h2 {
-            font-size: 1.2rem;
-            color: var(--primary-color);
+            font-size: 1.1rem;
+            color: var(--bg-dark-blue);
             margin-bottom: 1rem;
-            border-bottom: 2px solid var(--bg-color);
+            border-bottom: 2px solid var(--bg-main);
             padding-bottom: 0.5rem;
+            text-transform: uppercase;
         }
 
         .form-grid {
@@ -140,17 +177,16 @@
         input[type="number"],
         select {
             padding: 10px;
-            border: 1px solid var(--input-border);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus,
         select:focus {
-            border-color: var(--accent-color);
+            border-color: var(--bg-dark-blue);
         }
 
         input[readonly] {
@@ -167,14 +203,8 @@
             user-select: none;
         }
 
-        .checkbox-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
         .btn-submit {
-            background-color: var(--accent-color);
+            background-color: var(--green-accent);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -182,82 +212,13 @@
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s;
             margin-top: 1rem;
             width: 100%;
+            transition: background 0.2s;
         }
 
         .btn-submit:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-submit:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        footer {
-            background-color: #ffffff;
-            border-top: 1px solid #e0e0e0;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--footer-text);
-        }
-
-        .btn-logout {
-            background: transparent;
-            border: 1px solid var(--danger-color);
-            color: var(--danger-color);
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .btn-logout:hover {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .modal-content p {
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-        }
-
-        .modal-content button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
+            background-color: #0d6334;
         }
 
         .field-status {
@@ -265,29 +226,64 @@
             color: #888;
             margin-top: 2px;
         }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 2rem; border-radius: 8px; max-width: 400px; width: 90%; text-align: center;
+        }
+        .modal-content button {
+            background-color: var(--bg-dark-blue); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-container">
-            <h1>WMS - Sistema de Gestão</h1>
+    <!-- BARRA SUPERIOR -->
+    <header class="top-header">
+        <div class="brand-logo">
+            <i class="fa-solid fa-warehouse"></i>
+            <span>TRANSPETRO</span>
         </div>
-        <nav class="menu-nav">
-            <ul>
-                <li><a href="contagem.html" class="btn-nav active">Lançar Contagem</a></li>
-                <li><a href="Carga.html" class="btn-nav">Alimentar Sistema (SAP)</a></li>
-                <li><a href="consulta.html" class="btn-nav">Consulta Geral</a></li>
-                <li><a href="auditoria.html" class="btn-nav">Dashboard Operacional</a></li>
-            </ul>
-        </nav>
+        <div class="header-user-info">
+            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
+            <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
+            <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
+        </div>
     </header>
 
-    <main>
-        <!-- SEÇÃO PRINCIPAL: LANÇAMENTO DE CONTAGEM DE ESTOQUE -->
-        <section id="view-lancamento" class="view-section active-view">
+    <!-- CORPO DO SISTEMA -->
+    <div class="app-container">
+        
+        <!-- MENU LATERAL -->
+        <nav class="sidebar">
+            <a class="nav-item" onclick="irPara('menu.html')">
+                <i class="fa-solid fa-house"></i> Início
+            </a>
+            <a class="nav-item" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+            </a>
+            <a class="nav-item active" onclick="irPara('contagem.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Inventário Material
+            </a>
+            <a class="nav-item" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-boxes-packing"></i> Movimentação
+            </a>
+            <a class="nav-item" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i> Carga de Dados (SAP)
+            </a>
+        </nav>
+
+        <!-- ÁREA CENTRAL DE LANÇAMENTOS -->
+        <main class="main-content">
+            <h2 class="dashboard-title">INVENTÁRIO MATERIAL (ROTINA OPERACIONAL)</h2>
+
+            <!-- CARD 1: FORMULÁRIO DE CONTAGEM -->
             <div class="card">
-                <h2>Lançamento de Contagem de Estoque</h2>
+                <h2><i class="fa-solid fa-calculator"></i> Lançamento de Contagem de Estoque</h2>
                 <form id="formContagem">
                     <div class="form-grid">
                         <div class="form-group">
@@ -331,9 +327,9 @@
                 </form>
             </div>
 
-            <!-- CARD COMPLEMENTAR: REGISTRO DE TROCA DE ENDEREÇO -->
+            <!-- CARD 2: TROCA DE ENDEREÇO -->
             <div class="card">
-                <h2>Registrar Troca de Endereço</h2>
+                <h2><i class="fa-solid fa-route"></i> Registrar Troca de Endereço</h2>
                 <form id="formTrocaEndereco">
                     <div class="form-grid">
                         <div class="form-group">
@@ -368,51 +364,11 @@
                         <label for="btnJaAltereiSap"><strong>Já alterei no SAP</strong></label>
                     </div>
 
-                    <button type="submit" id="btnSalvarTroca" class="btn-submit" style="background-color: var(--primary-color);">Registrar Troca de Endereço</button>
+                    <button type="submit" id="btnSalvarTroca" class="btn-submit" style="background-color: var(--bg-dark-blue);">Registrar Troca de Endereço</button>
                 </form>
             </div>
-        </section>
-
-        <!-- VIEWS SECUNDÁRIAS PRESERVADAS (NAVEGAÇÃO DESATIVADA) -->
-        <section id="view-alimentar" class="view-section">
-            <div class="card">
-                <h2>Alimentar Sistema (Carga de Relatórios SAP)</h2>
-                <p style="color: #666; margin-bottom: 1rem;">Visão gerenciada através do hub <strong>Carga.html</strong>.</p>
-                <div class="form-group"><label>MB51</label><input type="file" id="fileMB51" accept=".xlsx, .xls"><small id="statusMB51">Pendente</small></div>
-                <div class="form-group"><label>MB25</label><input type="file" id="fileMB25" accept=".xlsx, .xls"><small id="statusMB25">Pendente</small></div>
-                <div class="form-group"><label>ZQMM_026A</label><input type="file" id="fileZQMM" accept=".xlsx, .xls"><small id="statusZQMM">Pendente</small></div>
-                <button id="btnProcessarCargas" class="btn-submit" style="display:none;">Integrar Banco WMS</button>
-                <div id="painelDiagnostico" style="display:none;"><div id="conteudoDiagnostico"></div></div>
-                <div id="painelPreview" style="display:none;"><table style="width:100%;"><thead id="cabecalhoTabela"></thead><tbody id="corpoTabela"></tbody></table></div>
-                <div id="painelHistorico"><div id="historicoCargasCorpo"></div></div>
-            </div>
-        </section>
-
-        <section id="view-consulta" class="view-section">
-            <div class="card">
-                <h2>Consulta Geral do Estoque</h2>
-                <p style="color: #666; margin-bottom: 1rem;">Visão gerenciada através do hub <strong>consulta.html</strong>.</p>
-                <input type="text" id="txtBuscaConsulta" placeholder="Digite para consultar...">
-                <div id="resConsulta">Aguardando consulta...</div>
-            </div>
-        </section>
-
-        <section id="view-dashboard" class="view-section">
-            <div class="card">
-                <h2>Dashboard Operacional</h2>
-                <p style="color: #666;">Visão gerenciada através do hub <strong>auditoria.html</strong>.</p>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div>
-            <span>Sistema WMS Operacional &copy; 2026</span>
-        </div>
-        <div>
-            <button class="btn-logout" onclick="encerrarSessaoManualmente()">Sair do Sistema</button>
-        </div>
-    </footer>
+        </main>
+    </div>
 
     <!-- MODAL DE ALERTA -->
     <div id="customAlert" class="modal-overlay">
@@ -422,8 +378,8 @@
         </div>
     </div>
 
+    <!-- LÓGICA DO JAVASCRIPT IGUAL À SUA -->
     <script>
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
             authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
@@ -438,28 +394,16 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Validação da Sessão do Usuário
+        // 🔒 SEGURANÇA E SESSÃO
         const usuarioAtual = localStorage.getItem('wms_usuario');
-        const perfilAtual = localStorage.getItem('wms_perfil');
-
         if (!usuarioAtual) {
             window.location.replace('index.html');
+        } else {
+            document.getElementById('lblUsuario').innerText = usuarioAtual;
         }
 
-        // TIMEOUT DE SESSÃO POR INATIVIDADE (5 MINUTOS)
-        const TEMPO_INATIVIDADE_MS = 5 * 60 * 1000;
-        let tempoInatividadeTimer;
-
-        function executarLogoutSessaoExpirada() {
-            localStorage.clear();
-            auth.signOut().finally(() => {
-                window.location.replace('index.html');
-            });
-        }
-
-        function reiniciarTimerInatividade() {
-            clearTimeout(tempoInatividadeTimer);
-            tempoInatividadeTimer = setTimeout(executarLogoutSessaoExpirada, TEMPO_INATIVIDADE_MS);
+        function irPara(pagina) {
+            window.location.href = pagina;
         }
 
         function encerrarSessaoManualmente() {
@@ -469,12 +413,20 @@
             });
         }
 
+        // ⏱️ TIMEOUT POR INATIVIDADE (5 MINUTOS)
+        const TEMPO_INATIVIDADE_MS = 5 * 60 * 1000;
+        let tempoInatividadeTimer;
+
+        function reiniciarTimerInatividade() {
+            clearTimeout(tempoInatividadeTimer);
+            tempoInatividadeTimer = setTimeout(encerrarSessaoManualmente, TEMPO_INATIVIDADE_MS);
+        }
+
         ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => {
             window.addEventListener(evt, reiniciarTimerInatividade);
         });
         reiniciarTimerInatividade();
 
-        // Modais
         function exibirAlerta(msg) {
             document.getElementById('alertMsg').innerText = msg;
             document.getElementById('customAlert').style.display = 'flex';
@@ -484,7 +436,7 @@
             document.getElementById('customAlert').style.display = 'none';
         }
 
-        // BUSCA E AUTOPREENCHIMENTO DE NM (estoque_zqmm026a)
+        // 🔍 BUSCA DE NM NO FIRESTORE (zqmm026a)
         const inputNm = document.getElementById('nm');
         const inputDescricao = document.getElementById('inputDescricao');
         const selectDeposito = document.getElementById('selectDeposito');
@@ -528,22 +480,22 @@
                     inputEndereco.value = data.endereco || data['Posição do Depósito'] || data.Posicao || data.Localizacao || "";
 
                     statusBuscaNm.innerText = "✅ Material localizado";
-                    statusBuscaNm.style.color = "var(--success-color)";
+                    statusBuscaNm.style.color = "var(--green-accent)";
                 } else {
                     inputDescricao.value = "";
                     selectDeposito.value = "";
                     inputEndereco.value = "";
                     statusBuscaNm.innerText = "⚠️ NM não encontrado no cadastro ZQMM";
-                    statusBuscaNm.style.color = "var(--danger-color)";
+                    statusBuscaNm.style.color = "var(--red-accent)";
                 }
             } catch (err) {
                 console.error("Erro ao buscar NM:", err);
                 statusBuscaNm.innerText = "Erro ao pesquisar NM";
-                statusBuscaNm.style.color = "var(--danger-color)";
+                statusBuscaNm.style.color = "var(--red-accent)";
             }
         }
 
-        // REGISTRO DE CONTAGEM (inventario_contagens)
+        // 💾 SALVAR CONTAGEM
         document.getElementById('formContagem').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -584,7 +536,7 @@
             }
         });
 
-        // REGISTRO DE TROCA DE ENDEREÇO
+        // 📦 TROCA DE ENDEREÇO
         document.getElementById('formTrocaEndereco').addEventListener('submit', async (e) => {
             e.preventDefault();
 
