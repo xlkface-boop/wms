@@ -3,38 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Acesso</title>
+    <title>WMS Almoxarifado Transpetro - Acesso</title>
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     
+    <!-- Ícones FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
+            --bg-dark-blue: #003B5C;
+            --primary-color: #003B5C;
+            --btn-green: #107C41;
+            --btn-green-hover: #0b5c30;
+            --card-bg: rgba(255, 255, 255, 0.95);
             --text-color: #1f2937;
             --input-bg: #f9fafb;
             --input-border: #d1d5db;
-            --primary-color: #10b981;
             --footer-text: #6b7280;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #0b101d;
-                --card-bg: #111827;
-                --text-color: #ffffff;
-                --input-bg: #374151;
-                --input-border: #4b5563;
-                --footer-text: #9ca3af;
-            }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; transition: background 0.3s, color 0.3s; }
-
+        /* BANNER DE FUNDO (IGUAL À FOTO 1 - ALMOXARIFADO) */
         body {
-            background-color: var(--bg-color);
+            background: linear-gradient(rgba(0, 40, 64, 0.65), rgba(0, 40, 64, 0.65)), 
+                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1600&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
@@ -44,76 +47,147 @@
             padding: 20px;
         }
 
+        /* CARD CENTRALIZADO NOVO (DESIGNS DA FOTO) */
         .login-card {
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             background: var(--card-bg);
-            border: 1px solid var(--input-border);
-            padding: 35px 25px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             text-align: center;
+            backdrop-filter: blur(5px);
         }
 
-        .login-card h2 { font-size: 26px; margin-bottom: 25px; color: var(--primary-color); }
+        .brand-header {
+            margin-bottom: 25px;
+        }
 
-        .form-group { margin-bottom: 20px; text-align: left; }
-        label { font-size: 13px; color: var(--footer-text); display: block; margin-bottom: 6px; }
+        .brand-header i {
+            font-size: 38px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .brand-header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .brand-header p {
+            font-size: 13px;
+            color: #555;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .form-group { 
+            margin-bottom: 18px; 
+            text-align: left; 
+        }
+
+        label { 
+            font-size: 12px; 
+            font-weight: bold; 
+            color: #444; 
+            display: block; 
+            margin-bottom: 6px; 
+            text-transform: uppercase;
+        }
+
         input {
-            width: 100%; background: var(--input-bg); border: 1px solid var(--input-border);
-            padding: 12px; border-radius: 8px; color: var(--text-color); outline: none;
+            width: 100%; 
+            background: var(--input-bg); 
+            border: 1px solid var(--input-border);
+            padding: 12px 14px; 
+            border-radius: 6px; 
+            color: var(--text-color); 
+            outline: none;
+            font-size: 14px;
         }
-        input:focus { border-color: var(--primary-color); }
+
+        input:focus { 
+            border-color: var(--primary-color); 
+            box-shadow: 0 0 0 2px rgba(0, 59, 92, 0.2);
+        }
 
         .btn-acao {
-            width: 100%; background: var(--primary-color); color: white; border: none;
-            padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;
+            width: 100%; 
+            background: var(--primary-color); 
+            color: white; 
+            border: none;
+            padding: 14px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 15px;
             margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+
+        .btn-acao:hover {
+            background: #002840;
         }
 
         .btn-toggle {
-            background: transparent; color: var(--footer-text); border: none;
-            font-size: 13px; cursor: pointer; text-decoration: underline;
+            background: transparent; 
+            color: var(--primary-color); 
+            border: none;
+            font-size: 13px; 
+            cursor: pointer; 
+            text-decoration: underline;
+            font-weight: 600;
         }
 
         .rodape-login {
-            margin-top: 30px;
+            margin-top: 25px;
             font-size: 11px;
-            color: var(--footer-text);
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             text-align: center;
-            max-width: 380px;
+            max-width: 400px;
             line-height: 1.5;
         }
 
         .aviso-restrito {
-            color: #f87171;
+            color: #fca5a5;
             font-weight: bold;
             display: block;
             margin-top: 5px;
         }
 
+        /* MODAL ALERTA PERSONALIZADO */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-content {
-            background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 320px; text-align: center; border: 1px solid var(--input-border);
+            background: #ffffff; padding: 25px; border-radius: 12px; max-width: 340px; text-align: center; border: 1px solid var(--input-border);
         }
         .modal-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: 600; }
-
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2 id="tituloTela">Acessar WMS</h2>
+        <!-- MARCA IGUAL À FOTO 1 DO LAYOUT -->
+        <div class="brand-header">
+            <i class="fa-solid fa-warehouse"></i>
+            <h1>Transpetro</h1>
+            <p id="tituloTela">WMS ALMOXARIFADO TRANSPETRO</p>
+        </div>
         
-        <!-- Formulário Único para Login e Cadastro -->
+        <!-- FORMULÁRIO COM A SUA LÓGICA INTEGRA -->
         <form id="authForm">
             <div class="form-group">
                 <label>E-mail Corporativo:</label>
-                <input type="email" id="email" placeholder="exemplo@transpetro.com.br" required autocomplete="off">
+                <input type="email" id="email" placeholder="Login: email@transpetro.com.br" required autocomplete="off">
             </div>
             <div class="form-group">
                 <label>Senha do Sistema:</label>
@@ -124,20 +198,22 @@
         </form>
     </div>
 
+    <!-- RODAPÉ DE DIREITOS E AUTORIA -->
     <div class="rodape-login">
         &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-        Projeto independente desenvolvido e de propriedade exclusiva de<br>
-        <strong>Dário João Torres</strong>.<br>
-        <span class="aviso-restrito">⚠️ AVISO DE USO RESTRITO: Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
+        Projeto independente desenvolvido por <strong>Dário João Torres</strong>.<br>
+        <span class="aviso-restrito">⚠️ Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
     </div>
 
+    <!-- CAIXA DE ALERTA -->
     <div id="customAlert" class="modal">
         <div class="modal-content">
-            <div id="alertMsg" style="font-size: 14px; white-space: pre-line;"></div>
+            <div id="alertMsg" style="font-size: 14px; color: #333; white-space: pre-line;"></div>
             <button class="modal-btn" onclick="fecharAlerta()">OK</button>
         </div>
     </div>
 
+    <!-- TODA A SUA LÓGICA DE JAVASCRIPT PRESERVADA 100% -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
@@ -167,7 +243,7 @@
 
         function alternarModo() {
             modoLogin = !modoLogin;
-            document.getElementById('tituloTela').innerText = modoLogin ? "Acessar WMS" : "Criar Acesso";
+            document.getElementById('tituloTela').innerText = modoLogin ? "WMS ALMOXARIFADO TRANSPETRO" : "CRIAR NOVO ACESSO";
             document.getElementById('btnPrincipal').innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
             document.getElementById('btnToggle').innerText = modoLogin ? "Não tem conta? Criar Acesso" : "Já tenho conta. Entrar";
         }
@@ -229,8 +305,9 @@
                     await db.collection("logs_acesso").add({ usuario: email, status: "LOGIN_SUCESSO", ...dadosSeg });
                     exibirAlerta(`🔓 Bem-vindo!\nAcesso liberado.`);
                     
+                    // Redireciona para a tela do Menu/Dashboard principal
                     setTimeout(() => { 
-                        window.location.replace('contagem.html'); 
+                        window.location.replace('menu.html'); 
                     }, 1000);
 
                 } else {
