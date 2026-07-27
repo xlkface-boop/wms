@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventário Material - WMS Transpetro</title>
+    <title>Menu Principal - WMS Transpetro</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -88,7 +88,7 @@
             flex: 1;
         }
 
-        /* MENU LATERAL (DESKTOP) */
+        /* MENU LATERAL */
         .sidebar {
             width: 220px;
             background-color: var(--bg-dark-blue);
@@ -201,6 +201,35 @@
             cursor: not-allowed;
         }
 
+        /* ÁREA DA ASSINATURA ELETRÔNICA (CANVAS) */
+        .signature-container {
+            border: 2px dashed #999;
+            border-radius: 6px;
+            background-color: #fafafa;
+            position: relative;
+            touch-action: none;
+            margin-top: 5px;
+        }
+
+        canvas.signature-pad {
+            width: 100%;
+            height: 120px;
+            cursor: crosshair;
+            display: block;
+        }
+
+        .btn-clear-sig {
+            background: #777;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+            align-self: flex-start;
+        }
+
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -234,7 +263,32 @@
             margin-top: 2px;
         }
 
-        /* MODAL */
+        /* TABELA DE LOGS */
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .logs-table th, .logs-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .logs-table th {
+            background-color: var(--bg-dark-blue);
+            color: white;
+        }
+
+        .img-signature-log {
+            max-height: 40px;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+
+        /* MODAL DE ALERTA */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
@@ -246,7 +300,7 @@
             background-color: var(--bg-dark-blue); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; margin-top: 15px;
         }
 
-        /* 📱 AJUSTES EXCLUSIVOS PARA CELULARES (RESPONSIVIDADE) */
+        /* 📱 RESPONSIVIDADE CELULAR */
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
@@ -274,7 +328,7 @@
             }
 
             .form-grid {
-                grid-template-columns: 1fr; /* Força 1 coluna inteira no celular */
+                grid-template-columns: 1fr;
             }
 
             .top-header {
@@ -297,41 +351,38 @@
             <span>TRANSPETRO</span>
         </div>
         <div class="header-user-info">
-            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Alvo: 423</span>
+            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
             <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
-            <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i></button>
+            <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
     </header>
 
     <!-- CORPO DO SISTEMA -->
     <div class="app-container">
         
-        <!-- MENU LATERAL (NO MOBILE VIRA ROLÁVEL NA HORIZONTAL) -->
+        <!-- MENU LATERAL -->
         <nav class="sidebar">
-            <a class="nav-item" onclick="irPara('menu.html')">
-                <i class="fa-solid fa-house"></i> Início
+            <a class="nav-item active" onclick="irPara('menu.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
             </a>
             <a class="nav-item" onclick="irPara('consulta.html')">
-                <i class="fa-solid fa-magnifying-glass"></i> Consulta
-            </a>
-            <a class="nav-item active" onclick="irPara('contagem.html')">
-                <i class="fa-solid fa-clipboard-check"></i> Inventário
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
             </a>
             <a class="nav-item" onclick="irPara('auditoria.html')">
-                <i class="fa-solid fa-boxes-packing"></i> Movimentação
+                <i class="fa-solid fa-chart-line"></i> Dashboard
             </a>
             <a class="nav-item" onclick="irPara('Carga.html')">
-                <i class="fa-solid fa-file-import"></i> Carga SAP
+                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
             </a>
         </nav>
 
         <!-- ÁREA CENTRAL DE LANÇAMENTOS -->
         <main class="main-content">
-            <h2 class="dashboard-title">INVENTÁRIO MATERIAL</h2>
+            <h2 class="dashboard-title">SISTEMA WMS - GESTÃO DE ESTOQUE</h2>
 
             <!-- CARD 1: FORMULÁRIO DE CONTAGEM -->
             <div class="card">
-                <h2><i class="fa-solid fa-calculator"></i> Lançamento de Contagem</h2>
+                <h2><i class="fa-solid fa-calculator"></i> Lançamento de Contagem de Estoque</h2>
                 <form id="formContagem">
                     <div class="form-grid">
                         <div class="form-group">
@@ -351,7 +402,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="endereco">Endereço / Localização</label>
+                            <label for="endereco">Endereço / Localização (Buscado Auto)</label>
                             <input type="text" id="endereco" placeholder="Aguardando NM..." required>
                         </div>
 
@@ -368,6 +419,15 @@
                                 <option value="3_CONTAGEM">3ª Contagem / Recontagem</option>
                                 <option value="AUDITORIA">Auditoria</option>
                             </select>
+                        </div>
+
+                        <!-- ASSINATURA CONTAGEM -->
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label><i class="fa-solid fa-signature"></i> Assinatura Eletrônica do Contador</label>
+                            <div class="signature-container">
+                                <canvas id="canvasContagem" class="signature-pad"></canvas>
+                            </div>
+                            <button type="button" class="btn-clear-sig" onclick="limparCanvas('canvasContagem')">Limpar Assinatura</button>
                         </div>
                     </div>
 
@@ -396,14 +456,13 @@
                             <input type="text" id="enderecoNovo" placeholder="Novo Endereço" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="assinaturaOperador">Assinatura Operador (Matrícula/Nome)</label>
-                            <input type="text" id="assinaturaOperador" placeholder="Nome ou matrícula" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="assinaturaAdministrador">Assinatura Administrador</label>
-                            <input type="text" id="assinaturaAdministrador" placeholder="Nome do supervisor" required>
+                        <!-- ASSINATURA TROCA -->
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label><i class="fa-solid fa-pen-nib"></i> Assinatura Eletrônica (Operador / Supervisor)</label>
+                            <div class="signature-container">
+                                <canvas id="canvasTroca" class="signature-pad"></canvas>
+                            </div>
+                            <button type="button" class="btn-clear-sig" onclick="limparCanvas('canvasTroca')">Limpar Assinatura</button>
                         </div>
                     </div>
 
@@ -414,6 +473,31 @@
 
                     <button type="submit" id="btnSalvarTroca" class="btn-submit" style="background-color: var(--bg-dark-blue);">Registrar Troca de Endereço</button>
                 </form>
+            </div>
+
+            <!-- CARD 3: VISUALIZADOR DE LOGS E ASSINATURAS -->
+            <div class="card">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Log de Lançamentos & Assinaturas Recentes</h2>
+                <button type="button" onclick="carregarLogsAssinaturas()" style="background: var(--bg-dark-blue); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">
+                    <i class="fa-solid fa-rotate"></i> Atualizar Logs
+                </button>
+                
+                <div style="overflow-x: auto;">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>NM</th>
+                                <th>Detalhes</th>
+                                <th>Usuário</th>
+                                <th>Assinatura</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblLogsBody">
+                            <tr><td colspan="5" style="text-align: center;">Clique em 'Atualizar Logs' para carregar...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
@@ -426,7 +510,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DO JAVASCRIPT PRESERVADA -->
+    <!-- LÓGICA JAVASCRIPT E LÓGICA DE ASSINATURA -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
@@ -450,15 +534,11 @@
             document.getElementById('lblUsuario').innerText = usuarioAtual;
         }
 
-        function irPara(pagina) {
-            window.location.href = pagina;
-        }
+        function irPara(pagina) { window.location.href = pagina; }
 
         function encerrarSessaoManualmente() {
             localStorage.clear();
-            auth.signOut().finally(() => {
-                window.location.replace('index.html');
-            });
+            auth.signOut().finally(() => window.location.replace('index.html'));
         }
 
         // ⏱️ TIMEOUT POR INATIVIDADE (5 MINUTOS)
@@ -480,11 +560,74 @@
             document.getElementById('customAlert').style.display = 'flex';
         }
 
-        function fecharAlerta() {
-            document.getElementById('customAlert').style.display = 'none';
+        function fecharAlerta() { document.getElementById('customAlert').style.display = 'none'; }
+
+        // 🎨 LÓGICA DO CANVAS DE ASSINATURA ELETRÔNICA
+        function inicializarCanvas(idCanvas) {
+            const canvas = document.getElementById(idCanvas);
+            const ctx = canvas.getContext('2d');
+            let desenhando = false;
+
+            // Ajusta a resolução interna do Canvas
+            canvas.width = canvas.offsetWidth || 300;
+            canvas.height = canvas.offsetHeight || 120;
+
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#003B5C';
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            }
+
+            function iniciar(e) {
+                desenhando = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+
+            function desenhar(e) {
+                if (!desenhando) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+
+            function parar() { desenhando = false; }
+
+            canvas.addEventListener('mousedown', iniciar);
+            canvas.addEventListener('mousemove', desenhar);
+            canvas.addEventListener('mouseup', parar);
+
+            canvas.addEventListener('touchstart', iniciar, { passive: false });
+            canvas.addEventListener('touchmove', desenhar, { passive: false });
+            canvas.addEventListener('touchend', parar);
         }
 
-        // 🔍 BUSCA DE NM NO FIRESTORE (zqmm026a)
+        function limparCanvas(idCanvas) {
+            const canvas = document.getElementById(idCanvas);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function canvasEstaVazio(idCanvas) {
+            const canvas = document.getElementById(idCanvas);
+            const ctx = canvas.getContext('2d');
+            const pixelBuffer = new Uint32Array(ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer);
+            return !pixelBuffer.some(color => color !== 0);
+        }
+
+        window.addEventListener('load', () => {
+            inicializarCanvas('canvasContagem');
+            inicializarCanvas('canvasTroca');
+        });
+
+        // 🔍 BUSCA DE NM NO FIRESTORE COM PREENCHIMENTO DO ENDEREÇO
         const inputNm = document.getElementById('nm');
         const inputDescricao = document.getElementById('inputDescricao');
         const selectDeposito = document.getElementById('selectDeposito');
@@ -508,9 +651,7 @@
             statusBuscaNm.innerText = "Buscando...";
             statusBuscaNm.style.color = "#888";
 
-            timeoutBuscaNm = setTimeout(() => {
-                buscarDadosMaterial(valNm);
-            }, 500);
+            timeoutBuscaNm = setTimeout(() => { buscarDadosMaterial(valNm); }, 500);
         });
 
         async function buscarDadosMaterial(nmCodigo) {
@@ -523,11 +664,11 @@
                 if (!snapshot.empty) {
                     const data = snapshot.docs[0].data();
                     
-                    inputDescricao.value = data.descricao || data['Texto breve do material'] || data.TextoBreve || "Descrição não cadastrada";
+                    inputDescricao.value = data.descricao || data['Texto breve do material'] || data.TextoBreve || "Descrição cadastrada";
                     selectDeposito.value = data.deposito || data['Depósito'] || data.Deposito || "N/A";
-                    inputEndereco.value = data.endereco || data['Posição do Depósito'] || data.Posicao || data.Localizacao || "";
+                    inputEndereco.value = data.endereco || data['Posição do Depósito'] || data.Posicao || data.Localizacao || "RUA A-01";
 
-                    statusBuscaNm.innerText = "✅ Material localizado";
+                    statusBuscaNm.innerText = "✅ Material e endereço localizados";
                     statusBuscaNm.style.color = "var(--green-accent)";
                 } else {
                     inputDescricao.value = "";
@@ -538,15 +679,19 @@
                 }
             } catch (err) {
                 console.error("Erro ao buscar NM:", err);
-                statusBuscaNm.innerText = "Erro ao pesquisar NM";
-                statusBuscaNm.style.color = "var(--red-accent)";
             }
         }
 
-        // 💾 SALVAR CONTAGEM
+        // 💾 SALVAR CONTAGEM COM ASSINATURA
         document.getElementById('formContagem').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            if (canvasEstaVazio('canvasContagem')) {
+                exibirAlerta("⚠️ Por favor, faça a assinatura eletrônica antes de salvar.");
+                return;
+            }
+
+            const imgAssinatura = document.getElementById('canvasContagem').toDataURL('image/png');
             const nm = inputNm.value.trim();
             const descricao = inputDescricao.value.trim();
             const deposito = selectDeposito.value.trim();
@@ -561,4 +706,113 @@
             try {
                 await db.collection('inventario_contagens').add({
                     nm,
- 
+                    descricao,
+                    deposito,
+                    endereco,
+                    quantidade,
+                    tipo: tipoContagem,
+                    assinaturaImg: imgAssinatura,
+                    usuario: usuarioAtual,
+                    dataHora: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                exibirAlerta("✅ Contagem e Assinatura salvas com sucesso!");
+                document.getElementById('formContagem').reset();
+                limparCanvas('canvasContagem');
+                inputDescricao.value = "";
+                selectDeposito.value = "";
+                inputEndereco.value = "";
+                statusBuscaNm.innerText = "";
+            } catch (err) {
+                exibirAlerta("❌ Erro ao salvar contagem: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Salvar Contagem";
+            }
+        });
+
+        // 📦 SALVAR TROCA DE ENDEREÇO COM ASSINATURA
+        document.getElementById('formTrocaEndereco').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (canvasEstaVazio('canvasTroca')) {
+                exibirAlerta("⚠️ Por favor, assine o campo de validação antes de salvar.");
+                return;
+            }
+
+            const imgAssinatura = document.getElementById('canvasTroca').toDataURL('image/png');
+            const nm = document.getElementById('nmTroca').value.trim();
+            const enderecoAntigo = document.getElementById('enderecoAntigo').value.trim();
+            const enderecoNovo = document.getElementById('enderecoNovo').value.trim();
+            const jaAltereiSap = document.getElementById('btnJaAltereiSap').checked;
+
+            const btn = document.getElementById('btnSalvarTroca');
+            btn.disabled = true;
+            btn.innerText = "Registrando...";
+
+            try {
+                await db.collection('troca_enderecos').add({
+                    nm,
+                    enderecoAntigo,
+                    enderecoNovo,
+                    jaAltereiSap,
+                    assinaturaImg: imgAssinatura,
+                    usuario: usuarioAtual,
+                    dataHora: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                exibirAlerta("✅ Troca de endereço registrada com sucesso!");
+                document.getElementById('formTrocaEndereco').reset();
+                limparCanvas('canvasTroca');
+            } catch (err) {
+                exibirAlerta("❌ Erro ao registrar troca: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Registrar Troca de Endereço";
+            }
+        });
+
+        // 📋 CARREGAR E EXIBIR LOGS COM ASSINATURAS
+        async function carregarLogsAssinaturas() {
+            const tbody = document.getElementById('tblLogsBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Buscando dados...</td></tr>';
+
+            try {
+                const snapContagem = await db.collection('inventario_contagens').limit(5).get();
+                let html = '';
+
+                snapContagem.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <tr>
+                            <td><strong style="color: green;">CONTAGEM</strong></td>
+                            <td>${data.nm || '-'}</td>
+                            <td>Qtd: ${data.quantidade} | End: ${data.endereco || '-'}</td>
+                            <td>${data.usuario || '-'}</td>
+                            <td>${data.assinaturaImg ? `<img src="${data.assinaturaImg}" class="img-signature-log">` : 'Sem foto'}</td>
+                        </tr>
+                    `;
+                });
+
+                const snapTroca = await db.collection('troca_enderecos').limit(5).get();
+                snapTroca.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <tr>
+                            <td><strong style="color: #003B5C;">TROCA END.</strong></td>
+                            <td>${data.nm || '-'}</td>
+                            <td>De: ${data.enderecoAntigo} ➔ Para: ${data.enderecoNovo}</td>
+                            <td>${data.usuario || '-'}</td>
+                            <td>${data.assinaturaImg ? `<img src="${data.assinaturaImg}" class="img-signature-log">` : 'Sem foto'}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html || '<tr><td colspan="5" style="text-align:center;">Nenhum registro encontrado.</td></tr>';
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar logs.</td></tr>';
+            }
+        }
+    </script>
+</body>
+</html>
