@@ -3,137 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Sistema Integrado</title>
+    <title>WMS - Contagem de Estoque</title>
+    
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <!-- XLSX Library -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Biblioteca XLSX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
-            --bg-color: #f3f4f6;
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f6f9;
             --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --input-bg: #f9fafb;
-            --input-border: #d1d5db;
-            --primary-color: #10b981;
-            --footer-text: #6b7280;
-            --sidebar-width: 260px;
+            --text-color: #333333;
+            --input-border: #cccccc;
+            --footer-text: #777777;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #0b101d;
-                --card-bg: #111827;
-                --text-color: #ffffff;
-                --input-bg: #1f2937;
-                --input-border: #374151;
-                --footer-text: #9ca3af;
-            }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Sidebar Navegação Original */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--card-bg);
-            border-right: 1px solid var(--input-border);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px 15px;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-            overflow-y: auto;
-        }
-
-        .brand {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu-nav {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .menu-nav li button {
-            width: 100%;
-            text-align: left;
-            background: transparent;
-            border: none;
-            padding: 10px 12px;
-            border-radius: 8px;
-            color: var(--text-color);
-            font-weight: 500;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .menu-nav li button:hover, .menu-nav li button.active {
-            background: var(--primary-color);
-            color: #ffffff;
-        }
-
-        /* Área Conteúdo Principal */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: 25px;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .header-container {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 10px;
-            border: 1px solid var(--input-border);
-        }
-
-        .user-info {
-            font-size: 13px;
-            color: var(--footer-text);
-        }
-
-        .btn-sair {
-            background: #ef4444;
+        header {
+            background-color: var(--primary-color);
             color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo-container h1 {
+            font-size: 1.5rem;
             font-weight: 600;
         }
 
-        .views-container {
+        nav.menu-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+        }
+
+        nav.menu-nav a.btn-nav, nav.menu-nav button {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        nav.menu-nav a.btn-nav:hover, nav.menu-nav button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        nav.menu-nav a.btn-nav.active, nav.menu-nav button.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
             width: 100%;
         }
 
@@ -145,286 +102,328 @@
             display: block;
         }
 
-        /* Estrutura de Cards */
         .card {
-            width: 100%;
             background: var(--card-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
         }
 
         .card h2 {
-            font-size: 20px;
+            font-size: 1.2rem;
             color: var(--primary-color);
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         label {
-            display: block;
-            font-size: 13px;
-            color: var(--footer-text);
-            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #555;
         }
 
-        input, select {
-            width: 100%;
+        input[type="text"],
+        input[type="number"],
+        select {
             padding: 10px;
-            background: var(--input-bg);
             border: 1px solid var(--input-border);
-            border-radius: 6px;
-            color: var(--text-color);
+            border-radius: 4px;
+            font-size: 1rem;
             outline: none;
+            transition: border-color 0.2s;
         }
 
-        input:focus, select:focus {
-            border-color: var(--primary-color);
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--accent-color);
         }
 
-        .btn-salvar {
-            width: 100%;
-            background: var(--primary-color);
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+            width: 100%;
         }
 
-        /* Modais */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
+        .btn-submit:hover {
+            background-color: #2980b9;
         }
+
+        .btn-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        footer {
+            background-color: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--footer-text);
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
         .modal-content {
-            background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 320px; text-align: center; border: 1px solid var(--input-border);
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .modal-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .modal-content button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .field-status {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar de Navegação Original -->
-    <div class="sidebar">
-        <div>
-            <div class="brand">📦 WMS Inteligente</div>
-            <ul class="menu-nav">
-                <li><button id="btn-nav-contagem" class="active" onclick="navegarPara('contagem')">📝 Lançar Contagem</button></li>
-                <li><button id="btn-nav-alimentar" onclick="navegarPara('alimentar')">⚡ Alimentar Sistema (SAP)</button></li>
-                <li><button id="btn-nav-consulta" onclick="navegarPara('consulta')">🔍 Consulta Geral</button></li>
-                <li><button id="btn-nav-dashboard" onclick="navegarPara('dashboard')">📊 Dashboard Operacional</button></li>
-                <li><button id="btn-nav-inventario" onclick="navegarPara('inventario')">📋 Gestão de Inventário</button></li>
-                <li><button id="btn-nav-reservas" onclick="navegarPara('reservas')">🔖 Controle de Reservas</button></li>
-                <li><button id="btn-nav-troca" onclick="navegarPara('troca')">🔄 Troca de Endereço</button></li>
-                <li><button id="btn-nav-acuracia" onclick="navegarPara('acuracia')">🎯 Acurácia de Estoque</button></li>
-                <li><button id="btn-nav-saude" onclick="navegarPara('saude')">🩺 Saúde do Estoque</button></li>
-                <li><button id="btn-nav-logs" onclick="navegarPara('logs')">📜 Logs do Sistema</button></li>
+    <header>
+        <div class="logo-container">
+            <h1>WMS - Sistema de Gestão</h1>
+        </div>
+        <nav class="menu-nav">
+            <ul>
+                <li><a href="contagem.html" class="btn-nav active">Lançar Contagem</a></li>
+                <li><a href="Carga.html" class="btn-nav">Alimentar Sistema (SAP)</a></li>
+                <li><a href="consulta.html" class="btn-nav">Consulta Geral</a></li>
+                <li><a href="auditoria.html" class="btn-nav">Dashboard Operacional</a></li>
             </ul>
-        </div>
-        <div style="font-size: 11px; color: var(--footer-text); text-align: center; margin-top: 15px;">
-            WMS v2.5 | 2026
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    <!-- Conteúdo Principal -->
-    <div class="main-content">
-        <div class="header-container">
-            <div class="user-info">
-                Operador: <strong id="lblUsuario">--</strong> | Perfil: <strong id="lblPerfil">--</strong>
-            </div>
-            <button class="btn-sair" onclick="encerrarSessaoManualmente()">Sair</button>
-        </div>
+    <main>
+        <!-- SEÇÃO PRINCIPAL: LANÇAMENTO DE CONTAGEM DE ESTOQUE -->
+        <section id="view-lancamento" class="view-section active-view">
+            <div class="card">
+                <h2>Lançamento de Contagem de Estoque</h2>
+                <form id="formContagem">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nm">Código NM</label>
+                            <input type="text" id="nm" placeholder="Digite o Código NM" required autocomplete="off">
+                            <span id="statusBuscaNm" class="field-status"></span>
+                        </div>
 
-        <div class="views-container">
-            
-            <!-- VIEW 1: REGISTRO DE CONTAGEM -->
-            <div id="view-contagem" class="view-section active-view">
-                <div class="card" style="max-width: 600px; margin: 0 auto;">
-                    <h2>📦 Lançamento de Contagem</h2>
-                    <form id="formContagem">
                         <div class="form-group">
-                            <label>Código do Material (NM):</label>
-                            <input type="text" id="nm" placeholder="Digite o código NM" required>
+                            <label for="inputDescricao">Descrição do Material</label>
+                            <input type="text" id="inputDescricao" placeholder="Aguardando NM..." readonly>
                         </div>
+
                         <div class="form-group">
-                            <label>Endereço / Posição:</label>
-                            <input type="text" id="endereco" placeholder="Ex: RUA-01-A" required>
+                            <label for="selectDeposito">Depósito</label>
+                            <input type="text" id="selectDeposito" placeholder="Aguardando NM..." readonly>
                         </div>
+
                         <div class="form-group">
-                            <label>Quantidade Contada:</label>
-                            <input type="number" id="quantidade" placeholder="0" min="0" step="any" required>
+                            <label for="endereco">Endereço / Localização</label>
+                            <input type="text" id="endereco" placeholder="Aguardando NM..." required>
                         </div>
+
                         <div class="form-group">
-                            <label>Tipo de Contagem:</label>
-                            <select id="tipoContagem">
-                                <option value="1a CONTAGEM">1ª Contagem</option>
-                                <option value="2a CONTAGEM">2ª Contagem</option>
-                                <option value="RECONTAGEM">Recontagem</option>
+                            <label for="quantidade">Quantidade Contada</label>
+                            <input type="number" id="quantidade" step="0.001" min="0" placeholder="0.00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipoContagem">Tipo de Contagem</label>
+                            <select id="tipoContagem" required>
+                                <option value="1_CONTAGEM">1ª Contagem</option>
+                                <option value="2_CONTAGEM">2ª Contagem</option>
+                                <option value="3_CONTAGEM">3ª Contagem / Recontagem</option>
+                                <option value="AUDITORIA">Auditoria</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn-salvar" id="btnSalvar">Salvar Contagem</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- VIEW 2: ALIMENTAR SISTEMA (SAP) -->
-            <div id="view-alimentar" class="view-section">
-                <div class="card">
-                    <h2>⚡ Alimentar Sistema (SAP)</h2>
-                    
-                    <div class="form-group">
-                        <label>Relatório MB51 (Movimentações):</label>
-                        <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" onchange="processarArquivo(this, 'MB51')">
-                        <small id="statusMB51" style="font-size: 11px; color: var(--footer-text); display: block; margin-top: 4px;">Pendente</small>
                     </div>
 
-                    <div class="form-group">
-                        <label>Relatório MB25 (Reservas):</label>
-                        <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" onchange="processarArquivo(this, 'MB25')">
-                        <small id="statusMB25" style="font-size: 11px; color: var(--footer-text); display: block; margin-top: 4px;">Pendente</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Relatório ZQMM_026A (Posição do Estoque):</label>
-                        <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" onchange="processarArquivo(this, 'ZQMM_026A')">
-                        <small id="statusZQMM" style="font-size: 11px; color: var(--footer-text); display: block; margin-top: 4px;">Pendente</small>
-                    </div>
-
-                    <button id="btnProcessarCargas" class="btn-salvar" style="display: none;" onclick="executarIntegracaoFirebase()">
-                        Confirmar e Integrar com Banco WMS
-                    </button>
-                </div>
-
-                <!-- Painel de Diagnóstico e Mapeamento -->
-                <div id="painelDiagnostico" class="card" style="display: none;">
-                    <h2>🔍 Diagnóstico e Mapeamento</h2>
-                    <div id="conteudoDiagnostico" style="font-size: 13px; line-height: 1.5; color: var(--text-color);"></div>
-                </div>
-
-                <!-- Preview dos Dados Procesados -->
-                <div id="painelPreview" class="card" style="display: none;">
-                    <h2>📊 Pré-visualização</h2>
-                    <div style="overflow-x: auto; max-height: 250px; margin-top: 10px;">
-                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
-                            <thead>
-                                <tr id="cabecalhoTabela" style="background: var(--input-bg);"></tr>
-                            </thead>
-                            <tbody id="corpoTabela"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Histórico de Cargas -->
-                <div class="card">
-                    <h2>📜 Histórico de Cargas</h2>
-                    <div id="historicoCargasCorpo" style="font-size: 12px; color: var(--footer-text); line-height: 1.6;">
-                        Nenhuma carga registrada nesta sessão.
-                    </div>
-                </div>
+                    <button type="submit" id="btnSalvar" class="btn-submit">Salvar Contagem</button>
+                </form>
             </div>
 
-            <!-- VIEW 3: CONSULTA GERAL -->
-            <div id="view-consulta" class="view-section">
-                <div class="card">
-                    <h2>🔍 Consulta Geral do Estoque</h2>
-                    <div class="form-group">
-                        <label>Pesquisar por NM, Descrição ou Endereço:</label>
-                        <input type="text" id="txtBuscaConsulta" placeholder="Digite para buscar..." onkeyup="filtrarConsulta()">
+            <!-- CARD COMPLEMENTAR: REGISTRO DE TROCA DE ENDEREÇO -->
+            <div class="card">
+                <h2>Registrar Troca de Endereço</h2>
+                <form id="formTrocaEndereco">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nmTroca">Código NM</label>
+                            <input type="text" id="nmTroca" placeholder="Digite o Código NM" required autocomplete="off">
+                            <span id="statusBuscaNmTroca" class="field-status"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="enderecoAntigo">Endereço Atual / Origem</label>
+                            <input type="text" id="enderecoAntigo" placeholder="Endereço de Origem" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="enderecoNovo">Novo Endereço / Destino</label>
+                            <input type="text" id="enderecoNovo" placeholder="Novo Endereço" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assinaturaOperador">Assinatura Operador (Matrícula/Nome)</label>
+                            <input type="text" id="assinaturaOperador" placeholder="Nome ou matrícula do operador" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assinaturaAdministrador">Assinatura Administrador (Validação)</label>
+                            <input type="text" id="assinaturaAdministrador" placeholder="Nome do supervisor / administrador" required>
+                        </div>
                     </div>
-                    <div style="font-size: 13px; color: var(--footer-text);" id="resConsulta">
-                        Aguardando dados ou consulta...
+
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="btnJaAltereiSap">
+                        <label for="btnJaAltereiSap"><strong>Já alterei no SAP</strong></label>
                     </div>
-                </div>
-            </div>
 
-            <!-- VIEW 4: DASHBOARD OPERACIONAL -->
-            <div id="view-dashboard" class="view-section">
-                <div class="card">
-                    <h2>📊 Dashboard Operacional</h2>
-                    <p style="font-size: 13px; color: var(--footer-text);">Visão geral dos lançamentos e volumes contados.</p>
-                    <div id="dashResumo" style="margin-top: 15px; font-size: 13px;">
-                        Total Lançamentos: <strong>--</strong>
-                    </div>
-                </div>
+                    <button type="submit" id="btnSalvarTroca" class="btn-submit" style="background-color: var(--primary-color);">Registrar Troca de Endereço</button>
+                </form>
             </div>
+        </section>
 
-            <!-- VIEW 5: GESTÃO DE INVENTÁRIO -->
-            <div id="view-inventario" class="view-section">
-                <div class="card">
-                    <h2>📋 Gestão de Inventário</h2>
-                    <p style="font-size: 13px; color: var(--footer-text);">Acompanhamento e conciliação de ciclos de inventário.</p>
-                </div>
+        <!-- VIEWS SECUNDÁRIAS PRESERVADAS (NAVEGAÇÃO DESATIVADA) -->
+        <section id="view-alimentar" class="view-section">
+            <div class="card">
+                <h2>Alimentar Sistema (Carga de Relatórios SAP)</h2>
+                <p style="color: #666; margin-bottom: 1rem;">Visão gerenciada através do hub <strong>Carga.html</strong>.</p>
+                <div class="form-group"><label>MB51</label><input type="file" id="fileMB51" accept=".xlsx, .xls"><small id="statusMB51">Pendente</small></div>
+                <div class="form-group"><label>MB25</label><input type="file" id="fileMB25" accept=".xlsx, .xls"><small id="statusMB25">Pendente</small></div>
+                <div class="form-group"><label>ZQMM_026A</label><input type="file" id="fileZQMM" accept=".xlsx, .xls"><small id="statusZQMM">Pendente</small></div>
+                <button id="btnProcessarCargas" class="btn-submit" style="display:none;">Integrar Banco WMS</button>
+                <div id="painelDiagnostico" style="display:none;"><div id="conteudoDiagnostico"></div></div>
+                <div id="painelPreview" style="display:none;"><table style="width:100%;"><thead id="cabecalhoTabela"></thead><tbody id="corpoTabela"></tbody></table></div>
+                <div id="painelHistorico"><div id="historicoCargasCorpo"></div></div>
             </div>
+        </section>
 
-            <!-- VIEW 6: CONTROLE DE RESERVAS -->
-            <div id="view-reservas" class="view-section">
-                <div class="card">
-                    <h2>🔖 Controle de Reservas</h2>
-                    <p style="font-size: 13px; color: var(--footer-text);">Visualização e baixa de reservas ativas (MB25).</p>
-                </div>
+        <section id="view-consulta" class="view-section">
+            <div class="card">
+                <h2>Consulta Geral do Estoque</h2>
+                <p style="color: #666; margin-bottom: 1rem;">Visão gerenciada através do hub <strong>consulta.html</strong>.</p>
+                <input type="text" id="txtBuscaConsulta" placeholder="Digite para consultar...">
+                <div id="resConsulta">Aguardando consulta...</div>
             </div>
+        </section>
 
-            <!-- VIEW 7: TROCA DE ENDEREÇO -->
-            <div id="view-troca" class="view-section">
-                <div class="card">
-                    <h2>🔄 Troca de Endereço</h2>
-                    <div class="form-group">
-                        <label>Código NM:</label>
-                        <input type="text" id="trocaNM" placeholder="NM do material">
-                    </div>
-                    <div class="form-group">
-                        <label>Novo Endereço:</label>
-                        <input type="text" id="trocaNovoEnd" placeholder="Ex: RUA-02-B">
-                    </div>
-                    <button class="btn-salvar" onclick="exibirAlerta('Módulo de troca ativo.')">Confirmar Transferência</button>
-                </div>
+        <section id="view-dashboard" class="view-section">
+            <div class="card">
+                <h2>Dashboard Operacional</h2>
+                <p style="color: #666;">Visão gerenciada através do hub <strong>auditoria.html</strong>.</p>
             </div>
+        </section>
+    </main>
 
-            <!-- VIEW 8: ACURÁCIA DE ESTOQUE -->
-            <div id="view-acuracia" class="view-section">
-                <div class="card">
-                    <h2>🎯 Acurácia de Estoque</h2>
-                    <p style="font-size: 13px; color: var(--footer-text);">Índice de assertividade entre físico e sistema.</p>
-                </div>
-            </div>
-
-            <!-- VIEW 9: SAÚDE DO ESTOQUE -->
-            <div id="view-saude" class="view-section">
-                <div class="card">
-                    <h2>🩺 Saúde do Estoque</h2>
-                    <p style="font-size: 13px; color: var(--footer-text);">Análise de materiais parados e divergências críticas.</p>
-                </div>
-            </div>
-
-            <!-- VIEW 10: LOGS DO SISTEMA -->
-            <div id="view-logs" class="view-section">
-                <div class="card">
-                    <h2>📜 Logs do Sistema</h2>
-                    <p style="font-size: 13px; color: var(--footer-text);">Histórico de acessos e operações registradas.</p>
-                </div>
-            </div>
-
+    <footer>
+        <div>
+            <span>Sistema WMS Operacional &copy; 2026</span>
         </div>
-    </div>
+        <div>
+            <button class="btn-logout" onclick="encerrarSessaoManualmente()">Sair do Sistema</button>
+        </div>
+    </footer>
 
-    <!-- Modal de Alerta Original -->
-    <div id="customAlert" class="modal">
+    <!-- MODAL DE ALERTA -->
+    <div id="customAlert" class="modal-overlay">
         <div class="modal-content">
-            <div id="alertMsg" style="font-size: 14px; white-space: pre-line;"></div>
-            <button class="modal-btn" onclick="fecharAlerta()">OK</button>
+            <p id="alertMsg">Mensagem do sistema</p>
+            <button onclick="fecharAlerta()">OK</button>
         </div>
     </div>
 
     <script>
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
             authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
@@ -445,38 +444,15 @@
 
         if (!usuarioAtual) {
             window.location.replace('index.html');
-        } else {
-            document.getElementById('lblUsuario').innerText = usuarioAtual;
-            document.getElementById('lblPerfil').innerText = perfilAtual || 'OPERACIONAL';
         }
 
-        // Navegação entre Visões da Sidebar Original
-        function navegarPara(view) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
-            document.querySelectorAll('.menu-nav li button').forEach(el => el.classList.remove('active'));
-
-            const targetView = document.getElementById(`view-${view}`);
-            const targetBtn = document.getElementById(`btn-nav-${view}`);
-
-            if (targetView) targetView.classList.add('active-view');
-            if (targetBtn) targetBtn.classList.add('active');
-
-            if (view === 'alimentar') {
-                carregarHistoricoCargas();
-            }
-        }
-
-        // -------------------------------------------------------------
         // TIMEOUT DE SESSÃO POR INATIVIDADE (5 MINUTOS)
-        // -------------------------------------------------------------
         const TEMPO_INATIVIDADE_MS = 5 * 60 * 1000;
         let tempoInatividadeTimer;
 
         function executarLogoutSessaoExpirada() {
             localStorage.clear();
-            auth.signOut().then(() => {
-                window.location.replace('index.html');
-            }).catch(() => {
+            auth.signOut().finally(() => {
                 window.location.replace('index.html');
             });
         }
@@ -493,15 +469,12 @@
             });
         }
 
-        window.addEventListener('mousemove', reiniciarTimerInatividade);
-        window.addEventListener('keydown', reiniciarTimerInatividade);
-        window.addEventListener('click', reiniciarTimerInatividade);
-        window.addEventListener('scroll', reiniciarTimerInatividade);
-        window.addEventListener('touchstart', reiniciarTimerInatividade);
-
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => {
+            window.addEventListener(evt, reiniciarTimerInatividade);
+        });
         reiniciarTimerInatividade();
 
-        // Alertas Modais
+        // Modais
         function exibirAlerta(msg) {
             document.getElementById('alertMsg').innerText = msg;
             document.getElementById('customAlert').style.display = 'flex';
@@ -511,23 +484,87 @@
             document.getElementById('customAlert').style.display = 'none';
         }
 
-        // Lançamento de Contagem
+        // BUSCA E AUTOPREENCHIMENTO DE NM (estoque_zqmm026a)
+        const inputNm = document.getElementById('nm');
+        const inputDescricao = document.getElementById('inputDescricao');
+        const selectDeposito = document.getElementById('selectDeposito');
+        const inputEndereco = document.getElementById('endereco');
+        const statusBuscaNm = document.getElementById('statusBuscaNm');
+
+        let timeoutBuscaNm;
+
+        inputNm.addEventListener('input', () => {
+            clearTimeout(timeoutBuscaNm);
+            const valNm = inputNm.value.trim();
+
+            if (!valNm) {
+                inputDescricao.value = "";
+                selectDeposito.value = "";
+                inputEndereco.value = "";
+                statusBuscaNm.innerText = "";
+                return;
+            }
+
+            statusBuscaNm.innerText = "Buscando...";
+            statusBuscaNm.style.color = "#888";
+
+            timeoutBuscaNm = setTimeout(() => {
+                buscarDadosMaterial(valNm);
+            }, 500);
+        });
+
+        async function buscarDadosMaterial(nmCodigo) {
+            try {
+                const snapshot = await db.collection('estoque_zqmm026a')
+                    .where('nm', '==', nmCodigo)
+                    .limit(1)
+                    .get();
+
+                if (!snapshot.empty) {
+                    const data = snapshot.docs[0].data();
+                    
+                    inputDescricao.value = data.descricao || data['Texto breve do material'] || data.TextoBreve || "Descrição não cadastrada";
+                    selectDeposito.value = data.deposito || data['Depósito'] || data.Deposito || "N/A";
+                    inputEndereco.value = data.endereco || data['Posição do Depósito'] || data.Posicao || data.Localizacao || "";
+
+                    statusBuscaNm.innerText = "✅ Material localizado";
+                    statusBuscaNm.style.color = "var(--success-color)";
+                } else {
+                    inputDescricao.value = "";
+                    selectDeposito.value = "";
+                    inputEndereco.value = "";
+                    statusBuscaNm.innerText = "⚠️ NM não encontrado no cadastro ZQMM";
+                    statusBuscaNm.style.color = "var(--danger-color)";
+                }
+            } catch (err) {
+                console.error("Erro ao buscar NM:", err);
+                statusBuscaNm.innerText = "Erro ao pesquisar NM";
+                statusBuscaNm.style.color = "var(--danger-color)";
+            }
+        }
+
+        // REGISTRO DE CONTAGEM (inventario_contagens)
         document.getElementById('formContagem').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nm = document.getElementById('nm').value.trim();
-            const endereco = document.getElementById('endereco').value.trim();
+            
+            const nm = inputNm.value.trim();
+            const descricao = inputDescricao.value.trim();
+            const deposito = selectDeposito.value.trim();
+            const endereco = inputEndereco.value.trim();
             const quantidade = parseFloat(document.getElementById('quantidade').value);
             const tipoContagem = document.getElementById('tipoContagem').value;
-            const btn = document.getElementById('btnSalvar');
 
+            const btn = document.getElementById('btnSalvar');
             btn.disabled = true;
             btn.innerText = "Salvando...";
 
             try {
-                await db.collection('contagens').add({
-                    nm: nm,
-                    endereco: endereco,
-                    quantidade: quantidade,
+                await db.collection('inventario_contagens').add({
+                    nm,
+                    descricao,
+                    deposito,
+                    endereco,
+                    quantidade,
                     tipo: tipoContagem,
                     usuario: usuarioAtual,
                     dataHora: firebase.firestore.FieldValue.serverTimestamp()
@@ -535,134 +572,54 @@
 
                 exibirAlerta("✅ Contagem salva com sucesso!");
                 document.getElementById('formContagem').reset();
+                inputDescricao.value = "";
+                selectDeposito.value = "";
+                inputEndereco.value = "";
+                statusBuscaNm.innerText = "";
             } catch (err) {
                 exibirAlerta("❌ Erro ao salvar contagem: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Salvar Contagem";
             }
-
-            btn.disabled = false;
-            btn.innerText = "Salvar Contagem";
         });
 
-        // -------------------------------------------------------------
-        // MÓDULO DE CARGA INTEGRADO (SEM AFETAR O LAYOUT NATIVO)
-        // -------------------------------------------------------------
-        let dadosProcessados = { MB51: null, MB25: null, ZQMM_026A: null };
+        // REGISTRO DE TROCA DE ENDEREÇO
+        document.getElementById('formTrocaEndereco').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        function processarArquivo(input, tipo) {
-            const file = input.files[0];
-            if (!file) return;
+            const nm = document.getElementById('nmTroca').value.trim();
+            const enderecoAntigo = document.getElementById('enderecoAntigo').value.trim();
+            const enderecoNovo = document.getElementById('enderecoNovo').value.trim();
+            const assinaturaOperador = document.getElementById('assinaturaOperador').value.trim();
+            const assinaturaAdministrador = document.getElementById('assinaturaAdministrador').value.trim();
+            const jaAltereiSap = document.getElementById('btnJaAltereiSap').checked;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-                    if (json.length === 0) {
-                        exibirAlerta(`⚠️ Arquivo ${tipo} sem dados.`);
-                        return;
-                    }
-
-                    dadosProcessados[tipo] = json;
-
-                    const idStatus = tipo === 'ZQMM_026A' ? 'statusZQMM' : `status${tipo}`;
-                    document.getElementById(idStatus).innerText = `✅ ${json.length} linhas lidas com sucesso`;
-                    document.getElementById(idStatus).style.color = "var(--primary-color)";
-
-                    document.getElementById('btnProcessarCargas').style.display = 'block';
-                    exibirDiagnostico(tipo, json);
-
-                } catch (err) {
-                    exibirAlerta(`❌ Erro no arquivo ${tipo}: ` + err.message);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function exibirDiagnostico(tipo, json) {
-            const painel = document.getElementById('painelDiagnostico');
-            const conteudo = document.getElementById('conteudoDiagnostico');
-            painel.style.display = 'block';
-
-            const colunas = Object.keys(json[0] || {});
-            conteudo.innerHTML = `
-                <p><strong>Relatório:</strong> ${tipo}</p>
-                <p><strong>Total de Registros:</strong> ${json.length}</p>
-                <p><strong>Colunas Mapeadas:</strong> ${colunas.slice(0, 6).join(', ')}...</p>
-            `;
-        }
-
-        async function executarIntegracaoFirebase() {
-            const btn = document.getElementById('btnProcessarCargas');
+            const btn = document.getElementById('btnSalvarTroca');
             btn.disabled = true;
-            btn.innerText = "Enviando dados...";
+            btn.innerText = "Registrando...";
 
             try {
-                for (const tipo of ['MB51', 'MB25', 'ZQMM_026A']) {
-                    if (dadosProcessados[tipo] && dadosProcessados[tipo].length > 0) {
-                        await db.collection('historico_cargas').add({
-                            tipoRelatorio: tipo,
-                            quantidadeRegistros: dadosProcessados[tipo].length,
-                            usuario: usuarioAtual,
-                            dataHora: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-                }
-
-                exibirAlerta("✅ Cargas integradas ao banco com sucesso!");
-                carregarHistoricoCargas();
-                
-                // Reseta os inputs
-                document.getElementById('fileMB51').value = '';
-                document.getElementById('fileMB25').value = '';
-                document.getElementById('fileZQMM').value = '';
-                document.getElementById('statusMB51').innerText = 'Pendente';
-                document.getElementById('statusMB25').innerText = 'Pendente';
-                document.getElementById('statusZQMM').innerText = 'Pendente';
-                document.getElementById('btnProcessarCargas').style.display = 'none';
-                document.getElementById('painelDiagnostico').style.display = 'none';
-
-            } catch (err) {
-                exibirAlerta("❌ Erro ao integrar dados: " + err.message);
-            }
-
-            btn.disabled = false;
-            btn.innerText = "Confirmar e Integrar com Banco WMS";
-        }
-
-        async function carregarHistoricoCargas() {
-            const container = document.getElementById('historicoCargasCorpo');
-            try {
-                const snapshot = await db.collection('historico_cargas')
-                    .orderBy('dataHora', 'desc')
-                    .limit(5)
-                    .get();
-
-                if (snapshot.empty) {
-                    container.innerHTML = "Nenhuma carga registrada.";
-                    return;
-                }
-
-                let html = "";
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    const dt = d.dataHora ? d.dataHora.toDate().toLocaleString('pt-BR') : '--';
-                    html += `<p style="margin-bottom: 5px; border-bottom: 1px solid var(--input-border); padding-bottom: 4px;">
-                        <strong>${d.tipoRelatorio}</strong> - ${d.quantidadeRegistros} registros em ${dt}
-                    </p>`;
+                await db.collection('troca_enderecos').add({
+                    nm,
+                    enderecoAntigo,
+                    enderecoNovo,
+                    assinaturaOperador,
+                    assinaturaAdministrador,
+                    jaAltereiSap,
+                    usuario: usuarioAtual,
+                    dataHora: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                container.innerHTML = html;
-            } catch (err) {
-                container.innerHTML = "Erro ao carregar histórico.";
-            }
-        }
 
-        function filtrarConsulta() {
-            const termo = document.getElementById('txtBuscaConsulta').value.toLowerCase();
-            document.getElementById('resConsulta').innerText = termo ? `Buscando por: "${termo}"...` : 'Aguardando dados ou consulta...';
-        }
+                exibirAlerta("✅ Troca de endereço registrada com sucesso!");
+                document.getElementById('formTrocaEndereco').reset();
+            } catch (err) {
+                exibirAlerta("❌ Erro ao registrar troca de endereço: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Registrar Troca de Endereço";
+            }
+        });
     </script>
 </body>
 </html>
