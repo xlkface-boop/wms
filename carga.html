@@ -32,60 +32,132 @@
 
         body {
             background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
+        /* HEADER PADRÃO IDÊNTICO ÀS OUTRAS TELAS */
         .top-header {
             background-color: var(--bg-dark-blue);
             color: white;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 15px;
-            font-size: 14px;
-        }
-
-        .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .header-user-info { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-        .user-badge { background: rgba(255, 255, 255, 0.15); padding: 5px 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .btn-logout { background: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        .app-container { display: flex; flex: 1; }
-
-        .sidebar {
-            width: 220px;
-            background-color: var(--bg-dark-blue);
+            padding: 12px 15px 0 15px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-user-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
             gap: 5px;
-            padding-top: 10px;
-            flex-shrink: 0;
+        }
+
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* MENU DE NAVEGAÇÃO SUPERIOR FIXO E AJUSTADO */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-dark-blue);
+            margin-top: 5px;
         }
 
         .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 20px;
-            color: white; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 4px;
+            color: white;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            white-space: nowrap;
         }
-        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .nav-item.active { background-color: #FFFFFF; color: var(--bg-dark-blue); border-radius: 4px 0 0 4px; margin-left: 8px; }
 
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .dashboard-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 15px; text-transform: uppercase; }
+        .nav-item i { font-size: 13px; }
+
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 6px 6px 0 0;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+        .container {
+            max-width: 900px;
+            margin: 15px auto;
+            padding: 0 12px;
+            width: 100%;
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
 
         .grid-cargas {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
         }
 
         .card-carga {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
@@ -93,24 +165,22 @@
         }
 
         .card-carga h3 {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--bg-dark-blue);
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .card-carga p { font-size: 12px; color: #666; margin-bottom: 15px; line-height: 1.4; }
+        .card-carga p { font-size: 11px; color: #666; margin-bottom: 12px; line-height: 1.4; }
 
-        .file-input-wrapper {
-            margin-bottom: 15px;
-        }
+        .file-input-wrapper { margin-bottom: 12px; }
 
         .file-input-wrapper input[type="file"] {
             width: 100%;
-            font-size: 12px;
-            padding: 8px;
+            font-size: 11px;
+            padding: 6px;
             border: 1px dashed var(--border-color);
             border-radius: 4px;
             background: #fafafa;
@@ -120,15 +190,15 @@
             background: var(--bg-dark-blue);
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 4px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             transition: background 0.2s;
         }
@@ -136,106 +206,109 @@
         .btn-processar:hover { background: #00273e; }
         .btn-processar:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Status Feedback */
         .status-box {
-            margin-top: 10px;
+            margin-top: 8px;
             font-size: 11px;
             font-weight: bold;
             color: var(--green-accent);
             display: none;
         }
-
-        @media (max-width: 768px) {
-            .app-container { flex-direction: column; }
-            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
-            .nav-item { padding: 8px 12px; font-size: 11px; }
-            .main-content { padding: 10px; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- BARRA SUPERIOR -->
+    <!-- CABEÇALHO PADRONIZADO -->
     <header class="top-header">
-        <div class="brand-logo">
+        <div class="header-brand">
             <i class="fa-solid fa-warehouse"></i>
             <span>TRANSPETRO</span>
         </div>
-        <div class="header-user-info">
+        
+        <div class="header-user-row">
             <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
             <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
             <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
+
+        <!-- MENU DE NAVEGAÇÃO SUPERIOR -->
+        <nav class="nav-bar">
+            <button class="nav-item" onclick="irPara('menu.html')">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>Contagem</span>
+            </button>
+            <button class="nav-item" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Consulta</span>
+            </button>
+            <button class="nav-item" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-item active" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i>
+                <span>Carga SAP</span>
+            </button>
+        </nav>
     </header>
 
-    <div class="app-container">
-        <!-- MENU LATERAL -->
-        <nav class="sidebar">
-            <a class="nav-item" onclick="irPara('menu.html')"><i class="fa-solid fa-clipboard-check"></i> Contagem / Início</a>
-            <a class="nav-item" onclick="irPara('consulta.html')"><i class="fa-solid fa-magnifying-glass"></i> Consulta Material</a>
-            <a class="nav-item" onclick="irPara('auditoria.html')"><i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria</a>
-            <a class="nav-item active" onclick="irPara('Carga.html')"><i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)</a>
-        </nav>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="container">
+        <h2 class="page-title">IMPORTAÇÃO DE PLANILHAS SAP</h2>
 
-        <!-- ÁREA CENTRAL DE CARGA -->
-        <main class="main-content">
-            <h2 class="dashboard-title">IMPORTAÇÃO DE PLANILHAS SAP</h2>
+        <div class="grid-cargas">
 
-            <div class="grid-cargas">
-
-                <!-- CARGA 1: ZTMM_026A -->
-                <div class="card-carga">
-                    <div>
-                        <h3><i class="fa-solid fa-boxes-stacked"></i> Base de Estoque (ZTMM_026A)</h3>
-                        <p>Atualiza o cadastro geral de materiais, saldos em estoque, posições/endereçamento e valor unitário do inventário.</p>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="fileZTMM" accept=".xlsx, .xls, .csv">
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn-processar" onclick="processarPlanilha('ZTMM')" id="btnZTMM">
-                            <i class="fa-solid fa-upload"></i> Processar ZTMM_026A
-                        </button>
-                        <div id="statusZTMM" class="status-box"></div>
+            <!-- CARGA 1: ZTMM_026A -->
+            <div class="card-carga">
+                <div>
+                    <h3><i class="fa-solid fa-boxes-stacked"></i> Base de Estoque (ZTMM_026A)</h3>
+                    <p>Atualiza o cadastro geral de materiais, saldos em estoque, posições/endereçamento e valor unitário.</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileZTMM" accept=".xlsx, .xls, .csv">
                     </div>
                 </div>
-
-                <!-- CARGA 2: MB51 -->
-                <div class="card-carga">
-                    <div>
-                        <h3><i class="fa-solid fa-arrow-right-left"></i> Movimentações (MB51)</h3>
-                        <p>Carrega o histórico de saídas e entradas para alimentar o motor do <b>Inventário Cíclico Automático</b>.</p>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv">
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn-processar" onclick="processarPlanilha('MB51')" id="btnMB51">
-                            <i class="fa-solid fa-upload"></i> Processar MB51
-                        </button>
-                        <div id="statusMB51" class="status-box"></div>
-                    </div>
+                <div>
+                    <button class="btn-processar" onclick="processarPlanilha('ZTMM')" id="btnZTMM">
+                        <i class="fa-solid fa-upload"></i> Processar ZTMM_026A
+                    </button>
+                    <div id="statusZTMM" class="status-box"></div>
                 </div>
-
-                <!-- CARGA 3: MB25 -->
-                <div class="card-carga">
-                    <div>
-                        <h3><i class="fa-solid fa-file-invoice"></i> Reservas (MB25)</h3>
-                        <p>Importa a lista de materiais reservados para Ordens de Serviço/Manutenção no terminal.</p>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv">
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn-processar" onclick="processarPlanilha('MB25')" id="btnMB25">
-                            <i class="fa-solid fa-upload"></i> Processar MB25
-                        </button>
-                        <div id="statusMB25" class="status-box"></div>
-                    </div>
-                </div>
-
             </div>
-        </main>
+
+            <!-- CARGA 2: MB51 -->
+            <div class="card-carga">
+                <div>
+                    <h3><i class="fa-solid fa-arrow-right-left"></i> Movimentações (MB51)</h3>
+                    <p>Carrega o histórico de saídas e entradas para alimentar o motor do inventário cíclico.</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv">
+                    </div>
+                </div>
+                <div>
+                    <button class="btn-processar" onclick="processarPlanilha('MB51')" id="btnMB51">
+                        <i class="fa-solid fa-upload"></i> Processar MB51
+                    </button>
+                    <div id="statusMB51" class="status-box"></div>
+                </div>
+            </div>
+
+            <!-- CARGA 3: MB25 -->
+            <div class="card-carga">
+                <div>
+                    <h3><i class="fa-solid fa-file-invoice"></i> Reservas (MB25)</h3>
+                    <p>Importa a lista de materiais reservados para Ordens de Serviço/Manutenção no terminal.</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv">
+                    </div>
+                </div>
+                <div>
+                    <button class="btn-processar" onclick="processarPlanilha('MB25')" id="btnMB25">
+                        <i class="fa-solid fa-upload"></i> Processar MB25
+                    </button>
+                    <div id="statusMB25" class="status-box"></div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
@@ -265,7 +338,6 @@
             auth.signOut().finally(() => window.location.replace('index.html'));
         }
 
-        // Função genérica para mapeamento flexível de colunas das planilhas
         function extrairValor(row, possiveisNomes) {
             const chaves = Object.keys(row);
             for (let nome of possiveisNomes) {
@@ -277,7 +349,6 @@
             return null;
         }
 
-        // Leitura e Upload das Planilhas para o Firestore
         async function processarPlanilha(tipo) {
             const fileInput = document.getElementById(`file${tipo}`);
             const btn = document.getElementById(`btn${tipo}`);
@@ -290,7 +361,7 @@
 
             const file = fileInput.files[0];
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lendo arquivo...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lendo...`;
 
             const reader = new FileReader();
 
@@ -306,9 +377,8 @@
                         throw new Error("Planilha vazia ou sem dados válidos.");
                     }
 
-                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando ao Firestore...`;
+                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Salvando...`;
                     
-                    // Firestore salva em lotes (batch) de até 500 registros por vez
                     let batch = db.batch();
                     let contador = 0;
                     let totalSalvo = 0;
@@ -317,7 +387,6 @@
                         let docRef;
 
                         if (tipo === 'ZTMM') {
-                            // Mapeamento ZTMM_026A (Busca flexível pelos nomes comuns de colunas SAP)
                             const nm = extrairValor(row, ['Material', 'NM', 'Código Material', 'Nº material']) || `SEM_NM_${Date.now()}`;
                             const descricao = extrairValor(row, ['Texto breve material', 'Descrição', 'Texto Breve']) || 'Sem Descrição';
                             const saldo = parseFloat(extrairValor(row, ['Utilização livre', 'Saldo', 'Qtd', 'Quantidade']) || 0);
@@ -336,7 +405,6 @@
                             }, { merge: true });
 
                         } else if (tipo === 'MB51') {
-                            // Mapeamento MB51 (Movimentações)
                             const nm = extrairValor(row, ['Material', 'NM', 'Nº material']) || 'SEM_NM';
                             const descricao = extrairValor(row, ['Texto breve material', 'Descrição']) || '';
                             const qtd = parseFloat(extrairValor(row, ['Qtd. na UM de entrada', 'Quantidade', 'Qtd']) || 1);
@@ -354,7 +422,6 @@
                             });
 
                         } else if (tipo === 'MB25') {
-                            // Mapeamento MB25 (Reservas)
                             const reserva = extrairValor(row, ['Reserva', 'Nº reserva']) || `RES_${Date.now()}`;
                             const nm = extrairValor(row, ['Material', 'NM']) || '';
                             const qtdReservada = parseFloat(extrairValor(row, ['Quantidade necessária', 'Qtd.reservada']) || 0);
@@ -373,7 +440,6 @@
                         contador++;
                         totalSalvo++;
 
-                        // Se atingir 400 itens, grava o lote e inicia um novo
                         if (contador === 400) {
                             await batch.commit();
                             batch = db.batch();
@@ -386,18 +452,18 @@
                     }
 
                     statusBox.style.display = 'block';
-                    statusBox.innerText = `✓ ${totalSalvo} linhas importadas com sucesso!`;
+                    statusBox.innerText = `✓ ${totalSalvo} linhas importadas!`;
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Carga Concluída!',
-                        text: `${totalSalvo} registros da planilha ${tipo} foram salvos com sucesso no sistema.`,
+                        text: `${totalSalvo} registros da planilha ${tipo} salvos com sucesso.`,
                         confirmButtonColor: '#003B5C'
                     });
 
                 } catch (error) {
                     console.error("Erro na carga:", error);
-                    Swal.fire('Erro no Processamento', `Não foi possível ler o arquivo: ${error.message}`, 'error');
+                    Swal.fire('Erro no Processamento', `Erro ao ler arquivo: ${error.message}`, 'error');
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fa-solid fa-upload"></i> Processar ${tipo}`;
