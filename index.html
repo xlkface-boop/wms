@@ -3,347 +3,571 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Almoxarifado Transpetro - Acesso</title>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    
-    <!-- Ícones FontAwesome -->
+    <title>Sistema WMS Transpetro - Gestão de Estoque Unificada</title>
+
+    <!-- Firebase SDKs (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <!-- SheetJS para Leitura de Excel / CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- FontAwesome & SweetAlert2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
             --bg-dark-blue: #003B5C;
-            --primary-color: #003B5C;
-            --btn-green: #107C41;
-            --btn-green-hover: #0b5c30;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-color: #1f2937;
-            --input-bg: #f9fafb;
-            --input-border: #d1d5db;
-            --footer-text: #6b7280;
+            --bg-main: #EFEFEF;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --green-accent: #107C41;
+            --danger-color: #d9534f;
+            --border-color: #D1D5DB;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        /* BANNER DE FUNDO (IGUAL À FOTO 1 - ALMOXARIFADO) */
         body {
-            background: linear-gradient(rgba(0, 40, 64, 0.65), rgba(0, 40, 64, 0.65)), 
-                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1600&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            color: var(--text-color);
+            background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* TELA DE LOGIN OTIMIZADA */
+        #loginScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark-blue);
+            display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            z-index: 9999;
+            padding: 15px;
         }
 
-        /* CARD CENTRALIZADO NOVO (DESIGNS DA FOTO) */
         .login-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
             width: 100%;
-            max-width: 400px;
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-align: center;
-            backdrop-filter: blur(5px);
         }
 
-        .brand-header {
-            margin-bottom: 25px;
+        .login-card h2 { color: var(--bg-dark-blue); font-size: 18px; margin-bottom: 5px; }
+        .login-card p { font-size: 11px; color: #666; margin-bottom: 15px; }
+        .login-card input {
+            width: 100%; padding: 10px; margin-bottom: 12px;
+            border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px;
+        }
+        .login-card button {
+            width: 100%; padding: 10px; background: var(--bg-dark-blue); color: white;
+            border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;
         }
 
-        .brand-header i {
-            font-size: 38px;
-            color: var(--primary-color);
-            margin-bottom: 8px;
+        /* CABEÇALHO PADRÃO TRANSPETRO */
+        .top-header {
+            background-color: var(--bg-dark-blue);
+            color: white;
+            padding: 12px 15px 0 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
-        .brand-header h1 {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--primary-color);
-            letter-spacing: 1px;
-            text-transform: uppercase;
+        .header-brand {
+            display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 15px; letter-spacing: 0.5px;
         }
 
-        .brand-header p {
-            font-size: 13px;
-            color: #555;
-            font-weight: 600;
-            margin-top: 2px;
+        .header-user-row {
+            display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 11px; margin-bottom: 2px;
         }
 
-        .form-group { 
-            margin-bottom: 18px; 
-            text-align: left; 
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15); padding: 3px 8px; border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2); color: white; display: flex; align-items: center; gap: 5px;
         }
 
-        label { 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: #444; 
-            display: block; 
-            margin-bottom: 6px; 
-            text-transform: uppercase;
+        .btn-logout {
+            background: var(--danger-color); color: white; border: none; padding: 3px 8px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; display: flex; align-items: center; gap: 4px;
         }
 
-        input {
-            width: 100%; 
-            background: var(--input-bg); 
-            border: 1px solid var(--input-border);
-            padding: 12px 14px; 
-            border-radius: 6px; 
-            color: var(--text-color); 
-            outline: none;
-            font-size: 14px;
+        /* MENU DE NAVEGAÇÃO SUPERIOR (ABAS ROOLÁVEIS COM ABA ATIVA DESTACADA) */
+        .nav-bar {
+            display: flex; width: 100%; max-width: 700px; background-color: var(--bg-dark-blue);
+            overflow-x: auto; white-space: nowrap; margin-top: 5px; scrollbar-width: none;
+        }
+        .nav-bar::-webkit-scrollbar { display: none; }
+
+        .nav-item {
+            flex: 1; min-width: 130px; display: flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 10px 12px; color: white; text-decoration: none; font-size: 12px;
+            font-weight: 600; cursor: pointer; border: none; background: none;
         }
 
-        input:focus { 
-            border-color: var(--primary-color); 
-            box-shadow: 0 0 0 2px rgba(0, 59, 92, 0.2);
+        .nav-item.active {
+            background-color: #FFFFFF; color: var(--bg-dark-blue); border-radius: 6px 6px 0 0;
         }
 
-        .btn-acao {
-            width: 100%; 
-            background: var(--primary-color); 
-            color: white; 
-            border: none;
-            padding: 14px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 15px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* CONTEÚDO DAS ABAS */
+        .tab-content { display: none; max-width: 900px; margin: 15px auto; padding: 0 12px; width: 100%; flex: 1; }
+        .tab-content.active { display: block; }
+
+        .page-title {
+            font-size: 14px; font-weight: bold; color: var(--bg-dark-blue); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px; background: white; padding: 10px; border-radius: 6px;
+            border-left: 4px solid var(--bg-dark-blue); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-transform: uppercase;
+        }
+
+        /* FORMULÁRIOS E INPUTS */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 4px; }
+        .form-control {
+            width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px; background: #fff;
+        }
+        .form-control:read-only { background: #EAEAEA; color: #666; }
+
+        .btn-action {
+            background: var(--bg-dark-blue); color: white; border: none; padding: 10px; width: 100%;
+            border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
             transition: background 0.2s;
         }
+        .btn-action:hover { background: #00273e; }
+        .btn-action:disabled { background: #ccc; cursor: not-allowed; }
 
-        .btn-acao:hover {
-            background: #002840;
+        /* GRIDS E CARDS */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+        .card-box {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;
         }
+        .card-box h3 { font-size: 13px; color: var(--bg-dark-blue); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .card-box p { font-size: 11px; color: #666; margin-bottom: 10px; line-height: 1.3; }
 
-        .btn-toggle {
-            background: transparent; 
-            color: var(--primary-color); 
-            border: none;
-            font-size: 13px; 
-            cursor: pointer; 
-            text-decoration: underline;
-            font-weight: 600;
-        }
-
-        .rodape-login {
-            margin-top: 25px;
-            font-size: 11px;
-            color: #ffffff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            text-align: center;
-            max-width: 400px;
-            line-height: 1.5;
-        }
-
-        .aviso-restrito {
-            color: #fca5a5;
-            font-weight: bold;
-            display: block;
-            margin-top: 5px;
-        }
-
-        /* MODAL ALERTA PERSONALIZADO */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background: #ffffff; padding: 25px; border-radius: 12px; max-width: 340px; text-align: center; border: 1px solid var(--input-border);
-        }
-        .modal-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+        /* TABELAS */
+        .table-responsive { width: 100%; overflow-x: auto; background: white; border-radius: 6px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+        th { background: var(--bg-dark-blue); color: white; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <!-- MARCA IGUAL À FOTO 1 DO LAYOUT -->
-        <div class="brand-header">
+    <!-- TELA DE LOGIN UNIFICADA -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <h2>WMS TRANSPETRO</h2>
+            <p>Sistema Integrado de Controle de Estoque</p>
+            <input type="email" id="txtEmail" placeholder="E-mail corporativo">
+            <input type="password" id="txtSenha" placeholder="Senha">
+            <button onclick="fazerLogin()">Entrar no Sistema</button>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO DO SISTEMA -->
+    <header class="top-header" id="appHeader" style="display:none;">
+        <div class="header-brand">
             <i class="fa-solid fa-warehouse"></i>
-            <h1>Transpetro</h1>
-            <p id="tituloTela">WMS ALMOXARIFADO TRANSPETRO</p>
+            <span>TRANSPETRO - WMS GESTÃO DE ESTOQUE</span>
         </div>
         
-        <!-- FORMULÁRIO COM A SUA LÓGICA INTEGRA -->
-        <form id="authForm">
+        <div class="header-user-row">
+            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
+            <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Operador</span></span>
+            <button class="btn-logout" onclick="fazerLogout()"><i class="fa-solid fa-power-off"></i> Sair</button>
+        </div>
+
+        <!-- MENU DE ABAS UNIFICADAS -->
+        <nav class="nav-bar">
+            <button class="nav-item active" onclick="mudarAba('tabContagem', this)">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>Contagem</span>
+            </button>
+            <button class="nav-item" onclick="mudarAba('tabConsulta', this)">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Consulta</span>
+            </button>
+            <button class="nav-item" onclick="mudarAba('tabDashboard', this)">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-item" onclick="mudarAba('tabCarga', this)">
+                <i class="fa-solid fa-file-import"></i>
+                <span>Alimentar SAP</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- ABA 1: CONTAGEM DE ESTOQUE -->
+    <div id="tabContagem" class="tab-content active">
+        <div class="page-title"><i class="fa-solid fa-pen-to-square"></i> Lançamento de Contagem de Estoque</div>
+        <div class="card-box" style="background: white;">
             <div class="form-group">
-                <label>E-mail Corporativo:</label>
-                <input type="email" id="email" placeholder="Login: email@transpetro.com.br" required autocomplete="off">
+                <label>Código NM</label>
+                <input type="text" id="cntNm" class="form-control" placeholder="Digite o Código NM e saia do campo" onblur="buscarMaterialContagem()">
             </div>
             <div class="form-group">
-                <label>Senha do Sistema:</label>
-                <input type="password" id="senha" placeholder="••••••••" required>
+                <label>Descrição do Material</label>
+                <input type="text" id="cntDesc" class="form-control" readonly placeholder="Aguardando NM...">
             </div>
-            <button type="submit" class="btn-acao" id="btnPrincipal">Entrar no Sistema</button>
-            <button type="button" class="btn-toggle" id="btnToggle" onclick="alternarModo()">Não tem conta? Criar Acesso</button>
-        </form>
-    </div>
-
-    <!-- RODAPÉ DE DIREITOS E AUTORIA -->
-    <div class="rodape-login">
-        &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-        Projeto independente desenvolvido por <strong>Dário João Torres</strong>.<br>
-        <span class="aviso-restrito">⚠️ Uso autorizado apenas para e-mails institucionais da Transpetro.</span>
-    </div>
-
-    <!-- CAIXA DE ALERTA -->
-    <div id="customAlert" class="modal">
-        <div class="modal-content">
-            <div id="alertMsg" style="font-size: 14px; color: #333; white-space: pre-line;"></div>
-            <button class="modal-btn" onclick="fecharAlerta()">OK</button>
+            <div class="form-group">
+                <label>Depósito / Posição</label>
+                <input type="text" id="cntPosicao" class="form-control" readonly placeholder="Aguardando NM...">
+            </div>
+            <div class="form-group">
+                <label>Quantidade Contada</label>
+                <input type="number" id="cntQtd" class="form-control" value="0.00">
+            </div>
+            <div class="form-group">
+                <label>Tipo de Contagem</label>
+                <select id="cntTipo" class="form-control">
+                    <option value="1a Contagem">1ª Contagem</option>
+                    <option value="2a Contagem">2ª Contagem</option>
+                    <option value="Contagem Cíclica">Contagem Cíclica</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-signature"></i> Assinatura Eletrônica do Contador</label>
+                <input type="text" id="cntAssinatura" class="form-control" placeholder="Digite seu nome completo / matrícula">
+            </div>
+            <button class="btn-action" onclick="salvarContagem()">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar Contagem no Firebase
+            </button>
         </div>
     </div>
 
-    <!-- TODA A SUA LÓGICA DE JAVASCRIPT PRESERVADA 100% -->
+    <!-- ABA 2: CONSULTA DE MATERIAIS -->
+    <div id="tabConsulta" class="tab-content">
+        <div class="page-title"><i class="fa-solid fa-magnifying-glass"></i> Consulta de Materiais (ZTMM_026A)</div>
+        <div class="form-group">
+            <input type="text" id="filtroConsulta" class="form-control" placeholder="Filtrar por Código NM, Descrição ou Posição..." oninput="filtrarMateriais()">
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código NM</th>
+                        <th>Descrição do Material</th>
+                        <th>Posição / Endereço</th>
+                        <th>Saldo SAP</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaMateriaisBody">
+                    <tr><td colspan="4" style="text-align:center; padding: 15px;">Carregando dados do Firebase...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 3: DASHBOARD / AUDITORIA -->
+    <div id="tabDashboard" class="tab-content">
+        <div class="page-title"><i class="fa-solid fa-chart-pie"></i> Indicadores do Inventário</div>
+        <div class="grid-cards">
+            <div class="card-box">
+                <h3><i class="fa-solid fa-boxes-stacked"></i> Total Cadastrado</h3>
+                <p id="dashTotalItens" style="font-size: 20px; font-weight: bold; color: var(--bg-dark-blue);">0</p>
+            </div>
+            <div class="card-box">
+                <h3><i class="fa-solid fa-file-invoice"></i> Total de Contagens Salvas</h3>
+                <p id="dashTotalContagens" style="font-size: 20px; font-weight: bold; color: var(--green-accent);">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 4: ALIMENTAR SISTEMA (SAP) -->
+    <div id="tabCarga" class="tab-content">
+        <div class="page-title"><i class="fa-solid fa-cloud-arrow-up"></i> Importação de Planilhas SAP</div>
+        <div class="grid-cards">
+            <!-- ZTMM -->
+            <div class="card-box">
+                <div>
+                    <h3><i class="fa-solid fa-boxes-stacked"></i> Base de Estoque (ZTMM_026A)</h3>
+                    <p>Atualiza o cadastro geral de materiais, saldos e posições.</p>
+                    <input type="file" id="fileZTMM" class="form-control" accept=".xlsx, .xls, .csv" style="margin-bottom:8px;">
+                </div>
+                <button class="btn-action" onclick="processarPlanilha('ZTMM')" id="btnZTMM">Processar ZTMM_026A</button>
+            </div>
+            <!-- MB51 -->
+            <div class="card-box">
+                <div>
+                    <h3><i class="fa-solid fa-arrow-right-left"></i> Movimentações (MB51)</h3>
+                    <p>Histórico de entradas e saídas recentes.</p>
+                    <input type="file" id="fileMB51" class="form-control" accept=".xlsx, .xls, .csv" style="margin-bottom:8px;">
+                </div>
+                <button class="btn-action" onclick="processarPlanilha('MB51')" id="btnMB51">Processar MB51</button>
+            </div>
+            <!-- MB25 -->
+            <div class="card-box">
+                <div>
+                    <h3><i class="fa-solid fa-file-invoice"></i> Reservas (MB25)</h3>
+                    <p>Lista de materiais reservados para Ordens de Manutenção.</p>
+                    <input type="file" id="fileMB25" class="form-control" accept=".xlsx, .xls, .csv" style="margin-bottom:8px;">
+                </div>
+                <button class="btn-action" onclick="processarPlanilha('MB25')" id="btnMB25">Processar MB25</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Configuração oficial do Firebase já integrada
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
             authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
             projectId: "bolao-copa-2026-d264f",
             storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
             messagingSenderId: "802924891915",
-            appId: "1:802924891915:web:d9c641161733b510559c0e",
-            measurementId: "G-QQ210F367M"
+            appId: "1:802924891915:web:d9c641161733b510559c0e"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        const ADM_EMAIL = "joao-torres33@live.com";
-        let modoLogin = true;
+        let listaCacheMateriais = [];
 
-        function exibirAlerta(msg) {
-            document.getElementById('alertMsg').innerText = msg;
-            document.getElementById('customAlert').style.display = 'flex';
+        // Controle de Sessão e Auth no Firebase
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appHeader').style.display = 'flex';
+                document.getElementById('lblUsuario').innerText = user.email;
+                carregarDadosIniciais();
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('appHeader').style.display = 'none';
+            }
+        });
+
+        function fazerLogin() {
+            const email = document.getElementById('txtEmail').value;
+            const senha = document.getElementById('txtSenha').value;
+            if (!email || !senha) {
+                Swal.fire('Atenção', 'Informe e-mail e senha!', 'warning');
+                return;
+            }
+            auth.signInWithEmailAndPassword(email, senha).catch(err => {
+                Swal.fire('Erro', 'Falha no login: ' + err.message, 'error');
+            });
         }
 
-        function fecharAlerta() {
-            document.getElementById('customAlert').style.display = 'none';
+        function fazerLogout() {
+            auth.signOut();
         }
 
-        function alternarModo() {
-            modoLogin = !modoLogin;
-            document.getElementById('tituloTela').innerText = modoLogin ? "WMS ALMOXARIFADO TRANSPETRO" : "CRIAR NOVO ACESSO";
-            document.getElementById('btnPrincipal').innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
-            document.getElementById('btnToggle').innerText = modoLogin ? "Não tem conta? Criar Acesso" : "Já tenho conta. Entrar";
+        // Navegação por Abas Unificadas
+        function mudarAba(idAba, elementoBtn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            document.getElementById(idAba).classList.add('active');
+            elementoBtn.classList.add('active');
+
+            if (idAba === 'tabConsulta') carregarTabelaConsulta();
+            if (idAba === 'tabDashboard') calcularDashboard();
         }
 
-        async function obterDadosSeguranca() {
-            let ip = "Desconhecido";
+        // Sincronização e Leitura do Firestore
+        async function carregarDadosIniciais() {
             try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                ip = data.ip;
-            } catch (e) {}
-            return {
-                ip: ip,
-                dispositivo: navigator.userAgent,
-                dataAcesso: new Date().toLocaleString('pt-BR'),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
+                const snapshot = await db.collection('materiais_ztmm').get();
+                listaCacheMateriais = snapshot.docs.map(doc => doc.data());
+                document.getElementById('dashTotalItens').innerText = listaCacheMateriais.length;
+            } catch (e) { console.error("Erro ao carregar dados:", e); }
         }
 
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const senha = document.getElementById('senha').value;
-            const btn = document.getElementById('btnPrincipal');
+        async function buscarMaterialContagem() {
+            const nm = document.getElementById('cntNm').value.trim();
+            if (!nm) return;
+            try {
+                const docRef = await db.collection('materiais_ztmm').doc(nm).get();
+                if (docRef.exists) {
+                    const data = docRef.data();
+                    document.getElementById('cntDesc').value = data.descricao || '';
+                    document.getElementById('cntPosicao').value = data.posicao || '';
+                } else {
+                    document.getElementById('cntDesc').value = 'Material não cadastrado na base ZTMM';
+                    document.getElementById('cntPosicao').value = 'N/A';
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
 
-            btn.disabled = true;
-            btn.innerText = "Processando...";
+        async function salvarContagem() {
+            const nm = document.getElementById('cntNm').value.trim();
+            const qtd = parseFloat(document.getElementById('cntQtd').value) || 0;
+            const tipo = document.getElementById('cntTipo').value;
+            const assinatura = document.getElementById('cntAssinatura').value.trim();
 
-            // Trava de Domínio
-            if (email !== ADM_EMAIL && !email.endsWith("@transpetro.com.br")) {
-                exibirAlerta("❌ ACESSO NEGADO!\n\nUtilize seu e-mail institucional @transpetro.com.br.");
-                btn.disabled = false;
-                btn.innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
+            if (!nm) {
+                Swal.fire('Atenção', 'Informe o Código NM!', 'warning');
+                return;
+            }
+            if (!assinatura) {
+                Swal.fire('Atenção', 'Preencha a Assinatura Eletrônica do Contador!', 'warning');
                 return;
             }
 
-            const dadosSeg = await obterDadosSeguranca();
-
             try {
-                if (modoLogin) {
-                    // LOGIN
-                    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
-                    
-                    // Busca perfil no Firestore
-                    let perfilUsuario = "OPERACIONAL";
-                    if (email === ADM_EMAIL) {
-                        perfilUsuario = "ADMIN";
-                    } else {
-                        const userDoc = await db.collection("usuarios").doc(email).get();
-                        if (userDoc.exists && (userDoc.data().perfil === "GERENCIAL" || userDoc.data().perfil === "ADMIN")) {
-                            perfilUsuario = "ADMIN";
-                        }
-                    }
+                await db.collection('contagens').add({
+                    nm: nm,
+                    quantidadeContada: qtd,
+                    tipoContagem: tipo,
+                    assinaturaContador: assinatura,
+                    operador: auth.currentUser ? auth.currentUser.email : 'Anônimo',
+                    data: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-                    // 🔑 GRAVA SESSÃO NO LOCALSTORAGE
-                    localStorage.setItem('wms_usuario', email);
-                    localStorage.setItem('wms_perfil', perfilUsuario);
+                Swal.fire('Sucesso!', 'Contagem salva com sucesso no Firebase!', 'success');
+                document.getElementById('cntNm').value = '';
+                document.getElementById('cntDesc').value = '';
+                document.getElementById('cntPosicao').value = '';
+                document.getElementById('cntQtd').value = '0.00';
+                document.getElementById('cntAssinatura').value = '';
+            } catch(err) {
+                Swal.fire('Erro', 'Erro ao salvar no Firestore: ' + err.message, 'error');
+            }
+        }
 
-                    await db.collection("logs_acesso").add({ usuario: email, status: "LOGIN_SUCESSO", ...dadosSeg });
-                    exibirAlerta(`🔓 Bem-vindo!\nAcesso liberado.`);
-                    
-                    // Redireciona para a tela do Menu/Dashboard principal
-                    setTimeout(() => { 
-                        window.location.replace('menu.html'); 
-                    }, 1000);
-
-                } else {
-                    // CADASTRO
-                    await auth.createUserWithEmailAndPassword(email, senha);
-                    const perfilDefinido = (email === ADM_EMAIL ? "GERENCIAL" : "OPERACIONAL");
-                    
-                    await db.collection("usuarios").doc(email).set({
-                        email: email,
-                        perfil: perfilDefinido,
-                        dataCadastro: new Date().toISOString()
-                    });
-
-                    await db.collection("logs_acesso").add({ usuario: email, status: "CADASTRO_SUCESSO", ...dadosSeg });
-                    exibirAlerta("✅ Cadastro realizado!\nAgora você já pode entrar.");
-                    alternarModo();
-                }
-            } catch (error) {
-                let msgErro = "Ocorreu um erro. Verifique seus dados.";
-                if (error.code === "auth/email-already-in-use") msgErro = "Este e-mail já está em uso.";
-                if (error.code === "auth/wrong-password") msgErro = "Senha incorreta.";
-                if (error.code === "auth/user-not-found") msgErro = "Usuário não encontrado.";
-                
-                await db.collection("logs_acesso").add({ usuario: email, status: "ERRO", erro: error.code, ...dadosSeg });
-                exibirAlerta("❌ " + msgErro);
+        function carregarTabelaConsulta() {
+            const tbody = document.getElementById('tabelaMateriaisBody');
+            if (!listaCacheMateriais.length) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px;">Nenhum material encontrado. Faça upload da planilha ZTMM na aba Alimentar SAP.</td></tr>`;
+                return;
             }
 
-            btn.disabled = false;
-            btn.innerText = modoLogin ? "Entrar no Sistema" : "Cadastrar Agora";
-        });
+            let html = '';
+            listaCacheMateriais.forEach(m => {
+                html += `<tr>
+                    <td>${m.nm || ''}</td>
+                    <td>${m.descricao || ''}</td>
+                    <td>${m.posicao || ''}</td>
+                    <td>${m.saldoSap || 0}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
 
-        // Garante que os campos comecem limpos
-        window.onload = () => {
-            document.getElementById('email').value = "";
-            document.getElementById('senha').value = "";
-        };
+        function filtrarMateriais() {
+            const termo = document.getElementById('filtroConsulta').value.toLowerCase();
+            const filtrados = listaCacheMateriais.filter(m => 
+                (m.nm && m.nm.toLowerCase().includes(termo)) || 
+                (m.descricao && m.descricao.toLowerCase().includes(termo)) ||
+                (m.posicao && m.posicao.toLowerCase().includes(termo))
+            );
+
+            const tbody = document.getElementById('tabelaMateriaisBody');
+            let html = '';
+            filtrados.forEach(m => {
+                html += `<tr>
+                    <td>${m.nm || ''}</td>
+                    <td>${m.descricao || ''}</td>
+                    <td>${m.posicao || ''}</td>
+                    <td>${m.saldoSap || 0}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        async function calcularDashboard() {
+            document.getElementById('dashTotalItens').innerText = listaCacheMateriais.length;
+            try {
+                const snap = await db.collection('contagens').get();
+                document.getElementById('dashTotalContagens').innerText = snap.size;
+            } catch(e) {
+                document.getElementById('dashTotalContagens').innerText = "0";
+            }
+        }
+
+        // Processamento Seguro de Planilhas via SheetJS e Firestore Batch
+        function extrairValor(row, possiveisNomes) {
+            const chaves = Object.keys(row);
+            for (let nome of possiveisNomes) {
+                const chaveEncontrada = chaves.find(k => k.trim().toLowerCase() === nome.trim().toLowerCase());
+                if (chaveEncontrada && row[chaveEncontrada] !== undefined) return row[chaveEncontrada];
+            }
+            return null;
+        }
+
+        async function processarPlanilha(tipo) {
+            const fileInput = document.getElementById(`file${tipo}`);
+            const btn = document.getElementById(`btn${tipo}`);
+
+            if (!fileInput.files.length) {
+                Swal.fire('Atenção', 'Selecione um arquivo Excel ou CSV primeiro!', 'warning');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processando...`;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+                    if (!json.length) throw new Error("Planilha vazia ou sem dados.");
+
+                    let batch = db.batch();
+                    let count = 0;
+                    let total = 0;
+
+                    for (let row of json) {
+                        let docRef;
+                        if (tipo === 'ZTMM') {
+                            const nm = extrairValor(row, ['Material', 'NM', 'Nº material']) || `SEM_${Date.now()}`;
+                            const desc = extrairValor(row, ['Texto breve material', 'Descrição']) || '';
+                            const saldo = parseFloat(extrairValor(row, ['Utilização livre', 'Saldo', 'Quantidade']) || 0);
+                            const pos = extrairValor(row, ['Depósito', 'Posição', 'Endereço']) || 'GERAL';
+                            const valorUnit = parseFloat(extrairValor(row, ['Valor', 'Preço Unitário']) || 0);
+
+                            docRef = db.collection('materiais_ztmm').doc(String(nm));
+                            batch.set(docRef, { nm: String(nm), descricao: desc, saldoSap: saldo, posicao: pos, valorUnitario: valorUnit }, { merge: true });
+
+                        } else if (tipo === 'MB51') {
+                            const nm = extrairValor(row, ['Material', 'NM']) || 'SEM_NM';
+                            const desc = extrairValor(row, ['Texto breve material', 'Descrição']) || '';
+                            const qtd = parseFloat(extrairValor(row, ['Quantidade', 'Qtd']) || 1);
+
+                            docRef = db.collection('movimentacoes_mb51').doc();
+                            batch.set(docRef, { nm: String(nm), descricao: desc, quantidade: Math.abs(qtd) });
+
+                        } else if (tipo === 'MB25') {
+                            const reserva = extrairValor(row, ['Reserva', 'Nº reserva']) || `RES_${Date.now()}`;
+                            const nm = extrairValor(row, ['Material', 'NM']) || '';
+
+                            docRef = db.collection('reservas_mb25').doc(String(reserva));
+                            batch.set(docRef, { reserva: String(reserva), nm: String(nm) }, { merge: true });
+                        }
+
+                        count++;
+                        total++;
+                        if (count === 400) { await batch.commit(); batch = db.batch(); count = 0; }
+                    }
+                    if (count > 0) await batch.commit();
+
+                    Swal.fire('Sucesso!', `${total} registros da planilha ${tipo} importados com sucesso!`, 'success');
+                    carregarDadosIniciais();
+                } catch (err) {
+                    Swal.fire('Erro', err.message, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = `Processar ${tipo}`;
+                }
+            };
+            reader.readAsArrayBuffer(fileInput.files[0]);
+        }
     </script>
 </body>
 </html>
