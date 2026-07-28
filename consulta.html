@@ -30,13 +30,16 @@
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* HEADER PADRÃO IDÊNTICO À FOTO 1 */
+        /* HEADER PADRÃO IDÊNTICO AO DA CONTAGEM / INÍCIO */
         .top-header {
             background-color: var(--bg-dark-blue);
             color: white;
-            padding: 10px 15px 0 15px;
+            padding: 12px 15px 0 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -59,6 +62,7 @@
             gap: 8px;
             flex-wrap: wrap;
             font-size: 11px;
+            margin-bottom: 5px;
         }
 
         .user-badge {
@@ -86,35 +90,43 @@
             gap: 4px;
         }
 
-        /* BARRA DE NAVEGAÇÃO SUPERIOR (FOTO 1) */
+        /* MENU DE NAVEGAÇÃO FIXO E AJUSTADO PARA MOBILE */
         .nav-bar {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             width: 100%;
-            overflow-x: auto;
-            margin-top: 5px;
+            max-width: 600px;
             background-color: var(--bg-dark-blue);
+            margin-top: 5px;
         }
 
         .nav-item {
+            flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 10px 15px;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 4px;
             color: white;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
-            white-space: nowrap;
+            text-align: center;
             cursor: pointer;
             border: none;
             background: none;
+            white-space: nowrap;
+        }
+
+        .nav-item i {
+            font-size: 13px;
         }
 
         .nav-item.active {
             background-color: #FFFFFF;
             color: var(--bg-dark-blue);
-            border-radius: 4px 4px 0 0;
+            border-radius: 6px 6px 0 0;
         }
 
         /* CONTEÚDO DA PÁGINA */
@@ -122,6 +134,8 @@
             max-width: 900px;
             margin: 15px auto;
             padding: 0 12px;
+            width: 100%;
+            flex: 1;
         }
 
         .page-title {
@@ -134,8 +148,8 @@
 
         /* CARDS KPIS */
         .kpi-grid {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
             margin-bottom: 15px;
         }
@@ -151,18 +165,18 @@
         }
 
         .kpi-icon-box {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             color: white;
             flex-shrink: 0;
         }
 
-        .kpi-val { font-size: 16px; font-weight: bold; color: var(--text-main); }
+        .kpi-val { font-size: 15px; font-weight: bold; color: var(--text-main); }
         .kpi-lbl { font-size: 11px; color: #666; }
 
         /* BARRA DE PESQUISA */
@@ -233,6 +247,8 @@
             text-align: left;
             font-size: 11px;
             white-space: nowrap;
+            position: sticky;
+            top: 0;
         }
 
         td {
@@ -265,7 +281,7 @@
 </head>
 <body>
 
-    <!-- CABEÇALHO PADRONIZADO DA FOTO 1 -->
+    <!-- CABEÇALHO PADRONIZADO -->
     <header class="top-header">
         <div class="header-brand">
             <i class="fa-solid fa-warehouse"></i>
@@ -278,19 +294,23 @@
             <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
 
-        <!-- NAVEGAÇÃO SUPERIOR IGUAL À FOTO 1 -->
+        <!-- MENU DE NAVEGAÇÃO SUPERIOR FIXO -->
         <nav class="nav-bar">
             <button class="nav-item" onclick="irPara('menu.html')">
-                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>Contagem</span>
             </button>
             <button class="nav-item active" onclick="irPara('consulta.html')">
-                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Consulta</span>
             </button>
             <button class="nav-item" onclick="irPara('auditoria.html')">
-                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
             </button>
             <button class="nav-item" onclick="irPara('Carga.html')">
-                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
+                <i class="fa-solid fa-file-import"></i>
+                <span>Carga SAP</span>
             </button>
         </nav>
     </header>
@@ -352,7 +372,7 @@
                         <tr>
                             <td colspan="5" style="text-align: center; color: #888; padding: 20px;">
                                 Nenhuma informação encontrada na base <b>ZTMM_026A</b>.<br>
-                                Vá até a tela <b>Alimentar Sistema (SAP)</b> e faça o upload da planilha.
+                                Vá até a tela <b>Carga SAP</b> e faça o upload da planilha.
                             </td>
                         </tr>
                     </tbody>
