@@ -24,7 +24,6 @@
             --card-bg: #FFFFFF;
             --text-main: #333333;
             --green-accent: #107C41;
-            --orange-accent: #EA580C;
             --border-color: #D1D5DB;
         }
 
@@ -38,7 +37,7 @@
             min-height: 100vh;
         }
 
-        /* HEADER PADRÃO IDÊNTICO ÀS OUTRAS TELAS */
+        /* HEADER PADRÃO EXATO DA SEGUNDA FOTO */
         .top-header {
             background-color: var(--bg-dark-blue);
             color: white;
@@ -46,7 +45,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header-brand {
@@ -54,7 +53,7 @@
             align-items: center;
             gap: 8px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
             letter-spacing: 0.5px;
         }
 
@@ -65,12 +64,12 @@
             gap: 8px;
             flex-wrap: wrap;
             font-size: 11px;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .user-badge {
             background: rgba(255, 255, 255, 0.15);
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
@@ -83,7 +82,7 @@
             background: #d9534f;
             color: white;
             border: none;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
@@ -93,36 +92,35 @@
             gap: 4px;
         }
 
-        /* MENU DE NAVEGAÇÃO SUPERIOR FIXO E AJUSTADO */
+        /* MENU DE NAVEGAÇÃO IDÊNTICO À SEGUNDA FOTO (ROLÁVEL COM ABAS SUPERIORES) */
         .nav-bar {
             display: flex;
-            justify-content: space-between;
             width: 100%;
             max-width: 600px;
             background-color: var(--bg-dark-blue);
+            overflow-x: auto;
+            white-space: nowrap;
             margin-top: 5px;
+            scrollbar-width: none; /* Firefox */
         }
+        .nav-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
         .nav-item {
             flex: 1;
+            min-width: 120px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            padding: 8px 4px;
+            gap: 6px;
+            padding: 10px 12px;
             color: white;
             text-decoration: none;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 600;
-            text-align: center;
             cursor: pointer;
             border: none;
             background: none;
-            white-space: nowrap;
         }
-
-        .nav-item i { font-size: 13px; }
 
         .nav-item.active {
             background-color: #FFFFFF;
@@ -217,7 +215,7 @@
 </head>
 <body>
 
-    <!-- CABEÇALHO PADRONIZADO -->
+    <!-- CABEÇALHO PADRÃO -->
     <header class="top-header">
         <div class="header-brand">
             <i class="fa-solid fa-warehouse"></i>
@@ -230,15 +228,15 @@
             <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
 
-        <!-- MENU DE NAVEGAÇÃO SUPERIOR -->
+        <!-- MENU DE NAVEGAÇÃO IGUAL À SEGUNDA FOTO -->
         <nav class="nav-bar">
             <button class="nav-item" onclick="irPara('menu.html')">
                 <i class="fa-solid fa-clipboard-check"></i>
-                <span>Contagem</span>
+                <span>Contagem / Início</span>
             </button>
             <button class="nav-item" onclick="irPara('consulta.html')">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <span>Consulta</span>
+                <span>Consulta Material</span>
             </button>
             <button class="nav-item" onclick="irPara('auditoria.html')">
                 <i class="fa-solid fa-chart-line"></i>
@@ -246,7 +244,7 @@
             </button>
             <button class="nav-item active" onclick="irPara('Carga.html')">
                 <i class="fa-solid fa-file-import"></i>
-                <span>Carga SAP</span>
+                <span>Alimentar Sistema</span>
             </button>
         </nav>
     </header>
