@@ -229,7 +229,7 @@
     <!-- CORPO DO SISTEMA -->
     <div class="app-container">
         
-        <!-- MENU LATERAL (Ajustados os links) -->
+        <!-- MENU LATERAL -->
         <nav class="sidebar">
             <a class="nav-item" onclick="irPara('contagem.html')">
                 <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
@@ -350,15 +350,19 @@
             document.getElementById('lblUsuario').innerText = usuarioAtual;
         }
 
-        // REDIRECIONAMENTO BLINDADO (Garante minúsculas e força busca na pasta raiz relativa `./`)
+        // 📱 FUNÇÃO DE NAVEGAÇÃO COMPATÍVEL COM NAVEGADORES MÓVEIS / CELULAR
         function irPara(pagina) { 
-            const destino = pagina.trim().toLowerCase();
-            window.location.href = './' + destino; 
+            const urlAtual = window.location.href;
+            const novaUrl = urlAtual.substring(0, urlAtual.lastIndexOf('/') + 1) + pagina.trim().toLowerCase();
+            window.location.href = novaUrl;
         }
 
         function encerrarSessaoManualmente() {
             localStorage.clear();
-            auth.signOut().finally(() => window.location.replace('index.html'));
+            auth.signOut().finally(() => {
+                const urlAtual = window.location.href;
+                window.location.replace(urlAtual.substring(0, urlAtual.lastIndexOf('/') + 1) + 'index.html');
+            });
         }
 
         // BUSCA BASE REAL DO FIREBASE SE DISPONÍVEL
@@ -429,7 +433,8 @@
                 confirmButtonText: 'Efetuar Login Novamente',
                 allowOutsideClick: false
             }).then(() => {
-                window.location.href = "index.html";
+                const urlAtual = window.location.href;
+                window.location.href = urlAtual.substring(0, urlAtual.lastIndexOf('/') + 1) + 'index.html';
             });
         }
 
