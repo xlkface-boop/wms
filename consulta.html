@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta MMBE / ZQMM026A - WMS Transpetro</title>
-    
+    <title>Consulta de Material - WMS Transpetro</title>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    <!-- Ícones FontAwesome & SweetAlert2 -->
+    <!-- FontAwesome & SweetAlert2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -21,9 +21,8 @@
             --card-bg: #FFFFFF;
             --text-main: #333333;
             --green-accent: #107C41;
-            --red-accent: #D9534F;
+            --orange-accent: #EA580C;
             --border-color: #D1D5DB;
-            --accent-gold: #ffd700;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -35,7 +34,6 @@
             min-height: 100vh;
         }
 
-        /* BARRA SUPERIOR */
         .top-header {
             background-color: var(--bg-dark-blue);
             color: white;
@@ -45,52 +43,15 @@
             justify-content: space-between;
             padding: 10px 15px;
             font-size: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
+        .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .header-user-info { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .user-badge { background: rgba(255, 255, 255, 0.15); padding: 5px 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-logout { background: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        .header-user-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            flex-wrap: wrap;
-        }
+        .app-container { display: flex; flex: 1; }
 
-        .user-badge {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 5px 8px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            white-space: nowrap;
-        }
-
-        .btn-logout {
-            background: #d9534f;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* ESTRUTURA PRINCIPAL */
-        .app-container {
-            display: flex;
-            flex: 1;
-        }
-
-        /* MENU LATERAL */
         .sidebar {
             width: 220px;
             background-color: var(--bg-dark-blue);
@@ -98,116 +59,198 @@
             flex-direction: column;
             gap: 5px;
             padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
         }
 
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: white;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s;
-            cursor: pointer;
+            display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+            color: white; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer;
         }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .nav-item.active { background-color: #FFFFFF; color: var(--bg-dark-blue); border-radius: 4px 0 0 4px; margin-left: 8px; }
 
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .dashboard-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 15px; text-transform: uppercase; }
 
-        .nav-item.active {
-            background-color: #FFFFFF;
-            color: var(--bg-dark-blue);
-            border-radius: 4px 0 0 4px;
-            margin-left: 8px;
-        }
-
-        /* ÁREA CENTRAL DE CONTEÚDO */
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .main-container { width: 100%; max-width: 900px; }
-
-        /* CARD DA CONSULTA */
-        .card-consulta { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            width: 100%;
+        /* CARDS KPI SUMMARY */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
             margin-bottom: 20px;
         }
 
-        .header-box { 
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--bg-main); 
-            padding-bottom: 12px; 
-            margin-bottom: 15px; 
-        }
-
-        .titulo-central {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--bg-dark-blue);
-            text-transform: uppercase;
-        }
-
-        /* FORMULÁRIO DE FILTROS */
-        .grid-filtros {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
         }
 
-        .campo-grupo { margin-bottom: 5px; }
-        .label-filtro { display: block; font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; margin-bottom: 6px; }
-        .input-filtro {
-            width: 100%; padding: 10px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px;
-            font-size: 13px; outline: none; color: #333;
+        .kpi-icon {
+            width: 45px; height: 45px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: white; background: var(--bg-dark-blue);
         }
-        .input-filtro:focus { border-color: var(--bg-dark-blue); box-shadow: 0 0 0 2px rgba(0, 59, 92, 0.2); }
 
-        /* TABELA DE RESULTADOS */
-        .tabela-card {
+        .kpi-val { font-size: 18px; font-weight: bold; color: var(--text-main); }
+        .kpi-lbl { font-size: 12px; color: #666; }
+
+        /* SEARCH BAR & CONTROLS */
+        .search-container {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
+            padding: 15px;
             border-radius: 8px;
-            width: 100%;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
-        .tabela-wrapper { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
-        th { padding: 12px; background: var(--bg-dark-blue); color: white; font-size: 11px; text-transform: uppercase; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; color: #333; }
-        
-        .col-nm { color: var(--bg-dark-blue); font-weight: bold; }
-        .badge-end { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
 
-        .direitos-box { max-width: 900px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; width: 100%; margin-top: auto; margin-top: 25px; }
+        .search-input-box {
+            flex: 1;
+            position: relative;
+        }
 
-        /* 📱 RESPONSIVIDADE CELULAR */
+        .search-input-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-input-box input {
+            width: 100%;
+            padding: 10px 10px 10px 38px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-limpar {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* DATA TABLE */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .table-responsive {
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: var(--bg-dark-blue);
+            color: white;
+            padding: 12px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover { background-color: #f8fafc; cursor: pointer; }
+
+        .badge-pos {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-nm {
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--bg-dark-blue);
+        }
+
+        /* MODAL DE DETALHES */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title { font-size: 16px; color: var(--bg-dark-blue); font-weight: bold; }
+        .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .detail-item { font-size: 12px; }
+        .detail-item strong { display: block; color: #64748b; margin-bottom: 2px; }
+
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
-            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 5px; border-top: none; border-bottom: 2px solid rgba(255,255,255,0.2); }
-            .nav-item { padding: 8px 12px; font-size: 11px; white-space: nowrap; border-radius: 4px !important; margin-left: 0 !important; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
+            .nav-item { padding: 8px 12px; font-size: 11px; }
             .main-content { padding: 10px; }
-            .top-header { justify-content: center; text-align: center; }
-            .grid-filtros { grid-template-columns: 1fr; }
+            .detail-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -226,123 +269,132 @@
         </div>
     </header>
 
-    <!-- CORPO DO SISTEMA -->
     <div class="app-container">
-        
         <!-- MENU LATERAL -->
         <nav class="sidebar">
-            <a class="nav-item" onclick="irPara('contagem.html')">
-                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
-            </a>
-            <a class="nav-item active" onclick="irPara('consulta.html')">
-                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
-            </a>
-            <a class="nav-item" onclick="irPara('auditoria.html')">
-                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
-            </a>
-            <a class="nav-item" onclick="irPara('carga.html')">
-                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
-            </a>
+            <a class="nav-item" onclick="irPara('menu.html')"><i class="fa-solid fa-clipboard-check"></i> Contagem / Início</a>
+            <a class="nav-item active" onclick="irPara('consulta.html')"><i class="fa-solid fa-magnifying-glass"></i> Consulta Material</a>
+            <a class="nav-item" onclick="irPara('auditoria.html')"><i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria</a>
+            <a class="nav-item" onclick="irPara('Carga.html')"><i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)</a>
         </nav>
 
-        <!-- ÁREA PRINCIPAL DA PÁGINA -->
+        <!-- CONTEÚDO PRINCIPAL -->
         <main class="main-content">
-            <div class="main-container">
-                
-                <!-- CARD DA CONSULTA MMBE -->
-                <div class="card-consulta">
-                    <div class="header-box">
-                        <div class="titulo-central"><i class="fa-solid fa-boxes-stacked"></i> Consulta de Estoque (MMBE / ZQMM026A)</div>
-                        <button type="button" onclick="carregarEstoqueFirebase()" class="btn-logout" style="background:#0275d8;"><i class="fa-solid fa-rotate"></i> Atualizar</button>
-                    </div>
+            <h2 class="dashboard-title">CONSULTA DE MATERIAIS (ZTMM_026A)</h2>
 
-                    <!-- FILTROS DE PESQUISA -->
-                    <div class="grid-filtros">
-                        <div class="campo-grupo">
-                            <label class="label-filtro">NM (SAP)</label>
-                            <input type="text" id="filtroNM" class="input-filtro" placeholder="Digite o NM..." oninput="filtrarTabela()">
-                        </div>
-                        
-                        <div class="campo-grupo">
-                            <label class="label-filtro">Descrição (*Contém*)</label>
-                            <input type="text" id="filtroDesc" class="input-filtro" placeholder="Buscar na descrição..." oninput="filtrarTabela()">
-                        </div>
-
-                        <div class="campo-grupo">
-                            <label class="label-filtro">Depósito / Endereço</label>
-                            <input type="text" id="filtroDeposito" class="input-filtro" placeholder="Ex: DP01 ou A-01..." oninput="filtrarTabela()">
-                        </div>
+            <!-- CARDS KPIS DE RESUMO -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <div>
+                        <div class="kpi-val" id="lblTotalItens">0</div>
+                        <div class="kpi-lbl">Total de Itens Cadastrados</div>
                     </div>
                 </div>
-
-                <!-- REGRID DE DADOS DA TABELA ABAIXO -->
-                <div class="tabela-card">
-                    <div class="tabela-wrapper">
-                        <table id="tabelaEstoque">
-                            <thead>
-                                <tr>
-                                    <th>NM (SAP)</th>
-                                    <th>Depósito</th>
-                                    <th>Endereço</th>
-                                    <th>Descrição Operacional</th>
-                                    <th>Saldo Fis.</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblEstoqueBody">
-                                <tr>
-                                    <td class="col-nm">1000142</td>
-                                    <td>DP01</td>
-                                    <td><span class="badge-end">R-01-A</span></td>
-                                    <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                                    <td>45 UN</td>
-                                </tr>
-                                <tr>
-                                    <td class="col-nm">2000551</td>
-                                    <td>DP03</td>
-                                    <td><span class="badge-end">R-04-B</span></td>
-                                    <td>MANOMETRO PRESSAO FLANGEADO 1/2</td>
-                                    <td>10 UN</td>
-                                </tr>
-                                <tr>
-                                    <td class="col-nm">3000889</td>
-                                    <td>DPA1</td>
-                                    <td><span class="badge-end">PATIO-02</span></td>
-                                    <td>TUBO ACO CARBONO 4 POL SEM COSTURA</td>
-                                    <td>12 UN</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--green-accent);"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div>
+                        <div class="kpi-val" id="lblValorTotal">R$ 0,00</div>
+                        <div class="kpi-lbl">Valor Em Estoque</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--orange-accent);"><i class="fa-solid fa-location-dot"></i></div>
+                    <div>
+                        <div class="kpi-val" id="lblSemPosicao">0</div>
+                        <div class="kpi-lbl">Sem Endereço/Posição</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-            <div class="direitos-box">
-                <p style="font-size: 11px; line-height: 1.6; color: #666;">
-                    &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-                    Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
-                </p>
+            <!-- BARRA DE PESQUISA -->
+            <div class="search-container">
+                <div class="search-input-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="txtBusca" placeholder="Filtrar por Código NM, Descrição do Material ou Posição..." oninput="filtrarTabelaTardio()">
+                </div>
+                <button class="btn-limpar" onclick="limparBusca()"><i class="fa-solid fa-xmark"></i> Limpar</button>
+            </div>
+
+            <!-- TABELA DE MATERIAIS -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código NM</th>
+                                <th>Descrição do Material</th>
+                                <th>Posição / Endereço</th>
+                                <th style="text-align: right;">Saldo SAP</th>
+                                <th style="text-align: right;">Valor Unit. (R$)</th>
+                                <th style="text-align: right;">Valor Total (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblCorpoMateriais">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #888; padding: 20px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Carregando base ZTMM_026A do Firestore...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 
+    <!-- MODAL DE DETALHES DO MATERIAL -->
+    <div class="modal-overlay" id="modalDetalhes">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span class="modal-title" id="mdlTitulo">Detalhes do Material</span>
+                <button class="btn-close" onclick="fecharModal()">&times;</button>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item"><strong>CÓDIGO NM:</strong> <span id="mdlNM">-</span></div>
+                <div class="detail-item"><strong>POSIÇÃO / ENDEREÇO:</strong> <span id="mdlPosicao">-</span></div>
+                <div class="detail-item"><strong>SALDO EM ESTOQUE (SAP):</strong> <span id="mdlSaldo">-</span></div>
+                <div class="detail-item"><strong>VALOR TOTAL:</strong> <span id="mdlValorTotal">-</span></div>
+            </div>
+
+            <div style="margin-bottom: 12px; font-size: 13px;">
+                <strong>Descrição Completa:</strong>
+                <p id="mdlDescricao" style="color: #444; margin-top: 4px; line-height: 1.4;"></p>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
+
+            <!-- RESERVAS E MOVIMENTAÇÕES VINCULADAS -->
+            <h4 style="font-size: 13px; color: var(--bg-dark-blue); margin-bottom: 8px;">
+                <i class="fa-solid fa-file-invoice"></i> Reservas Ativas (MB25)
+            </h4>
+            <div id="boxReservas" style="font-size: 12px; color: #666; margin-bottom: 15px;">Carregando reservas...</div>
+
+            <h4 style="font-size: 13px; color: var(--bg-dark-blue); margin-bottom: 8px;">
+                <i class="fa-solid fa-clock-rotate-left"></i> Histórico Recente de Movimentos (MB51)
+            </h4>
+            <div id="boxMovimentos" style="font-size: 12px; color: #666;">Carregando histórico...</div>
+        </div>
+    </div>
+
     <script>
-        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
             authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
             projectId: "bolao-copa-2026-d264f",
             storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
             messagingSenderId: "802924891915",
-            appId: "1:802924891915:web:d9c641161733b510559c0e",
-            measurementId: "G-QQ210F367M"
+            appId: "1:802924891915:web:d9c641161733b510559c0e"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // 🔒 VALIDAÇÃO DE SEGURANÇA
+        let listaMateriaisGeral = [];
+        let timeoutBusca = null;
+
         const usuarioAtual = localStorage.getItem('wms_usuario');
         if (!usuarioAtual) {
             window.location.replace('index.html');
@@ -350,104 +402,174 @@
             document.getElementById('lblUsuario').innerText = usuarioAtual;
         }
 
-        // 📱 FUNÇÃO DE NAVEGAÇÃO COMPATÍVEL COM NAVEGADORES MÓVEIS / CELULAR
-        function irPara(pagina) { 
-            const urlAtual = window.location.href;
-            const novaUrl = urlAtual.substring(0, urlAtual.lastIndexOf('/') + 1) + pagina.trim().toLowerCase();
-            window.location.href = novaUrl;
-        }
-
+        function irPara(pagina) { window.location.href = pagina; }
         function encerrarSessaoManualmente() {
             localStorage.clear();
-            auth.signOut().finally(() => {
-                const urlAtual = window.location.href;
-                window.location.replace(urlAtual.substring(0, urlAtual.lastIndexOf('/') + 1) + 'index.html');
-            });
+            auth.signOut().finally(() => window.location.replace('index.html'));
         }
 
-        // BUSCA BASE REAL DO FIREBASE SE DISPONÍVEL
-        async function carregarEstoqueFirebase() {
+        // CARREGA BASE ZTMM_026A DO FIRESTORE
+        async function carregarBaseZTMM() {
             try {
-                const snapshot = await db.collection('estoque_zqmm026a').limit(100).get();
-                if (!snapshot.empty) {
-                    const tbody = document.getElementById('tblEstoqueBody');
-                    tbody.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const d = doc.data();
-                        tbody.innerHTML += `
-                            <tr>
-                                <td class="col-nm">${d.nm || '-'}</td>
-                                <td>${d.deposito || '-'}</td>
-                                <td><span class="badge-end">${d.endereco || 'S/END'}</span></td>
-                                <td>${d.descricao || '-'}</td>
-                                <td>${d.saldo || '0'} ${d.unidade || 'UN'}</td>
-                            </tr>
-                        `;
-                    });
+                const snapshot = await db.collection('materiais_ztmm').get();
+                
+                if (snapshot.empty) {
+                    document.getElementById('tblCorpoMateriais').innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #888; padding: 25px;">
+                                Nenhuma informação encontrada na base <b>ZTMM_026A</b>.<br>
+                                Vá até a tela <b>Alimentar Sistema (SAP)</b> e faça o upload da planilha.
+                            </td>
+                        </tr>`;
+                    atualizarKPIs([], 0, 0);
+                    return;
                 }
-            } catch (e) {
-                console.log("Mantendo dados estáticos caso banco esteja vazio/não configurado ainda.");
+
+                listaMateriaisGeral = [];
+                let valorTotalGeral = 0;
+                let semPosicaoCount = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    listaMateriaisGeral.push(data);
+
+                    valorTotalGeral += (data.valorTotal || 0);
+                    if (!data.posicao || data.posicao === 'GERAL' || data.posicao === '') {
+                        semPosicaoCount++;
+                    }
+                });
+
+                atualizarKPIs(listaMateriaisGeral.length, valorTotalGeral, semPosicaoCount);
+                renderizarTabela(listaMateriaisGeral);
+
+            } catch (error) {
+                console.error("Erro ao carregar Firestore:", error);
+                document.getElementById('tblCorpoMateriais').innerHTML = `
+                    <tr><td colspan="6" style="text-align: center; color: red;">Erro ao carregar dados do banco.</td></tr>`;
             }
         }
 
-        // FILTRO DE BUSCA EM TEMPO REAL
-        function filtrarTabela() {
-            const valNM = document.getElementById('filtroNM').value.toUpperCase();
-            const valDesc = document.getElementById('filtroDesc').value.toUpperCase();
-            const valDep = document.getElementById('filtroDeposito').value.toUpperCase();
-            
-            const tabela = document.getElementById('tabelaEstoque');
-            const linhas = tabela.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        function atualizarKPIs(total, valorTotal, semPosicao) {
+            document.getElementById('lblTotalItens').innerText = Number(total).toLocaleString('pt-BR');
+            document.getElementById('lblValorTotal').innerText = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('lblSemPosicao').innerText = Number(semPosicao).toLocaleString('pt-BR');
+        }
 
-            for (let i = 0; i < linhas.length; i++) {
-                const celulaNM = linhas[i].getElementsByTagName('td')[0].innerText.toUpperCase();
-                const celulaDep = linhas[i].getElementsByTagName('td')[1].innerText.toUpperCase();
-                const celulaEnd = linhas[i].getElementsByTagName('td')[2].innerText.toUpperCase();
-                const celulaDesc = linhas[i].getElementsByTagName('td')[3].innerText.toUpperCase();
+        function renderizarTabela(dados) {
+            const tbody = document.getElementById('tblCorpoMateriais');
+            tbody.innerHTML = '';
 
-                const combinaDep = celulaDep.includes(valDep) || celulaEnd.includes(valDep);
-
-                if (celulaNM.includes(valNM) && combinaDep && celulaDesc.includes(valDesc)) {
-                    linhas[i].style.display = "";
-                } else {
-                    linhas[i].style.display = "none";
-                }
+            if (dados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888;">Nenhum registro encontrado para essa busca.</td></tr>`;
+                return;
             }
-        }
 
-        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (5 MINUTOS)
-        let cronometroInatividade;
+            // Exibe os primeiros 150 itens para garantir excelente performance na rolagem
+            const limiteExibicao = dados.slice(0, 150);
 
-        function resetarCronometroSessao() {
-            clearTimeout(cronometroInatividade);
-            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
-        }
+            limiteExibicao.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => abrirModalDetalhes(item);
 
-        function executarBloqueioPorInatividade() {
-            localStorage.clear();
-            Swal.fire({
-                icon: 'warning',
-                title: 'Sessão Expirada!',
-                text: 'Por diretrizes de segurança, o sistema foi bloqueado devido a 5 minutos de inatividade.',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Efetuar Login Novamente',
-                allowOutsideClick: false
-            }).then(() => {
-                const urlAtual = window.location.href;
-                window.location.href = urlAtual.substring(0, urlAtual.lastIndexOf('/') + 1) + 'index.html';
+                const valorUnitFormatted = (item.valorUnitario || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const valorTotalFormatted = (item.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                tr.innerHTML = `
+                    <td class="badge-nm">${item.nm || '-'}</td>
+                    <td>${item.descricao || '-'}</td>
+                    <td><span class="badge-pos">${item.posicao || 'GERAL'}</span></td>
+                    <td style="text-align: right; font-weight: bold;">${(item.saldoSap || 0).toLocaleString('pt-BR')}</td>
+                    <td style="text-align: right;">${valorUnitFormatted}</td>
+                    <td style="text-align: right; font-weight: bold; color: var(--bg-dark-blue);">${valorTotalFormatted}</td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        // MONITORAMENTO DE ATIVIDADE
-        window.onload = function() {
-            resetarCronometroSessao();
-            carregarEstoqueFirebase();
-        };
-        document.onmousemove = resetarCronometroSessao;
-        document.onkeypress = resetarCronometroSessao;
-        document.onclick = resetarCronometroSessao;
-        document.onscroll = resetarCronometroSessao;
-        document.ontouchstart = resetarCronometroSessao;
+        // DEBOUNCE PARA BUSCA FLUIDA E RÁPIDA
+        function filtrarTabelaTardio() {
+            clearTimeout(timeoutBusca);
+            timeoutBusca = setTimeout(() => {
+                const termo = document.getElementById('txtBusca').value.toLowerCase().trim();
+                
+                if (!termo) {
+                    renderizarTabela(listaMateriaisGeral);
+                    return;
+                }
+
+                const filtrados = listaMateriaisGeral.filter(item => {
+                    const nm = String(item.nm || '').toLowerCase();
+                    const desc = String(item.descricao || '').toLowerCase();
+                    const pos = String(item.posicao || '').toLowerCase();
+                    return nm.includes(termo) || desc.includes(termo) || pos.includes(termo);
+                });
+
+                renderizarTabela(filtrados);
+            }, 250);
+        }
+
+        function limparBusca() {
+            document.getElementById('txtBusca').value = '';
+            renderizarTabela(listaMateriaisGeral);
+        }
+
+        // DETALHAMENTO DO MATERIAL E BUSCA CRUZADA COM MB25 E MB51
+        async function abrirModalDetalhes(item) {
+            document.getElementById('mdlTitulo').innerText = `Material: ${item.nm}`;
+            document.getElementById('mdlNM').innerText = item.nm;
+            document.getElementById('mdlPosicao').innerText = item.posicao || 'GERAL';
+            document.getElementById('mdlSaldo').innerText = (item.saldoSap || 0).toLocaleString('pt-BR');
+            document.getElementById('mdlValorTotal').innerText = (item.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('mdlDescricao').innerText = item.descricao || 'Sem descrição cadastrada.';
+
+            document.getElementById('boxReservas').innerText = 'Buscando reservas MB25...';
+            document.getElementById('boxMovimentos').innerText = 'Buscando movimentações MB51...';
+
+            document.getElementById('modalDetalhes').style.display = 'flex';
+
+            // Busca Reservas (MB25) para o mesmo NM
+            try {
+                const snapReservas = await db.collection('reservas_mb25').where('nm', '==', String(item.nm)).get();
+                if (snapReservas.empty) {
+                    document.getElementById('boxReservas').innerText = 'Nenhuma reserva ativa encontrada para este item.';
+                } else {
+                    let htmlRes = '<ul style="padding-left: 18px;">';
+                    snapReservas.forEach(rDoc => {
+                        const r = rDoc.data();
+                        htmlRes += `<li>Reserva <b>${r.reserva}</b> - Ordem: ${r.ordem || 'N/A'} (Qtd: <b>${r.qtdReservada}</b>)</li>`;
+                    });
+                    htmlRes += '</ul>';
+                    document.getElementById('boxReservas').innerHTML = htmlRes;
+                }
+            } catch (err) {
+                document.getElementById('boxReservas').innerText = 'Sem dados de reserva vinculados.';
+            }
+
+            // Busca Movimentações (MB51) para o mesmo NM
+            try {
+                const snapMov = await db.collection('movimentacoes_mb51').where('nm', '==', String(item.nm)).limit(5).get();
+                if (snapMov.empty) {
+                    document.getElementById('boxMovimentos').innerText = 'Nenhum histórico recente de movimentação registrado.';
+                } else {
+                    let htmlMov = '<ul style="padding-left: 18px;">';
+                    snapMov.forEach(mDoc => {
+                        const m = mDoc.data();
+                        htmlMov += `<li>Movimento <b>${m.tipoMovimento}</b> - Qtd: <b>${m.quantidade}</b> em ${m.dataLancamento || 'Data N/I'}</li>`;
+                    });
+                    htmlMov += '</ul>';
+                    document.getElementById('boxMovimentos').innerHTML = htmlMov;
+                }
+            } catch (err) {
+                document.getElementById('boxMovimentos').innerText = 'Sem histórico recente de movimentações.';
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modalDetalhes').style.display = 'none';
+        }
+
+        // Inicializa a consulta
+        carregarBaseZTMM();
     </script>
 </body>
 </html>
