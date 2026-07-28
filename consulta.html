@@ -3,251 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Consulta MMBE</title>
-    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <title>Consulta MMBE / ZQMM026A - WMS Transpetro</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <!-- Ícones FontAwesome & SweetAlert2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --card-bg: rgba(255, 255, 255, 0.08);
-            --card-border: rgba(255, 255, 255, 0.12);
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
+            --bg-dark-blue: #003B5C;
+            --bg-main: #EFEFEF;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --green-accent: #107C41;
+            --red-accent: #D9534F;
+            --border-color: #D1D5DB;
             --accent-gold: #ffd700;
-            --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
-            --sidebar-width: 260px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        body { 
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%); 
-            color: var(--text-main); 
-            min-height: 100vh;
-            display: flex;
-        }
 
-        /* SIDEBAR FIXA LATERAL */
-        .sidebar {
-            width: var(--sidebar-width);
-            min-width: var(--sidebar-width);
-            height: 100vh;
-            background: #0b1120;
-            border-right: 1px solid var(--card-border);
+        body {
+            background-color: var(--bg-main);
             display: flex;
             flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
+            min-height: 100vh;
         }
 
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--card-border);
+        /* BARRA SUPERIOR */
+        .top-header {
+            background-color: var(--bg-dark-blue);
+            color: white;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            font-size: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .sidebar-title { 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: var(--accent-gold); 
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
             letter-spacing: 0.5px;
         }
 
-        .sidebar-menu {
-            list-style: none;
-            padding: 15px 0;
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* ESTRUTURA PRINCIPAL */
+        .app-container {
+            display: flex;
             flex: 1;
         }
 
-        .sidebar-item a {
+        /* MENU LATERAL */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-dark-blue);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 20px;
-            color: #cbd5e0;
+            padding: 12px 20px;
+            color: white;
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
-        .sidebar-item a:hover, .sidebar-item.active a {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-            border-left: 4px solid var(--accent-gold);
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* ÁREA PRINCIPAL DE CONTEÚDO */
-        .main-wrapper {
-            margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
-            min-height: 100vh;
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 4px 0 0 4px;
+            margin-left: 8px;
+        }
+
+        /* ÁREA CENTRAL DE CONTEÚDO */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 25px;
-            flex: 1;
         }
 
-        .main-container { width: 100%; max-width: 600px; }
+        .main-container { width: 100%; max-width: 900px; }
 
         /* CARD DA CONSULTA */
         .card-consulta { 
             background: var(--card-bg); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--card-border); 
-            padding: 25px; 
-            border-radius: 16px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
+            border: 1px solid var(--border-color); 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
             width: 100%;
             margin-bottom: 20px;
         }
 
         .header-box { 
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            padding-bottom: 15px; 
-            margin-bottom: 25px; 
+            border-bottom: 2px solid var(--bg-main); 
+            padding-bottom: 12px; 
+            margin-bottom: 15px; 
         }
 
         .titulo-central {
-            text-align: center;
-            font-size: 19px;
+            font-size: 16px;
             font-weight: 700;
-            line-height: 1.2;
+            color: var(--bg-dark-blue);
+            text-transform: uppercase;
         }
 
         /* FORMULÁRIO DE FILTROS */
-        .campo-grupo { margin-bottom: 15px; }
-        .label-filtro { display: block; font-size: 11px; font-weight: bold; color: #a0aec0; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .input-filtro {
-            width: 100%; padding: 14px; background: #ffffff; border: 1px solid transparent; border-radius: 8px;
-            font-size: 15px; outline: none; color: #1e293b;
+        .grid-filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
-        .input-filtro:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+
+        .campo-grupo { margin-bottom: 5px; }
+        .label-filtro { display: block; font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; margin-bottom: 6px; }
+        .input-filtro {
+            width: 100%; padding: 10px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px;
+            font-size: 13px; outline: none; color: #333;
+        }
+        .input-filtro:focus { border-color: var(--bg-dark-blue); box-shadow: 0 0 0 2px rgba(0, 59, 92, 0.2); }
 
         /* TABELA DE RESULTADOS */
         .tabela-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             width: 100%;
             overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .tabela-wrapper { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 450px; }
-        th { padding: 14px; background: rgba(0,0,0,0.3); color: var(--text-muted); font-size: 11px; text-transform: uppercase; text-align: left; }
-        td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+        th { padding: 12px; background: var(--bg-dark-blue); color: white; font-size: 11px; text-transform: uppercase; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; color: #333; }
         
-        .col-nm { color: var(--accent-gold); font-weight: bold; }
+        .col-nm { color: var(--bg-dark-blue); font-weight: bold; }
+        .badge-end { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
 
-        .direitos-box { max-width: 600px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: auto; }
+        .direitos-box { max-width: 900px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; width: 100%; margin-top: auto; margin-top: 25px; }
+
+        /* 📱 RESPONSIVIDADE CELULAR */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 5px; border-top: none; border-bottom: 2px solid rgba(255,255,255,0.2); }
+            .nav-item { padding: 8px 12px; font-size: 11px; white-space: nowrap; border-radius: 4px !important; margin-left: 0 !important; }
+            .main-content { padding: 10px; }
+            .top-header { justify-content: center; text-align: center; }
+            .grid-filtros { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR FIXA IDENTICA AO CONTAGEM.HTML -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <span class="sidebar-title">WMS Inteligente</span>
+    <!-- BARRA SUPERIOR -->
+    <header class="top-header">
+        <div class="brand-logo">
+            <i class="fa-solid fa-warehouse"></i>
+            <span>TRANSPETRO</span>
         </div>
-        <ul class="sidebar-menu">
-            <li class="sidebar-item">
-                <a href="contagem.html">📦 Contagem / Operação</a>
-            </li>
-            <li class="sidebar-item active">
-                <a href="consulta.html">🔍 Consulta MMBE</a>
-            </li>
-            <li class="sidebar-item">
-                <a href="auditoria.html">📊 Painel Gerencial / Auditoria</a>
-            </li>
-            <li class="sidebar-item">
-                <a href="Carga.html">🚀 Carga de Base MMBE</a>
-            </li>
-        </ul>
-    </aside>
+        <div class="header-user-info">
+            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
+            <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
+            <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
+        </div>
+    </header>
 
-    <!-- ÁREA PRINCIPAL DA PÁGINA (SUBSTITUI APENAS O CONTEÚDO CENTRAL) -->
-    <main class="main-wrapper">
-        <div class="main-container">
-            <!-- CARD DA CONSULTA MMBE -->
-            <div class="card-consulta">
-                <div class="header-box">
-                    <div class="titulo-central">Consulta de Estoque (MMBE)</div>
-                </div>
+    <!-- CORPO DO SISTEMA -->
+    <div class="app-container">
+        
+        <!-- MENU LATERAL -->
+        <nav class="sidebar">
+            <a class="nav-item" onclick="irPara('contagem.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
+            </a>
+            <a class="nav-item active" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+            </a>
+            <a class="nav-item" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
+            </a>
+            <a class="nav-item" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
+            </a>
+        </nav>
 
-                <!-- FILTROS DE PESQUISA -->
-                <div class="campo-grupo">
-                    <label class="label-filtro">NM (SAP)</label>
-                    <input type="text" id="filtroNM" class="input-filtro" placeholder="Digite o NM..." oninput="filtrarTabela()">
-                </div>
+        <!-- ÁREA PRINCIPAL DA PÁGINA -->
+        <main class="main-content">
+            <div class="main-container">
                 
-                <div class="campo-grupo">
-                    <label class="label-filtro">Descrição (*Contém*)</label>
-                    <input type="text" id="filtroDesc" class="input-filtro" placeholder="Buscar na descrição..." oninput="filtrarTabela()">
+                <!-- CARD DA CONSULTA MMBE -->
+                <div class="card-consulta">
+                    <div class="header-box">
+                        <div class="titulo-central"><i class="fa-solid fa-boxes-stacked"></i> Consulta de Estoque (MMBE / ZQMM026A)</div>
+                        <button type="button" onclick="carregarEstoqueFirebase()" class="btn-logout" style="background:#0275d8;"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+                    </div>
+
+                    <!-- FILTROS DE PESQUISA -->
+                    <div class="grid-filtros">
+                        <div class="campo-grupo">
+                            <label class="label-filtro">NM (SAP)</label>
+                            <input type="text" id="filtroNM" class="input-filtro" placeholder="Digite o NM..." oninput="filtrarTabela()">
+                        </div>
+                        
+                        <div class="campo-grupo">
+                            <label class="label-filtro">Descrição (*Contém*)</label>
+                            <input type="text" id="filtroDesc" class="input-filtro" placeholder="Buscar na descrição..." oninput="filtrarTabela()">
+                        </div>
+
+                        <div class="campo-grupo">
+                            <label class="label-filtro">Depósito / Endereço</label>
+                            <input type="text" id="filtroDeposito" class="input-filtro" placeholder="Ex: DP01 ou A-01..." oninput="filtrarTabela()">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="campo-grupo">
-                    <label class="label-filtro">Depósito (DP01-DP05, DPA1-DPA2)</label>
-                    <input type="text" id="filtroDeposito" class="input-filtro" placeholder="Ex: DP01..." oninput="filtrarTabela()">
+                <!-- REGRID DE DADOS DA TABELA ABAIXO -->
+                <div class="tabela-card">
+                    <div class="tabela-wrapper">
+                        <table id="tabelaEstoque">
+                            <thead>
+                                <tr>
+                                    <th>NM (SAP)</th>
+                                    <th>Depósito</th>
+                                    <th>Endereço</th>
+                                    <th>Descrição Operacional</th>
+                                    <th>Saldo Fis.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblEstoqueBody">
+                                <tr>
+                                    <td class="col-nm">1000142</td>
+                                    <td>DP01</td>
+                                    <td><span class="badge-end">R-01-A</span></td>
+                                    <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
+                                    <td>45 UN</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-nm">2000551</td>
+                                    <td>DP03</td>
+                                    <td><span class="badge-end">R-04-B</span></td>
+                                    <td>MANOMETRO PRESSAO FLANGEADO 1/2</td>
+                                    <td>10 UN</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-nm">3000889</td>
+                                    <td>DPA1</td>
+                                    <td><span class="badge-end">PATIO-02</span></td>
+                                    <td>TUBO ACO CARBONO 4 POL SEM COSTURA</td>
+                                    <td>12 UN</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- REGRID DE DADOS DA TABELA ABAIXO -->
-            <div class="tabela-card">
-                <div class="tabela-wrapper">
-                    <table id="tabelaEstoque">
-                        <thead>
-                            <tr>
-                                <th>NM (SAP)</th>
-                                <th>Depósito</th>
-                                <th>Descrição Operacional</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="col-nm">1000142</td>
-                                <td>DP01</td>
-                                <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                            </tr>
-                            <tr>
-                                <td class="col-nm">2000551</td>
-                                <td>DP03</td>
-                                <td>MANOMETRO PRESSAO FLANGEADO 1/2</td>
-                            </tr>
-                            <tr>
-                                <td class="col-nm">1000142</td>
-                                <td>DP02</td>
-                                <td>VALVULA GLOBO FLUÍDOS 3 POL SCH40</td>
-                            </tr>
-                            <tr>
-                                <td class="col-nm">3000889</td>
-                                <td>DPA1</td>
-                                <td>TUBO ACO CARBONO 4 POL SEM COSTURA</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
+            <div class="direitos-box">
+                <p style="font-size: 11px; line-height: 1.6; color: #666;">
+                    &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+                    Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
+                </p>
             </div>
-        </div>
-
-        <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-        <div class="direitos-box">
-            <p style="font-size: 11px; line-height: 1.6; color: #cbd5e0;">
-                &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
-                Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
-            </p>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <script>
-        // Função inteligente para filtrar as linhas da tabela em tempo real
+        // CONFIGURAÇÃO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
+            authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
+            projectId: "bolao-copa-2026-d264f",
+            storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
+            messagingSenderId: "802924891915",
+            appId: "1:802924891915:web:d9c641161733b510559c0e",
+            measurementId: "G-QQ210F367M"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // 🔒 VALIDAÇÃO DE SEGURANÇA
+        const usuarioAtual = localStorage.getItem('wms_usuario');
+        if (!usuarioAtual) {
+            window.location.replace('index.html');
+        } else {
+            document.getElementById('lblUsuario').innerText = usuarioAtual;
+        }
+
+        function irPara(pagina) { window.location.href = pagina; }
+
+        function encerrarSessaoManualmente() {
+            localStorage.clear();
+            auth.signOut().finally(() => window.location.replace('index.html'));
+        }
+
+        // BUSCA BASE REAL DO FIREBASE SE DISPONÍVEL
+        async function carregarEstoqueFirebase() {
+            try {
+                const snapshot = await db.collection('estoque_zqmm026a').limit(100).get();
+                if (!snapshot.empty) {
+                    const tbody = document.getElementById('tblEstoqueBody');
+                    tbody.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="col-nm">${d.nm || '-'}</td>
+                                <td>${d.deposito || '-'}</td>
+                                <td><span class="badge-end">${d.endereco || 'S/END'}</span></td>
+                                <td>${d.descricao || '-'}</td>
+                                <td>${d.saldo || '0'} ${d.unidade || 'UN'}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) {
+                console.log("Mantendo dados estáticos caso banco esteja vazio/não configurado ainda.");
+            }
+        }
+
+        // FILTRO DE BUSCA EM TEMPO REAL
         function filtrarTabela() {
             const valNM = document.getElementById('filtroNM').value.toUpperCase();
             const valDesc = document.getElementById('filtroDesc').value.toUpperCase();
@@ -259,10 +394,13 @@
             for (let i = 0; i < linhas.length; i++) {
                 const celulaNM = linhas[i].getElementsByTagName('td')[0].innerText.toUpperCase();
                 const celulaDep = linhas[i].getElementsByTagName('td')[1].innerText.toUpperCase();
-                const celulaDesc = linhas[i].getElementsByTagName('td')[2].innerText.toUpperCase();
+                const celulaEnd = linhas[i].getElementsByTagName('td')[2].innerText.toUpperCase();
+                const celulaDesc = linhas[i].getElementsByTagName('td')[3].innerText.toUpperCase();
 
-                // Verifica se a linha atende a todos os filtros preenchidos de forma simultânea
-                if (celulaNM.includes(valNM) && celulaDep.includes(valDep) && celulaDesc.includes(valDesc)) {
+                // Filtra combinando Depósito e Endereço no campo correspondente
+                const combinaDep = celulaDep.includes(valDep) || celulaEnd.includes(valDep);
+
+                if (celulaNM.includes(valNM) && combinaDep && celulaDesc.includes(valDesc)) {
                     linhas[i].style.display = "";
                 } else {
                     linhas[i].style.display = "none";
@@ -270,19 +408,16 @@
             }
         }
 
-        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA)
+        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA DE 5 MINUTOS)
         let cronometroInatividade;
 
         function resetarCronometroSessao() {
             clearTimeout(cronometroInatividade);
-            // 5 minutos convertidos para milissegundos
             cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
         }
 
         function executarBloqueioPorInatividade() {
-            // Apaga as permissões locais instantaneamente
             localStorage.clear();
-            
             Swal.fire({
                 icon: 'warning',
                 title: 'Sessão Expirada!',
@@ -291,12 +426,15 @@
                 confirmButtonText: 'Efetuar Login Novamente',
                 allowOutsideClick: false
             }).then(() => {
-                window.location.href = "index.html"; // Chuta o usuário para fora
+                window.location.href = "index.html";
             });
         }
 
-        // Inicializa o cronômetro no carregamento e monitora as interações
-        window.onload = resetarCronometroSessao;
+        // MONITORAMENTO DE ATIVIDADE
+        window.onload = function() {
+            resetarCronometroSessao();
+            carregarEstoqueFirebase();
+        };
         document.onmousemove = resetarCronometroSessao;
         document.onkeypress = resetarCronometroSessao;
         document.onclick = resetarCronometroSessao;
