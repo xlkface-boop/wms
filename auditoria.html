@@ -3,352 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMS Inteligente - Central de Relatórios</title>
-    <!-- Biblioteca de Alertas Bonitos (SweetAlert2) -->
+    <title>Auditoria & Inventário - WMS Transpetro</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <!-- Ícones FontAwesome & SweetAlert2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // 🛡️ BLOQUEIO DE SEGURANÇA ANTECIPADO (PREVENT OVERFLASH)
-        // Executado imediatamente antes do carregamento do body para evitar que dados confidenciais pisquem em telas não autorizadas
-        (function() {
-            const perfilAtivo = localStorage.getItem('wms_perfil');
-            if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
-                // Redireciona imediatamente limpando o rastro de histórico
-                window.location.replace("index.html");
-            }
-        })();
-    </script>
+
     <style>
+        :root {
+            --bg-dark-blue: #003B5C;
+            --bg-main: #EFEFEF;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --green-accent: #107C41;
+            --red-accent: #D9534F;
+            --border-color: #D1D5DB;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        body { 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
-            color: white; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
+
+        body {
+            background-color: var(--bg-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        
-        .main-container { width: 100%; max-width: 500px; }
-        
-        .card-menu-principal { 
-            background: rgba(255, 255, 255, 0.08); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.12); 
-            padding: 25px; 
-            border-radius: 16px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
-            width: 100%;
-        }
-        
-        .header-box { 
-            display: grid;
-            grid-template-columns: 40px 1fr 40px;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            padding-bottom: 15px; 
-            margin-bottom: 25px; 
-        }
-        
-        .titulo-central {
-            text-align: center;
-            font-size: 19px;
-            font-weight: 700;
-        }
-        
-        .btn-x-voltar { 
-            font-size: 22px;
-            color: #cbd5e0;
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
+
+        /* BARRA SUPERIOR */
+        .top-header {
+            background-color: var(--bg-dark-blue);
+            color: white;
+            min-height: 50px;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            width: 40px;
-            height: 40px;
+            justify-content: space-between;
+            padding: 10px 15px;
+            font-size: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .btn-x-voltar:hover { color: #ef4444; }
 
-        .menu-vertical { display: flex; flex-direction: column; gap: 15px; }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* ESTRUTURA PRINCIPAL */
+        .app-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* MENU LATERAL */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-dark-blue);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 4px 0 0 4px;
+            margin-left: 8px;
+        }
+
+        /* ÁREA CENTRAL DE CONTEÚDO */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .dashboard-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* MENU DE BOTÕES PAINEL GERENCIAL */
+        .menu-vertical {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
         .btn-opcao-painel {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--bg-dark-blue);
             padding: 18px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
             text-align: left;
-            transition: 0.2s ease;
+            transition: all 0.2s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .btn-opcao-painel:hover { background: rgba(255, 255, 255, 0.12); border-color: #ffd700; }
+
+        .btn-opcao-painel:hover {
+            background: var(--bg-dark-blue);
+            color: #FFFFFF;
+            border-color: var(--bg-dark-blue);
+        }
+
+        /* CARDS / MODAIS / SUBTELAS */
+        .card {
+            background: var(--card-bg);
+            border-radius: 6px;
+            padding: 1.2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            color: var(--bg-dark-blue);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
 
         .sub-tela-exclusiva {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #0f172a;
+            background: rgba(0,0,0,0.6);
             z-index: 999;
             display: none;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
         }
+
         .sub-tela-exclusiva.ativa { display: flex; }
 
-        .lista-inventarios-diarios { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .item-inventario-check {
-            background: rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;
-            display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer;
+        .modal-box {
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .item-inventario-check input { width: 18px; height: 18px; }
 
-        .btn-acao-analise {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white; border: none; padding: 14px; border-radius: 8px;
-            font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;
-            margin-bottom: 20px; text-transform: uppercase;
+        .header-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
+
+        .titulo-central {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--bg-dark-blue);
+        }
+
+        .btn-x-voltar {
+            font-size: 18px;
+            color: #777;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-x-voltar:hover { color: var(--red-accent); }
 
         /* TABELAS DESIGN */
-        .tabela-wrapper { overflow-x: auto; width: 100%; border-radius: 8px; background: rgba(0,0,0,0.3); margin-top: 10px; }
+        .tabela-wrapper { overflow-x: auto; width: 100%; border-radius: 6px; border: 1px solid var(--border-color); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
-        th { padding: 12px; background: rgba(0,0,0,0.5); color: #a0aec0; font-size: 11px; text-transform: uppercase; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; vertical-align: middle; }
+        th { padding: 10px; background: var(--bg-dark-blue); color: white; font-size: 11px; text-transform: uppercase; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
 
         .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
-        .badge-ok { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
-        .badge-erro { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+        .badge-ok { background: rgba(34, 197, 94, 0.2); color: var(--green-accent); border: 1px solid var(--green-accent); }
+        .badge-erro { background: rgba(239, 68, 68, 0.2); color: var(--red-accent); border: 1px solid var(--red-accent); }
 
-        /* BOTÃO DE RECONTAGEM */
+        .abc-a { background: #d9534f; color: white; }
+        .abc-b { background: #f0ad4e; color: white; }
+        .abc-c { background: #0275d8; color: white; }
+
         .btn-recontar-acao {
             background: #ea580c;
             color: white;
             border: none;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
         .btn-recontar-acao:hover { background: #c2410c; }
 
-        .abc-a { background: #ef4444; } .abc-b { background: #f97316; } .abc-c { background: #3b82f6; }
+        .barra-progresso { background: #e9ecef; border-radius: 6px; height: 25px; width: 100%; overflow: hidden; border: 1px solid var(--border-color); margin: 15px 0; }
+        .barra-preenchida { height: 100%; background: var(--green-accent); color: white; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-weight: bold; font-size: 12px; transition: width 0.5s ease; }
 
-        .barra-progresso { background: rgba(255,255,255,0.05); border-radius: 6px; height: 25px; width: 100%; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); margin-top: 15px; margin-bottom: 15px; }
-        .barra-preenchida { height: 100%; background: #22c55e; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-weight: bold; font-size: 12px; transition: width 0.5s ease; }
-
-        .direitos-box { max-width: 500px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.6); border-radius: 8px; width: 100%; margin-top: 25px; }
+        /* 📱 RESPONSIVIDADE CELULAR */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 5px; border-top: none; border-bottom: 2px solid rgba(255,255,255,0.2); }
+            .nav-item { padding: 8px 12px; font-size: 11px; white-space: nowrap; border-radius: 4px !important; margin-left: 0 !important; }
+            .main-content { padding: 10px; }
+            .top-header { justify-content: center; text-align: center; }
+            .menu-vertical { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <!-- MENU DIRECIONADOR PRINCIPAL -->
-        <div class="card-menu-principal">
-            <div class="header-box">
-                <button type="button" class="btn-x-voltar" onclick="voltarParaMenu()">✕</button>
-                <div class="titulo-central">Painel Gerencial</div>
-                <div></div>
-            </div>
-
-            <div class="menu-vertical">
-                <button class="btn-opcao-painel" onclick="abrirTela('telaABC')">📊 1. Curva ABC por Valor <span>➔</span></button>
-                <button class="btn-opcao-painel" onclick="abrirTela('telaAcuracia')">🎯 2. Histórico de Acurácia <span>➔</span></button>
-                <button class="btn-opcao-painel" onclick="abrirTela('telaCriticos')">⚠️ 3. Pontos Críticos & Ordens <span>➔</span></button>
-                <button class="btn-opcao-painel" onclick="abrirTela('telaSaude')">📈 4. Saúde Total do Estoque <span>➔</span></button>
-            </div>
+    <!-- BARRA SUPERIOR -->
+    <header class="top-header">
+        <div class="brand-logo">
+            <i class="fa-solid fa-warehouse"></i>
+            <span>TRANSPETRO</span>
         </div>
-    </div>
-
-    <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
-    <div class="direitos-box">
-        <p style="font-size: 11px; color: #cbd5e0;">&copy; 2026 WMS Inteligente. Propriedade de <strong>Dário João Torres</strong>.</p>
-    </div>
-
-
-    <!-- TELA 1 EXCLUSIVA: CURVA ABC POR VALOR -->
-    <div id="telaABC" class="sub-tela-exclusiva">
-        <div class="header-box">
-            <button class="btn-x-voltar" onclick="fecharTela('telaABC')">✕</button>
-            <div class="titulo-central" style="color: #ffd700;">Curva ABC de Pátio</div>
-            <div></div>
+        <div class="header-user-info">
+            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
+            <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
+            <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
-        <div class="tabela-wrapper">
-            <table>
-                <thead>
-                    <tr><th>NM</th><th>Descrição</th><th>Montante</th><th>Classe</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>1000142</td><td>VALVULA GLOBO 3 POL</td><td>R$ 112.500,00</td><td><span class="badge abc-a">A</span></td></tr>
-                    <tr><td>4001223</td><td>BOMBA CENTRIFUGA 5CV</td><td>R$ 36.000,00</td><td><span class="badge abc-a">A</span></td></tr>
-                    <tr><td>2000551</td><td>MANOMETRO FLANGEADO</td><td>R$ 5.400,00</td><td><span class="badge abc-b">B</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    </header>
 
-
-    <!-- TELA 2 EXCLUSIVA: HISTÓRICO DIÁRIO -->
-    <div id="telaAcuracia" class="sub-tela-exclusiva">
-        <div class="header-box">
-            <button class="btn-x-voltar" onclick="fecharTela('telaAcuracia')">✕</button>
-            <div class="titulo-central" style="color: #ffd700;">Histórico Diário</div>
-            <div></div>
-        </div>
+    <!-- CORPO DO SISTEMA -->
+    <div class="app-container">
         
-        <p style="font-size: 13px; color: #cbd5e0; margin-bottom: 15px;">Selecione uma ou mais rodadas para processar o relatório de auditoria por material:</p>
+        <!-- MENU LATERAL -->
+        <nav class="sidebar">
+            <a class="nav-item" onclick="irPara('menu.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
+            </a>
+            <a class="nav-item" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+            </a>
+            <a class="nav-item active" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
+            </a>
+            <a class="nav-item" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
+            </a>
+        </nav>
 
-        <div class="lista-inventarios-diarios">
-            <label class="item-inventario-check">
-                <input type="checkbox" name="inventario_ref" value="17/07/2026 às 08:30" id="inv_17">
-                <div>
-                    <strong style="display:block; font-size:14px; color:#fff;">📅 17/07/2026 - 08:30</strong>
-                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 98.4% | Itens Críticos</span>
-                </div>
-            </label>
-            <label class="item-inventario-check">
-                <input type="checkbox" name="inventario_ref" value="16/07/2026 às 08:15" id="inv_16">
-                <div>
-                    <strong style="display:block; font-size:14px; color:#fff;">📅 16/07/2026 - 08:15</strong>
-                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 95.1% | Inventário Geral</span>
-                </div>
-            </label>
-            <label class="item-inventario-check">
-                <input type="checkbox" name="inventario_ref" value="13/07/2026 às 08:00" id="inv_13">
-                <div>
-                    <strong style="display:block; font-size:14px; color:#fff;">📅 13/07/2026 - 08:00</strong>
-                    <span style="font-size:12px; color:#a0aec0;">Acurácia: 100% | Linha de Tubulação</span>
-                </div>
-            </label>
-        </div>
+        <!-- ÁREA CENTRAL DE AUDITORIA -->
+        <main class="main-content">
+            <h2 class="dashboard-title">CENTRAL DE AUDITORIA & DASHBOARDS GERENCIAIS</h2>
 
-        <button class="btn-acao-analise" onclick="processarAnaliseInventarios()">⚡ Executar Análise Detalhada</button>
+            <!-- MENU DIRECIONADOR -->
+            <div class="menu-vertical">
+                <button class="btn-opcao-painel" onclick="abrirTela('telaABC')">📊 1. Curva ABC por Valor <i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn-opcao-painel" onclick="abrirTela('telaAcuracia')">🎯 2. Histórico de Acurácia <i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn-opcao-painel" onclick="abrirTela('telaCriticos')">⚠️ 3. Pontos Críticos & Ordens <i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn-opcao-painel" onclick="abrirTela('telaSaude')">📈 4. Saúde Total do Estoque <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
 
-        <div id="boxResultadoComparacao" style="background:rgba(0,0,0,0.4); padding:15px; border-radius:8px; display:none; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
-            <h4 style="color:#60a5fa; font-size:14px; margin-bottom:10px;" id="tituloRelatorio">📋 Relatório Gerencial Extraído:</h4>
-            <div id="corpoRelatorioHTML"></div>
+            <!-- CARD GERADOR INVENTÁRIO CÍCLICO -->
+            <div class="card">
+                <h2><i class="fa-solid fa-rotate"></i> Gerador de Inventário Cíclico (Base em Saídas MB51)</h2>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                    O sistema identifica automaticamente os materiais com maior movimentação e saída no MB51 para direcionar a contagem cíclica prioritária.
+                </p>
+                <button type="button" onclick="gerarInventarioCiclico()" class="btn-recontar-acao" style="padding: 10px 20px; font-size: 13px;">
+                    <i class="fa-solid fa-bolt"></i> Gerar Fila de Inventário Cíclico
+                </button>
+
+                <div id="boxResultadoCiclico" class="tabela-wrapper" style="margin-top: 15px; display: none;">
+                    <table>
+                        <thead>
+                            <tr><th>NM</th><th>Descrição</th><th>Saídas (MB51)</th><th>Ação</th></tr>
+                        </thead>
+                        <tbody id="tblCiclicoBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- TELA 1 EXCLUSIVA: CURVA ABC -->
+    <div id="telaABC" class="sub-tela-exclusiva">
+        <div class="modal-box">
+            <div class="header-box">
+                <div class="titulo-central"><i class="fa-solid fa-chart-pie"></i> Curva ABC por Valor</div>
+                <button class="btn-x-voltar" onclick="fecharTela('telaABC')">✕</button>
+            </div>
+            <div class="tabela-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>NM</th><th>Descrição</th><th>Saldo Valor</th><th>Classe</th></tr>
+                    </thead>
+                    <tbody id="tblABCBody">
+                        <tr><td>1000142</td><td>VALVULA GLOBO 3 POL</td><td>R$ 112.500,00</td><td><span class="badge abc-a">A</span></td></tr>
+                        <tr><td>4001223</td><td>BOMBA CENTRIFUGA 5CV</td><td>R$ 36.000,00</td><td><span class="badge abc-a">A</span></td></tr>
+                        <tr><td>2000551</td><td>MANOMETRO FLANGEADO</td><td>R$ 5.400,00</td><td><span class="badge abc-b">B</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- TELA 2 EXCLUSIVA: HISTÓRICO DE ACURÁCIA -->
+    <div id="telaAcuracia" class="sub-tela-exclusiva">
+        <div class="modal-box">
+            <div class="header-box">
+                <div class="titulo-central"><i class="fa-solid fa-bullseye"></i> Histórico Diário de Acurácia</div>
+                <button class="btn-x-voltar" onclick="fecharTela('telaAcuracia')">✕</button>
+            </div>
+            <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Acurácia consolidada dos últimos lançamentos:</p>
+            <div class="tabela-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Data/Hora</th><th>Total Itens</th><th>Acertos</th><th>Acurácia (%)</th></tr>
+                    </thead>
+                    <tbody id="tblAcuraciaBody">
+                        <tr><td>Hoje</td><td>15</td><td>14</td><td><span class="badge badge-ok">93.3%</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <!-- TELA 3 EXCLUSIVA: PONTOS CRÍTICOS -->
     <div id="telaCriticos" class="sub-tela-exclusiva">
-        <div class="header-box">
-            <button class="btn-x-voltar" onclick="fecharTela('telaCriticos')">✕</button>
-            <div class="titulo-central" style="color: #ffd700;">Pontos Críticos</div>
-            <div></div>
-        </div>
-        
-        <h4 style="font-size: 13px; color: #fca5a5; margin-bottom: 12px;">🔴 Divergências Críticas em Aberto:</h4>
-        <div class="tabela-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Material / NM</th>
-                        <th>Teórico</th>
-                        <th>Contado</th>
-                        <th>Divergência</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1000142</strong><br><span style="font-size:11px; color:#a0aec0;">VALVULA GLOBO 3 POL</span></td>
-                        <td>45 UN</td>
-                        <td>43 UN</td>
-                        <td><span class="badge badge-erro">-2 UN</span></td>
-                        <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('1000142', 'VALVULA GLOBO 3 POL')">🔄 Recontar</button></td>
-                    </tr>
-                    <tr>
-                        <td><strong>4001223</strong><br><span style="font-size:11px; color:#a0aec0;">BOMBA CENTRIFUGA 5CV</span></td>
-                        <td>12 UN</td>
-                        <td>15 UN</td>
-                        <td><span class="badge badge-erro">+3 UN</span></td>
-                        <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('4001223', 'BOMBA CENTRIFUGA 5CV')">🔄 Recontar</button></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="modal-box">
+            <div class="header-box">
+                <div class="titulo-central"><i class="fa-solid fa-triangle-exclamation"></i> Pontos Críticos em Aberto</div>
+                <button class="btn-x-voltar" onclick="fecharTela('telaCriticos')">✕</button>
+            </div>
+            <div class="tabela-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>NM</th><th>Descrição</th><th>Divergência</th><th>Ação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1000142</td>
+                            <td>VALVULA GLOBO 3 POL</td>
+                            <td><span class="badge badge-erro">-2 UN</span></td>
+                            <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('1000142', 'VALVULA GLOBO 3 POL')">🔄 Solicitar Recontagem</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
 
     <!-- TELA 4 EXCLUSIVA: SAÚDE TOTAL DO ESTOQUE -->
     <div id="telaSaude" class="sub-tela-exclusiva">
-        <div class="header-box">
-            <button class="btn-x-voltar" onclick="fecharTela('telaSaude')">✕</button>
-            <div class="titulo-central" style="color: #ffd700;">Espelho de Saúde Global</div>
-            <div></div>
-        </div>
-        
-        <p style="font-size: 13px; color: #cbd5e0;">Métricas de acertos e falhas consolidadas do último inventário rodado:</p>
-        
-        <div class="barra-progresso">
-            <div class="barra-preenchida" id="barraSaudeProgresso" style="width: 100%;">100% Saudável</div>
-        </div>
-
-        <h4 style="font-size: 14px; color: #ffd700; margin-top: 15px; margin-bottom: 10px;">📋 Registro Analítico de Justificativas:</h4>
-        <div class="tabela-wrapper">
-            <table id="tabelaEspelhoSaude">
-                <thead>
-                    <tr><th>Material / NM</th><th>Diagnóstico</th><th>Status</th></tr>
-                </thead>
-                <tbody id="corpoEspelhoSaude">
-                    <tr><td colspan="3" style="text-align: center; color: #a0aec0;">Execute um inventário na Aba 2 para espelhar as divergências aqui.</td></tr>
-                </tbody>
-            </table>
+        <div class="modal-box">
+            <div class="header-box">
+                <div class="titulo-central"><i class="fa-solid fa-heart-pulse"></i> Saúde Global do Estoque</div>
+                <button class="btn-x-voltar" onclick="fecharTela('telaSaude')">✕</button>
+            </div>
+            <p style="font-size: 13px; color: #555;">Índice de integridade física vs. cadastral:</p>
+            <div class="barra-progresso">
+                <div class="barra-preenchida" id="barraSaudeProgresso" style="width: 98.5%;">98.5% Saudável</div>
+            </div>
         </div>
     </div>
 
+    <!-- LÓGICA E FIRESTORE -->
     <script>
-        const dadosInventarios = {
-            "inv_17": {
-                acuracia: "98.4%",
-                bateram: [{ nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" }],
-                naoBateram: [{ nm: "1000142", desc: "VALVULA GLOBO 3 POL", teorico: "45 UN", contado: "43 UN", dif: "-2 UN" }]
-            },
-            "inv_16": {
-                acuracia: "95.1%",
-                bateram: [{ nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" }],
-                naoBateram: [
-                    { nm: "1000142", desc: "VALVULA GLOBO 3 POL", teorico: "45 UN", contado: "41 UN", dif: "-4 UN" },
-                    { nm: "4001223", desc: "BOMBA CENTRIFUGA 5CV", teorico: "12 UN", contado: "15 UN", dif: "+3 UN" }
-                ]
-            },
-            "inv_13": {
-                acuracia: "100%",
-                bateram: [
-                    { nm: "1000142", desc: "VALVULA GLOBO 3 POL", qtd: "45 UN" },
-                    { nm: "2000551", desc: "MANOMETRO PRESSAO FLANGEADO", qtd: "10 UN" },
-                    { nm: "4001223", desc: "BOMBA CENTRIFUGA 5CV", qtd: "12 UN" }
-                ],
-                naoBateram: []
-            }
+        const firebaseConfig = {
+            apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
+            authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
+            projectId: "bolao-copa-2026-d264f",
+            storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
+            messagingSenderId: "802924891915",
+            appId: "1:802924891915:web:d9c641161733b510559c0e",
+            measurementId: "G-QQ210F367M"
         };
 
-        // Interceptação imediata ao carregar a página/restaurar do cache do navegador
-        window.addEventListener('pageshow', function() {
-            const perfilAtivo = localStorage.getItem('wms_perfil');
-            if (!perfilAtivo || perfilAtivo !== 'ADMIN') {
-                window.location.replace("index.html");
-            }
-        });
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        function voltarParaMenu() {
-            window.location.replace("contagem.html");
+        // 🔒 VALIDAÇÃO DE SEGURANÇA
+        const usuarioAtual = localStorage.getItem('wms_usuario');
+        if (!usuarioAtual) {
+            window.location.replace('index.html');
+        } else {
+            document.getElementById('lblUsuario').innerText = usuarioAtual;
+        }
+
+        function irPara(pagina) { window.location.href = pagina; }
+
+        function encerrarSessaoManualmente() {
+            localStorage.clear();
+            auth.signOut().finally(() => window.location.replace('index.html'));
         }
 
         function abrirTela(idTela) { document.getElementById(idTela).classList.add('ativa'); }
@@ -357,123 +468,50 @@
         function solicitarRecontagem(nm, descricao) {
             Swal.fire({
                 icon: 'success',
-                title: 'Solicitação Enviada!',
-                html: `O material <b>NM ${nm}</b> (${descricao}) entrou na fila prioritária de Recontagem Cega para os operadores.`,
+                title: 'Recontagem Prioritária!',
+                html: `O material <b>NM ${nm}</b> (${descricao}) foi enviado para a fila de Recontagem Cega.`,
                 confirmButtonColor: '#ea580c',
                 confirmButtonText: 'Entendido'
             });
         }
 
-        function processarAnaliseInventarios() {
-            const checkboxes = document.querySelectorAll('input[name="inventario_ref"]:checked');
-            const boxResultado = document.getElementById('boxResultadoComparacao');
-            const corpoHTML = document.getElementById('corpoRelatorioHTML');
+        async function gerarInventarioCiclico() {
+            const box = document.getElementById('boxResultadoCiclico');
+            const tbody = document.getElementById('tblCiclicoBody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Analisando saídas MB51...</td></tr>';
+            box.style.display = 'block';
 
-            if (checkboxes.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Atenção',
-                    text: 'Selecione ao menos um inventário para visualizar o relatório.',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
+            try {
+                const snapshot = await db.collection('movimentacoes_mb51').limit(5).get();
+                let html = '';
 
-            boxResultado.style.display = "block";
-            let relatorioFinal = "";
-            let todosAcertosEspelho = [];
-            let todasFalhasEspelho = [];
-            let acuraciaUltimoSelecionado = "100%";
-
-            checkboxes.forEach(box => {
-                const id = box.id;
-                const dados = dadosInventarios[id];
-                acuraciaUltimoSelecionado = dados.acuracia;
-
-                relatorioFinal += `
-                    <div style="margin-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
-                        <span style="font-size:13px; color:#ffd700; font-weight:bold;">📅 Rotina: ${box.value} | Acurácia: ${dados.acuracia}</span>
-                        <p style="margin-top:10px; font-size:12px; color:#4ade80; font-weight:bold;">🟢 MATERIAIS QUE BATERAM TOTALMENTE:</p>
-                `;
-
-                if(dados.bateram.length === 0) {
-                    relatorioFinal += `<p style="font-size:11px; color:#a0aec0; margin-left:10px;">Nenhum material correto.</p>`;
+                if (snapshot.empty) {
+                    // Fallback visual de exemplo
+                    html = `
+                        <tr>
+                            <td>1000142</td><td>VALVULA GLOBO 3 POL</td><td>14 Saídas</td>
+                            <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('1000142', 'VALVULA GLOBO 3 POL')">Recontar Cíclico</button></td>
+                        </tr>
+                    `;
                 } else {
-                    dados.bateram.forEach(b => {
-                        relatorioFinal += `<p style="font-size:12px; margin-left:10px; color:#e2e8f0;">• NM ${b.nm} - ${b.desc} (${b.qtd})</p>`;
-                        todosAcertosEspelho.push(b);
-                    });
-                }
-
-                relatorioFinal += `<p style="margin-top:10px; font-size:12px; color:#fca5a5; font-weight:bold;">🔴 MATERIAIS COM DIVERGÊNCIA:</p>`;
-
-                if(dados.naoBateram.length === 0) {
-                    relatorioFinal += `<p style="font-size:11px; color:#a0aec0; margin-left:10px;">Zero erros.</p>`;
-                } else {
-                    dados.naoBateram.forEach(n => {
-                        relatorioFinal += `
-                            <p style="font-size:12px; margin-left:10px; color:#e2e8f0;">
-                                • <strong>NM ${n.nm}</strong> - ${n.desc}<br>
-                                <span style="font-size:11px; color:#cbd5e0; margin-left:10px;">[SAP: ${n.teorico} | Físico: ${n.contado} | Erro: ${n.dif}]</span>
-                            </p>
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        html += `
+                            <tr>
+                                <td>${data.nm || '1000142'}</td>
+                                <td>${data.descricao || 'Material ZQMM'}</td>
+                                <td>${data.quantidade || '1'} Mov.</td>
+                                <td><button class="btn-recontar-acao" onclick="solicitarRecontagem('${data.nm}', '${data.descricao}')">Recontar Cíclico</button></td>
+                            </tr>
                         `;
-                        todasFalhasEspelho.push(n);
                     });
                 }
-                relatorioFinal += `</div>`;
-            });
 
-            corpoHTML.innerHTML = relatorioFinal;
-
-            const barraSaude = document.getElementById('barraSaudeProgresso');
-            const corpoEspelho = document.getElementById('corpoEspelhoSaude');
-
-            barraSaude.style.width = acuraciaUltimoSelecionado;
-            barraSaude.innerText = `${acuraciaUltimoSelecionado} de Integridade`;
-
-            let htmlEspelho = "";
-            todasFalhasEspelho.forEach(f => {
-                htmlEspelho += `<tr><td><strong>NM ${f.nm}</strong><br><span style="font-size:11px; color:#a0aec0;">${f.desc}</span></td><td>Desvio físico de ${f.dif}.</td><td><span class="badge badge-erro">DIVERGENTE</span></td></tr>`;
-            });
-            todosAcertosEspelho.forEach(a => {
-                htmlEspelho += `<tr><td><strong>NM ${a.nm}</strong><br><span style="font-size:11px; color:#a0aec0;">${a.desc}</span></td><td>Físico confere.</td><td><span class="badge badge-ok">CONFORME</span></td></tr>`;
-            });
-            corpoEspelho.innerHTML = htmlEspelho;
+                tbody.innerHTML = html;
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Erro ao buscar saídas do MB51.</td></tr>';
+            }
         }
-
-        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA)
-        let cronometroInatividade;
-
-        function resetarCronometroSessao() {
-            clearTimeout(cronometroInatividade);
-            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); // 5 minutos
-        }
-
-        function executarBloqueioPorInatividade() {
-            localStorage.clear();
-            
-            Swal.fire({
-                icon: 'warning',
-                title: 'Sessão Expirada!',
-                text: 'Por diretrizes de segurança, o sistema foi bloqueado devido a 5 minutos de inatividade.',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Efetuar Login Novamente',
-                allowOutsideClick: false
-            }).then(() => {
-                window.location.replace("index.html");
-            });
-        }
-
-        // Inicialização combinada
-        window.addEventListener('load', () => {
-            resetarCronometroSessao();
-        });
-        document.addEventListener('mousemove', resetarCronometroSessao);
-        document.addEventListener('keypress', resetarCronometroSessao);
-        document.addEventListener('click', resetarCronometroSessao);
-        document.addEventListener('scroll', resetarCronometroSessao);
-        document.addEventListener('touchstart', resetarCronometroSessao);
     </script>
 </body>
 </html>
