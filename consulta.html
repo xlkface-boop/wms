@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Material - WMS Transpetro</title>
+    <title>Consulta Material - WMS Transpetro</title>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -29,321 +29,339 @@
 
         body {
             background-color: var(--bg-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            color: var(--text-main);
         }
 
+        /* HEADER PADRÃO IDÊNTICO À FOTO 1 */
         .top-header {
             background-color: var(--bg-dark-blue);
             color: white;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 15px;
-            font-size: 14px;
-        }
-
-        .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .header-user-info { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-        .user-badge { background: rgba(255, 255, 255, 0.15); padding: 5px 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .btn-logout { background: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        .app-container { display: flex; flex: 1; }
-
-        .sidebar {
-            width: 220px;
-            background-color: var(--bg-dark-blue);
+            padding: 10px 15px 0 15px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-user-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 11px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
             gap: 5px;
-            padding-top: 10px;
-            flex-shrink: 0;
+        }
+
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* BARRA DE NAVEGAÇÃO SUPERIOR (FOTO 1) */
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 5px;
+            background-color: var(--bg-dark-blue);
         }
 
         .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 20px;
-            color: white; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+            background: none;
         }
-        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .nav-item.active { background-color: #FFFFFF; color: var(--bg-dark-blue); border-radius: 4px 0 0 4px; margin-left: 8px; }
 
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .dashboard-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 15px; text-transform: uppercase; }
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 4px 4px 0 0;
+        }
 
-        /* CARDS KPI SUMMARY */
+        /* CONTEÚDO DA PÁGINA */
+        .container {
+            max-width: 900px;
+            margin: 15px auto;
+            padding: 0 12px;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        /* CARDS KPIS */
         .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .kpi-card {
             background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
             border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .kpi-icon {
-            width: 45px; height: 45px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: white; background: var(--bg-dark-blue);
-        }
-
-        .kpi-val { font-size: 18px; font-weight: bold; color: var(--text-main); }
-        .kpi-lbl { font-size: 12px; color: #666; }
-
-        /* SEARCH BAR & CONTROLS */
-        .search-container {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
+        .kpi-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
             display: flex;
-            gap: 10px;
             align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
         }
 
-        .search-input-box {
+        .kpi-val { font-size: 16px; font-weight: bold; color: var(--text-main); }
+        .kpi-lbl { font-size: 11px; color: #666; }
+
+        /* BARRA DE PESQUISA */
+        .search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .search-box {
             flex: 1;
             position: relative;
         }
 
-        .search-input-box i {
+        .search-box i {
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
-        }
-
-        .search-input-box input {
-            width: 100%;
-            padding: 10px 10px 10px 38px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .btn-limpar {
-            background: #e0e0e0;
-            color: #333;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
+            color: #888;
             font-size: 13px;
         }
 
-        /* DATA TABLE */
-        .table-card {
-            background: var(--card-bg);
-            border-radius: 8px;
+        .search-box input {
+            width: 100%;
+            padding: 8px 10px 8px 32px;
             border: 1px solid var(--border-color);
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-radius: 4px;
+            font-size: 12px;
+            outline: none;
+            background: white;
         }
 
-        .table-responsive {
-            max-height: 520px;
-            overflow-y: auto;
+        .btn-limpar {
+            background: #d1d5db;
+            color: #333;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* TABELA DE DADOS */
+        .table-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 400px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         th {
             background: var(--bg-dark-blue);
             color: white;
-            padding: 12px 15px;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            font-weight: 600;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 11px;
+            white-space: nowrap;
         }
 
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
         }
 
         tr:hover { background-color: #f8fafc; cursor: pointer; }
 
-        .badge-pos {
-            background: #e2e8f0;
-            color: #334155;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        .badge-nm {
-            font-family: monospace;
-            font-weight: bold;
-            color: var(--bg-dark-blue);
-        }
-
-        /* MODAL DE DETALHES */
+        /* MODAL DETALHES */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
         }
 
         .modal-card {
-            background: white;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 650px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: white; border-radius: 8px; width: 92%; max-width: 500px;
+            max-height: 85vh; overflow-y: auto; padding: 15px;
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--bg-main);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--bg-main); padding-bottom: 8px; margin-bottom: 12px;
         }
 
-        .modal-title { font-size: 16px; color: var(--bg-dark-blue); font-weight: bold; }
-        .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 15px;
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 6px;
-        }
-
-        .detail-item { font-size: 12px; }
-        .detail-item strong { display: block; color: #64748b; margin-bottom: 2px; }
-
-        @media (max-width: 768px) {
-            .app-container { flex-direction: column; }
-            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
-            .nav-item { padding: 8px 12px; font-size: 11px; }
-            .main-content { padding: 10px; }
-            .detail-grid { grid-template-columns: 1fr; }
-        }
+        .modal-title { font-size: 14px; color: var(--bg-dark-blue); font-weight: bold; }
+        .btn-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #666; }
     </style>
 </head>
 <body>
 
-    <!-- BARRA SUPERIOR -->
+    <!-- CABEÇALHO PADRONIZADO DA FOTO 1 -->
     <header class="top-header">
-        <div class="brand-logo">
+        <div class="header-brand">
             <i class="fa-solid fa-warehouse"></i>
             <span>TRANSPETRO</span>
         </div>
-        <div class="header-user-info">
+        
+        <div class="header-user-row">
             <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
             <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
             <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
+
+        <!-- NAVEGAÇÃO SUPERIOR IGUAL À FOTO 1 -->
+        <nav class="nav-bar">
+            <button class="nav-item" onclick="irPara('menu.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
+            </button>
+            <button class="nav-item active" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+            </button>
+            <button class="nav-item" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
+            </button>
+            <button class="nav-item" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
+            </button>
+        </nav>
     </header>
 
-    <div class="app-container">
-        <!-- MENU LATERAL -->
-        <nav class="sidebar">
-            <a class="nav-item" onclick="irPara('menu.html')"><i class="fa-solid fa-clipboard-check"></i> Contagem / Início</a>
-            <a class="nav-item active" onclick="irPara('consulta.html')"><i class="fa-solid fa-magnifying-glass"></i> Consulta Material</a>
-            <a class="nav-item" onclick="irPara('auditoria.html')"><i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria</a>
-            <a class="nav-item" onclick="irPara('Carga.html')"><i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)</a>
-        </nav>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="container">
+        <h2 class="page-title">CONSULTA DE MATERIAIS (ZTMM_026A)</h2>
 
-        <!-- CONTEÚDO PRINCIPAL -->
-        <main class="main-content">
-            <h2 class="dashboard-title">CONSULTA DE MATERIAIS (ZTMM_026A)</h2>
-
-            <!-- CARDS KPIS DE RESUMO -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblTotalItens">0</div>
-                        <div class="kpi-lbl">Total de Itens Cadastrados</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--green-accent);"><i class="fa-solid fa-sack-dollar"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblValorTotal">R$ 0,00</div>
-                        <div class="kpi-lbl">Valor Em Estoque</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--orange-accent);"><i class="fa-solid fa-location-dot"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblSemPosicao">0</div>
-                        <div class="kpi-lbl">Sem Endereço/Posição</div>
-                    </div>
+        <!-- KPIS -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon-box" style="background: var(--bg-dark-blue);"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblTotalItens">0</div>
+                    <div class="kpi-lbl">Total de Itens Cadastrados</div>
                 </div>
             </div>
 
-            <!-- BARRA DE PESQUISA -->
-            <div class="search-container">
-                <div class="search-input-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="txtBusca" placeholder="Filtrar por Código NM, Descrição do Material ou Posição..." oninput="filtrarTabelaTardio()">
+            <div class="kpi-card">
+                <div class="kpi-icon-box" style="background: var(--green-accent);"><i class="fa-solid fa-sack-dollar"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblValorTotal">R$ 0,00</div>
+                    <div class="kpi-lbl">Valor Em Estoque</div>
                 </div>
-                <button class="btn-limpar" onclick="limparBusca()"><i class="fa-solid fa-xmark"></i> Limpar</button>
             </div>
 
-            <!-- TABELA DE MATERIAIS -->
-            <div class="table-card">
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Código NM</th>
-                                <th>Descrição do Material</th>
-                                <th>Posição / Endereço</th>
-                                <th style="text-align: right;">Saldo SAP</th>
-                                <th style="text-align: right;">Valor Unit. (R$)</th>
-                                <th style="text-align: right;">Valor Total (R$)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tblCorpoMateriais">
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: #888; padding: 20px;">
-                                    <i class="fa-solid fa-spinner fa-spin"></i> Carregando base ZTMM_026A do Firestore...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="kpi-card">
+                <div class="kpi-icon-box" style="background: var(--orange-accent);"><i class="fa-solid fa-location-dot"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblSemPosicao">0</div>
+                    <div class="kpi-lbl">Sem Endereço/Posição</div>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- PESQUISA -->
+        <div class="search-row">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="txtBusca" placeholder="Filtrar por Código NM, Descrição ou Posição..." oninput="filtrarTabelaTardio()">
+            </div>
+            <button class="btn-limpar" onclick="limparBusca()"><i class="fa-solid fa-xmark"></i> Limpar</button>
+        </div>
+
+        <!-- TABELA DE MATERIAIS -->
+        <div class="table-card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código NM</th>
+                            <th>Descrição do Material</th>
+                            <th>Posição / Endereço</th>
+                            <th style="text-align: right;">Saldo SAP</th>
+                            <th style="text-align: right;">Valor Unit. (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblCorpoMateriais">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #888; padding: 20px;">
+                                Nenhuma informação encontrada na base <b>ZTMM_026A</b>.<br>
+                                Vá até a tela <b>Alimentar Sistema (SAP)</b> e faça o upload da planilha.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <!-- MODAL DE DETALHES DO MATERIAL -->
+    <!-- MODAL DETALHES -->
     <div class="modal-overlay" id="modalDetalhes">
         <div class="modal-card">
             <div class="modal-header">
@@ -351,30 +369,13 @@
                 <button class="btn-close" onclick="fecharModal()">&times;</button>
             </div>
 
-            <div class="detail-grid">
-                <div class="detail-item"><strong>CÓDIGO NM:</strong> <span id="mdlNM">-</span></div>
-                <div class="detail-item"><strong>POSIÇÃO / ENDEREÇO:</strong> <span id="mdlPosicao">-</span></div>
-                <div class="detail-item"><strong>SALDO EM ESTOQUE (SAP):</strong> <span id="mdlSaldo">-</span></div>
-                <div class="detail-item"><strong>VALOR TOTAL:</strong> <span id="mdlValorTotal">-</span></div>
+            <div style="font-size: 12px; line-height: 1.6; color: #333;">
+                <p><strong>NM:</strong> <span id="mdlNM">-</span></p>
+                <p><strong>Descrição:</strong> <span id="mdlDescricao">-</span></p>
+                <p><strong>Posição:</strong> <span id="mdlPosicao">-</span></p>
+                <p><strong>Saldo SAP:</strong> <span id="mdlSaldo">-</span></p>
+                <p><strong>Valor Total:</strong> <span id="mdlValorTotal">-</span></p>
             </div>
-
-            <div style="margin-bottom: 12px; font-size: 13px;">
-                <strong>Descrição Completa:</strong>
-                <p id="mdlDescricao" style="color: #444; margin-top: 4px; line-height: 1.4;"></p>
-            </div>
-
-            <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
-
-            <!-- RESERVAS E MOVIMENTAÇÕES VINCULADAS -->
-            <h4 style="font-size: 13px; color: var(--bg-dark-blue); margin-bottom: 8px;">
-                <i class="fa-solid fa-file-invoice"></i> Reservas Ativas (MB25)
-            </h4>
-            <div id="boxReservas" style="font-size: 12px; color: #666; margin-bottom: 15px;">Carregando reservas...</div>
-
-            <h4 style="font-size: 13px; color: var(--bg-dark-blue); margin-bottom: 8px;">
-                <i class="fa-solid fa-clock-rotate-left"></i> Histórico Recente de Movimentos (MB51)
-            </h4>
-            <div id="boxMovimentos" style="font-size: 12px; color: #666;">Carregando histórico...</div>
         </div>
     </div>
 
@@ -408,22 +409,10 @@
             auth.signOut().finally(() => window.location.replace('index.html'));
         }
 
-        // CARREGA BASE ZTMM_026A DO FIRESTORE
         async function carregarBaseZTMM() {
             try {
                 const snapshot = await db.collection('materiais_ztmm').get();
-                
-                if (snapshot.empty) {
-                    document.getElementById('tblCorpoMateriais').innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align: center; color: #888; padding: 25px;">
-                                Nenhuma informação encontrada na base <b>ZTMM_026A</b>.<br>
-                                Vá até a tela <b>Alimentar Sistema (SAP)</b> e faça o upload da planilha.
-                            </td>
-                        </tr>`;
-                    atualizarKPIs([], 0, 0);
-                    return;
-                }
+                if (snapshot.empty) return;
 
                 listaMateriaisGeral = [];
                 let valorTotalGeral = 0;
@@ -432,27 +421,18 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     listaMateriaisGeral.push(data);
-
                     valorTotalGeral += (data.valorTotal || 0);
-                    if (!data.posicao || data.posicao === 'GERAL' || data.posicao === '') {
-                        semPosicaoCount++;
-                    }
+                    if (!data.posicao || data.posicao === 'GERAL' || data.posicao === '') semPosicaoCount++;
                 });
 
-                atualizarKPIs(listaMateriaisGeral.length, valorTotalGeral, semPosicaoCount);
+                document.getElementById('lblTotalItens').innerText = Number(listaMateriaisGeral.length).toLocaleString('pt-BR');
+                document.getElementById('lblValorTotal').innerText = valorTotalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('lblSemPosicao').innerText = Number(semPosicaoCount).toLocaleString('pt-BR');
+
                 renderizarTabela(listaMateriaisGeral);
-
             } catch (error) {
-                console.error("Erro ao carregar Firestore:", error);
-                document.getElementById('tblCorpoMateriais').innerHTML = `
-                    <tr><td colspan="6" style="text-align: center; color: red;">Erro ao carregar dados do banco.</td></tr>`;
+                console.error(error);
             }
-        }
-
-        function atualizarKPIs(total, valorTotal, semPosicao) {
-            document.getElementById('lblTotalItens').innerText = Number(total).toLocaleString('pt-BR');
-            document.getElementById('lblValorTotal').innerText = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('lblSemPosicao').innerText = Number(semPosicao).toLocaleString('pt-BR');
         }
 
         function renderizarTabela(dados) {
@@ -460,52 +440,37 @@
             tbody.innerHTML = '';
 
             if (dados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888;">Nenhum registro encontrado para essa busca.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888;">Nenhum registro encontrado.</td></tr>`;
                 return;
             }
 
-            // Exibe os primeiros 150 itens para garantir excelente performance na rolagem
-            const limiteExibicao = dados.slice(0, 150);
-
-            limiteExibicao.forEach(item => {
+            dados.slice(0, 100).forEach(item => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => abrirModalDetalhes(item);
-
-                const valorUnitFormatted = (item.valorUnitario || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                const valorTotalFormatted = (item.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
                 tr.innerHTML = `
-                    <td class="badge-nm">${item.nm || '-'}</td>
+                    <td style="font-family: monospace; font-weight: bold; color: var(--bg-dark-blue);">${item.nm || '-'}</td>
                     <td>${item.descricao || '-'}</td>
-                    <td><span class="badge-pos">${item.posicao || 'GERAL'}</span></td>
+                    <td><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${item.posicao || 'GERAL'}</span></td>
                     <td style="text-align: right; font-weight: bold;">${(item.saldoSap || 0).toLocaleString('pt-BR')}</td>
-                    <td style="text-align: right;">${valorUnitFormatted}</td>
-                    <td style="text-align: right; font-weight: bold; color: var(--bg-dark-blue);">${valorTotalFormatted}</td>
+                    <td style="text-align: right;">${(item.valorUnitario || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // DEBOUNCE PARA BUSCA FLUIDA E RÁPIDA
         function filtrarTabelaTardio() {
             clearTimeout(timeoutBusca);
             timeoutBusca = setTimeout(() => {
                 const termo = document.getElementById('txtBusca').value.toLowerCase().trim();
-                
-                if (!termo) {
-                    renderizarTabela(listaMateriaisGeral);
-                    return;
-                }
+                if (!termo) { renderizarTabela(listaMateriaisGeral); return; }
 
-                const filtrados = listaMateriaisGeral.filter(item => {
-                    const nm = String(item.nm || '').toLowerCase();
-                    const desc = String(item.descricao || '').toLowerCase();
-                    const pos = String(item.posicao || '').toLowerCase();
-                    return nm.includes(termo) || desc.includes(termo) || pos.includes(termo);
-                });
-
+                const filtrados = listaMateriaisGeral.filter(item => 
+                    String(item.nm || '').toLowerCase().includes(termo) ||
+                    String(item.descricao || '').toLowerCase().includes(termo) ||
+                    String(item.posicao || '').toLowerCase().includes(termo)
+                );
                 renderizarTabela(filtrados);
-            }, 250);
+            }, 200);
         }
 
         function limparBusca() {
@@ -513,62 +478,18 @@
             renderizarTabela(listaMateriaisGeral);
         }
 
-        // DETALHAMENTO DO MATERIAL E BUSCA CRUZADA COM MB25 E MB51
-        async function abrirModalDetalhes(item) {
-            document.getElementById('mdlTitulo').innerText = `Material: ${item.nm}`;
+        function abrirModalDetalhes(item) {
+            document.getElementById('mdlTitulo').innerText = `Material ${item.nm}`;
             document.getElementById('mdlNM').innerText = item.nm;
+            document.getElementById('mdlDescricao').innerText = item.descricao || 'Sem descrição';
             document.getElementById('mdlPosicao').innerText = item.posicao || 'GERAL';
             document.getElementById('mdlSaldo').innerText = (item.saldoSap || 0).toLocaleString('pt-BR');
             document.getElementById('mdlValorTotal').innerText = (item.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('mdlDescricao').innerText = item.descricao || 'Sem descrição cadastrada.';
-
-            document.getElementById('boxReservas').innerText = 'Buscando reservas MB25...';
-            document.getElementById('boxMovimentos').innerText = 'Buscando movimentações MB51...';
-
             document.getElementById('modalDetalhes').style.display = 'flex';
-
-            // Busca Reservas (MB25) para o mesmo NM
-            try {
-                const snapReservas = await db.collection('reservas_mb25').where('nm', '==', String(item.nm)).get();
-                if (snapReservas.empty) {
-                    document.getElementById('boxReservas').innerText = 'Nenhuma reserva ativa encontrada para este item.';
-                } else {
-                    let htmlRes = '<ul style="padding-left: 18px;">';
-                    snapReservas.forEach(rDoc => {
-                        const r = rDoc.data();
-                        htmlRes += `<li>Reserva <b>${r.reserva}</b> - Ordem: ${r.ordem || 'N/A'} (Qtd: <b>${r.qtdReservada}</b>)</li>`;
-                    });
-                    htmlRes += '</ul>';
-                    document.getElementById('boxReservas').innerHTML = htmlRes;
-                }
-            } catch (err) {
-                document.getElementById('boxReservas').innerText = 'Sem dados de reserva vinculados.';
-            }
-
-            // Busca Movimentações (MB51) para o mesmo NM
-            try {
-                const snapMov = await db.collection('movimentacoes_mb51').where('nm', '==', String(item.nm)).limit(5).get();
-                if (snapMov.empty) {
-                    document.getElementById('boxMovimentos').innerText = 'Nenhum histórico recente de movimentação registrado.';
-                } else {
-                    let htmlMov = '<ul style="padding-left: 18px;">';
-                    snapMov.forEach(mDoc => {
-                        const m = mDoc.data();
-                        htmlMov += `<li>Movimento <b>${m.tipoMovimento}</b> - Qtd: <b>${m.quantidade}</b> em ${m.dataLancamento || 'Data N/I'}</li>`;
-                    });
-                    htmlMov += '</ul>';
-                    document.getElementById('boxMovimentos').innerHTML = htmlMov;
-                }
-            } catch (err) {
-                document.getElementById('boxMovimentos').innerText = 'Sem histórico recente de movimentações.';
-            }
         }
 
-        function fecharModal() {
-            document.getElementById('modalDetalhes').style.display = 'none';
-        }
+        function fecharModal() { document.getElementById('modalDetalhes').style.display = 'none'; }
 
-        // Inicializa a consulta
         carregarBaseZTMM();
     </script>
 </body>
