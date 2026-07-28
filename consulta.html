@@ -229,7 +229,7 @@
     <!-- CORPO DO SISTEMA -->
     <div class="app-container">
         
-        <!-- MENU LATERAL -->
+        <!-- MENU LATERAL (Ajustados os links) -->
         <nav class="sidebar">
             <a class="nav-item" onclick="irPara('contagem.html')">
                 <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
@@ -240,7 +240,7 @@
             <a class="nav-item" onclick="irPara('auditoria.html')">
                 <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
             </a>
-            <a class="nav-item" onclick="irPara('Carga.html')">
+            <a class="nav-item" onclick="irPara('carga.html')">
                 <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
             </a>
         </nav>
@@ -350,7 +350,11 @@
             document.getElementById('lblUsuario').innerText = usuarioAtual;
         }
 
-        function irPara(pagina) { window.location.href = pagina; }
+        // REDIRECIONAMENTO BLINDADO (Garante minúsculas e força busca na pasta raiz relativa `./`)
+        function irPara(pagina) { 
+            const destino = pagina.trim().toLowerCase();
+            window.location.href = './' + destino; 
+        }
 
         function encerrarSessaoManualmente() {
             localStorage.clear();
@@ -397,7 +401,6 @@
                 const celulaEnd = linhas[i].getElementsByTagName('td')[2].innerText.toUpperCase();
                 const celulaDesc = linhas[i].getElementsByTagName('td')[3].innerText.toUpperCase();
 
-                // Filtra combinando Depósito e Endereço no campo correspondente
                 const combinaDep = celulaDep.includes(valDep) || celulaEnd.includes(valDep);
 
                 if (celulaNM.includes(valNM) && combinaDep && celulaDesc.includes(valDesc)) {
@@ -408,7 +411,7 @@
             }
         }
 
-        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (SEGURANÇA EXTREMA DE 5 MINUTOS)
+        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (5 MINUTOS)
         let cronometroInatividade;
 
         function resetarCronometroSessao() {
