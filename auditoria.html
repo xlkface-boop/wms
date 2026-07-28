@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    <!-- Chart.js para gráficos e FontAwesome / SweetAlert2 -->
+    <!-- Chart.js, FontAwesome e SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -31,119 +31,178 @@
 
         body {
             background-color: var(--bg-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            color: var(--text-main);
         }
 
+        /* HEADER PADRÃO IDÊNTICO ÀS OUTRAS TELAS */
         .top-header {
             background-color: var(--bg-dark-blue);
             color: white;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 15px;
-            font-size: 14px;
-        }
-
-        .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .header-user-info { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-        .user-badge { background: rgba(255, 255, 255, 0.15); padding: 5px 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .btn-logout { background: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        .app-container { display: flex; flex: 1; }
-
-        .sidebar {
-            width: 220px;
-            background-color: var(--bg-dark-blue);
+            padding: 10px 15px 0 15px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-user-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 11px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
             gap: 5px;
-            padding-top: 10px;
-            flex-shrink: 0;
+        }
+
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* BARRA DE NAVEGAÇÃO SUPERIOR PADRÃO */
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 5px;
+            background-color: var(--bg-dark-blue);
         }
 
         .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 20px;
-            color: white; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+            background: none;
         }
-        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .nav-item.active { background-color: #FFFFFF; color: var(--bg-dark-blue); border-radius: 4px 0 0 4px; margin-left: 8px; }
 
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .dashboard-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 15px; text-transform: uppercase; }
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* CONTEÚDO PRINCIPAL DO DASHBOARD */
+        .container {
+            max-width: 1100px;
+            margin: 15px auto;
+            padding: 0 12px;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
 
         /* GRID DE KPIS */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
         .kpi-card {
             background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 12px 15px;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            gap: 12px;
         }
 
         .kpi-icon {
-            width: 48px; height: 48px; border-radius: 8px;
+            width: 40px; height: 40px; border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: white; background: var(--bg-dark-blue);
+            font-size: 16px; color: white; background: var(--bg-dark-blue);
+            flex-shrink: 0;
         }
 
-        .kpi-val { font-size: 20px; font-weight: bold; color: var(--text-main); }
-        .kpi-lbl { font-size: 12px; color: #666; }
+        .kpi-val { font-size: 16px; font-weight: bold; color: var(--text-main); }
+        .kpi-lbl { font-size: 11px; color: #666; }
 
         /* GRID DE GRÁFICOS */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
         .chart-card {
             background: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            padding: 15px;
             display: flex;
             flex-direction: column;
         }
 
         .chart-card h3 {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--bg-dark-blue);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .chart-container { position: relative; height: 260px; width: 100%; }
+        .chart-container { position: relative; height: 240px; width: 100%; }
 
         .btn-detalhes {
             background: #e2e8f0;
             border: none;
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             color: #334155;
             cursor: pointer;
         }
         .btn-detalhes:hover { background: #cbd5e1; }
 
-        /* MODAL DE CONSULTA DA CURVA ABC */
+        /* MODAL DA CURVA ABC */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: none;
@@ -151,133 +210,127 @@
         }
 
         .modal-card {
-            background: white; border-radius: 8px; width: 90%; max-width: 750px;
-            max-height: 85vh; overflow-y: auto; padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: white; border-radius: 8px; width: 92%; max-width: 700px;
+            max-height: 85vh; overflow-y: auto; padding: 15px;
         }
 
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--bg-main); padding-bottom: 10px; margin-bottom: 15px;
+            border-bottom: 2px solid var(--bg-main); padding-bottom: 8px; margin-bottom: 12px;
         }
 
-        .modal-title { font-size: 16px; color: var(--bg-dark-blue); font-weight: bold; }
-        .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; }
+        .modal-title { font-size: 14px; color: var(--bg-dark-blue); font-weight: bold; }
+        .btn-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #666; }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: var(--bg-dark-blue); color: white; padding: 8px 12px; text-align: left; position: sticky; top: 0; }
-        td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+        th { background: var(--bg-dark-blue); color: white; padding: 8px; text-align: left; position: sticky; top: 0; font-size: 11px; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
 
-        .badge-classe {
-            padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; color: white;
-        }
+        .badge-classe { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; color: white; }
         .badge-A { background: var(--red-accent); }
         .badge-B { background: var(--orange-accent); }
         .badge-C { background: var(--green-accent); }
-
-        @media (max-width: 768px) {
-            .app-container { flex-direction: column; }
-            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
-            .nav-item { padding: 8px 12px; font-size: 11px; }
-            .main-content { padding: 10px; }
-            .charts-grid { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- BARRA SUPERIOR -->
+    <!-- CABEÇALHO PADRONIZADO -->
     <header class="top-header">
-        <div class="brand-logo">
+        <div class="header-brand">
             <i class="fa-solid fa-warehouse"></i>
             <span>TRANSPETRO</span>
         </div>
-        <div class="header-user-info">
+        
+        <div class="header-user-row">
             <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
             <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
             <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
         </div>
+
+        <!-- NAVEGAÇÃO SUPERIOR -->
+        <nav class="nav-bar">
+            <button class="nav-item" onclick="irPara('menu.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
+            </button>
+            <button class="nav-item" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+            </button>
+            <button class="nav-item active" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
+            </button>
+            <button class="nav-item" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
+            </button>
+        </nav>
     </header>
 
-    <div class="app-container">
-        <!-- MENU LATERAL -->
-        <nav class="sidebar">
-            <a class="nav-item" onclick="irPara('menu.html')"><i class="fa-solid fa-clipboard-check"></i> Contagem / Início</a>
-            <a class="nav-item" onclick="irPara('consulta.html')"><i class="fa-solid fa-magnifying-glass"></i> Consulta Material</a>
-            <a class="nav-item active" onclick="irPara('auditoria.html')"><i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria</a>
-            <a class="nav-item" onclick="irPara('Carga.html')"><i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)</a>
-        </nav>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="container">
+        <h2 class="page-title">Auditoria e Saúde do Estoque (ZTMM_026A)</h2>
 
-        <!-- ÁREA CENTRAL DE DASHBOARD -->
-        <main class="main-content">
-            <h2 class="dashboard-title">AUDITORIA E SAÚDE DO ESTOQUE (ZTMM_026A)</h2>
+        <!-- CARDS KPIS -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblAcuracia">0.0%</div>
+                    <div class="kpi-lbl">Acurácia Global</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: var(--green-accent);"><i class="fa-solid fa-sack-dollar"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblValorTotal">R$ 0,00</div>
+                    <div class="kpi-lbl">Valor Total do Inventário</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: var(--orange-accent);"><i class="fa-solid fa-clipboard-list"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblTotalAuditados">0</div>
+                    <div class="kpi-lbl">Itens Auditados</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: var(--red-accent);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div>
+                    <div class="kpi-val" id="lblDivergencias">0</div>
+                    <div class="kpi-lbl">Com Divergência</div>
+                </div>
+            </div>
+        </div>
 
-            <!-- CARDS KPIS REAL-TIME -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-bullseye"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblAcuracia">0.0%</div>
-                        <div class="kpi-lbl">Acurácia Global do Estoque</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--green-accent);"><i class="fa-solid fa-vault"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblValorTotal">R$ 0,00</div>
-                        <div class="kpi-lbl">Valor Total do Inventário</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--orange-accent);"><i class="fa-solid fa-clipboard-list"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblTotalAuditados">0</div>
-                        <div class="kpi-lbl">Itens Auditados</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--red-accent);"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div>
-                        <div class="kpi-val" id="lblDivergencias">0</div>
-                        <div class="kpi-lbl">Itens Com Divergência</div>
-                    </div>
+        <!-- GRÁFICOS -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>
+                    <span><i class="fa-solid fa-chart-pie"></i> Curva ABC por Valor Financ.</span>
+                    <button class="btn-detalhes" onclick="abrirModalCurvaABC()"><i class="fa-solid fa-list"></i> Ver Lista</button>
+                </h3>
+                <div class="chart-container">
+                    <canvas id="chartABC"></canvas>
                 </div>
             </div>
 
-            <!-- PAINEL DE GRÁFICOS DINÂMICOS -->
-            <div class="charts-grid">
-                <!-- CURVA ABC CALCULADA -->
-                <div class="chart-card">
-                    <h3>
-                        <span><i class="fa-solid fa-chart-pie"></i> Curva ABC por Valor Financ.</span>
-                        <button class="btn-detalhes" onclick="abrirModalCurvaABC()"><i class="fa-solid fa-list"></i> Ver Lista</button>
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chartABC"></canvas>
-                    </div>
-                </div>
-
-                <!-- ACURÁCIA & STATUS DE AUDITORIA -->
-                <div class="chart-card">
-                    <h3>
-                        <span><i class="fa-solid fa-chart-column"></i> Acurácia de Contagem</span>
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chartAcuracia"></canvas>
-                    </div>
+            <div class="chart-card">
+                <h3>
+                    <span><i class="fa-solid fa-chart-column"></i> Acurácia de Contagem</span>
+                </h3>
+                <div class="chart-container">
+                    <canvas id="chartAcuracia"></canvas>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- MODAL LISTAGEM DA CURVA ABC -->
+    <!-- MODAL CURVA ABC -->
     <div class="modal-overlay" id="modalABC">
         <div class="modal-card">
             <div class="modal-header">
                 <span class="modal-title"><i class="fa-solid fa-boxes-stacked"></i> Classificação da Curva ABC</span>
                 <button class="btn-close" onclick="fecharModalABC()">&times;</button>
             </div>
-            <div style="max-height: 450px; overflow-y: auto;">
+            <div style="max-height: 400px; overflow-y: auto;">
                 <table>
                     <thead>
                         <tr>
@@ -327,10 +380,8 @@
             auth.signOut().finally(() => window.location.replace('index.html'));
         }
 
-        // MOTOR PRINCIPAL DE CÁLCULO DINÂMICO
         async function processarAuditoriaEABC() {
             try {
-                // 1. Busca materiais da ZTMM_026A
                 const snapMateriais = await db.collection('materiais_ztmm').get();
                 if (snapMateriais.empty) {
                     renderizarGraficosVazios();
@@ -355,8 +406,6 @@
 
                 document.getElementById('lblValorTotal').innerText = valorTotalEstoque.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-                // 2. Cálculo Pareto (Curva ABC)
-                // Ordena do maior valor financeiro para o menor
                 materiais.sort((a, b) => b.valorTotal - a.valorTotal);
 
                 let acumuloValor = 0;
@@ -384,7 +433,6 @@
 
                 renderizarGraficoABC(classeA, classeB, classeC);
 
-                // 3. Busca contagens gravadas no Firestore para calcular Acurácia Real
                 const snapContagens = await db.collection('contagens_inventario').get();
                 let auditados = 0;
                 let divergencias = 0;
@@ -413,7 +461,6 @@
             }
         }
 
-        // GRÁFICO DONUT - CURVA ABC
         function renderizarGraficoABC(qtdA, qtdB, qtdC) {
             const ctx = document.getElementById('chartABC').getContext('2d');
             if (chartABCInstance) chartABCInstance.destroy();
@@ -430,12 +477,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
                 }
             });
         }
 
-        // GRÁFICO BAR - ACURÁCIA
         function renderizarGraficoAcuracia(exatos, divergencias) {
             const ctx = document.getElementById('chartAcuracia').getContext('2d');
             if (chartAcuraciaInstance) chartAcuraciaInstance.destroy();
@@ -443,9 +489,8 @@
             chartAcuraciaInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Sem Divergência (Correto)', 'Com Divergência'],
+                    labels: ['Sem Divergência', 'Com Divergência'],
                     datasets: [{
-                        label: 'Qtd de Itens Auditados',
                         data: [exatos, divergencias],
                         backgroundColor: ['#107C41', '#DC2626']
                     }]
@@ -464,13 +509,12 @@
             renderizarGraficoAcuracia(0, 0);
         }
 
-        // MODAL DA CURVA ABC
         function abrirModalCurvaABC() {
             const tbody = document.getElementById('tblCorpoABC');
             tbody.innerHTML = '';
 
             if (listaMateriaisClassificados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum material cadastrado para gerar a curva ABC.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum material cadastrado.</td></tr>`;
                 return;
             }
 
@@ -493,7 +537,6 @@
             document.getElementById('modalABC').style.display = 'none';
         }
 
-        // Carrega o dashboard
         processarAuditoriaEABC();
     </script>
 </body>
