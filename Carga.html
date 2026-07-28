@@ -3,208 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA WMS TRANSPETRO - CARGA SAP</title>
+    <title>Carga de Base SAP - WMS Transpetro</title>
     
     <!-- Bibliotecas Necessárias -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <!-- Ícones FontAwesome & SweetAlert2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
-            --petrobras-green: #008542;
-            --petrobras-yellow: #FFCC00;
-            --petrobras-dark-green: #005826;
-            --bg-light: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-dark: #333333;
-            --border-color: #e0e0e0;
-            --danger-color: #d9534f;
-            --warning-color: #f0ad4e;
-            --info-color: #17a2b8;
+            --bg-dark-blue: #003B5C;
+            --bg-main: #EFEFEF;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --green-accent: #107C41;
+            --red-accent: #D9534F;
+            --border-color: #D1D5DB;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 260px;
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-main);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            min-height: 100vh;
         }
 
-        .brand-container {
-            padding: 20px;
-            background-color: var(--petrobras-green);
+        /* BARRA SUPERIOR */
+        .top-header {
+            background-color: var(--bg-dark-blue);
             color: white;
-            text-align: center;
-        }
-
-        .brand-container h2 {
-            font-size: 1.2rem;
-            margin-top: 5px;
-            color: var(--petrobras-yellow);
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 20px 0;
-        }
-
-        .nav-item a {
+            min-height: 50px;
             display: flex;
             align-items: center;
-            padding: 12px 25px;
-            color: var(--text-dark);
+            justify-content: space-between;
+            padding: 10px 15px;
+            font-size: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* ESTRUTURA PRINCIPAL */
+        .app-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* MENU LATERAL */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-dark-blue);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
             text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
         }
 
-        .nav-item a:hover, .nav-item.active a {
-            background-color: #e8f5e9;
-            color: var(--petrobras-green);
-            border-left: 5px solid var(--petrobras-green);
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        .nav-item.active {
+            background-color: #FFFFFF;
+            color: var(--bg-dark-blue);
+            border-radius: 4px 0 0 4px;
+            margin-left: 8px;
         }
 
-        .user-info {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.85rem;
-            background-color: #fafafa;
-        }
-
-        /* Main Content */
+        /* ÁREA CENTRAL */
         .main-content {
             flex: 1;
-            padding: 30px;
+            padding: 20px;
             overflow-y: auto;
-        }
-
-        .header-title {
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--petrobras-green);
+            width: 100%;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
         }
 
-        /* Tabs UI */
+        .main-container { width: 100%; max-width: 950px; }
+
+        /* TABS DE NAVEGAÇÃO DA CARGA */
         .tabs-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
             border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
         }
 
         .tab-btn {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            font-size: 1rem;
+            padding: 10px 18px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
             font-weight: bold;
-            color: #666;
+            color: #555;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .tab-btn.active {
-            color: var(--petrobras-green);
-            border-bottom-color: var(--petrobras-green);
+            background: var(--bg-dark-blue);
+            color: white;
+            border-color: var(--bg-dark-blue);
         }
 
-        .tab-content {
-            display: none;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Card Layout */
+        /* CARDS E ELEMENTOS */
         .card {
             background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
 
         .drop-zone {
-            border: 2px dashed var(--petrobras-green);
+            border: 2px dashed var(--bg-dark-blue);
             border-radius: 6px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
-            background: #f9fbf9;
+            background: #f0f7ff;
             cursor: pointer;
             margin-bottom: 15px;
-            transition: background 0.3s;
+            transition: background 0.2s;
+            font-weight: bold;
+            color: var(--bg-dark-blue);
         }
 
-        .drop-zone:hover {
-            background: #eef7ee;
-        }
+        .drop-zone:hover { background: #e0f0ff; }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border: none;
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
+            font-size: 13px;
+            transition: background 0.2s;
         }
 
-        .btn-success {
-            background-color: var(--petrobras-green);
-            color: white;
-        }
+        .btn-success { background-color: var(--green-accent); color: white; }
+        .btn-success:hover { background-color: #0d6334; }
 
-        .btn-success:hover {
-            background-color: var(--petrobras-dark-green);
-        }
-
-        .btn-disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Mapping Table */
-        .mapping-table, .data-preview {
+        /* TABELAS */
+        .mapping-table, .data-preview, .history-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
-            font-size: 0.9rem;
+            font-size: 12px;
         }
 
         .mapping-table th, .mapping-table td,
-        .data-preview th, .data-preview td {
+        .data-preview th, .data-preview td,
+        .history-table th, .history-table td {
             border: 1px solid var(--border-color);
-            padding: 8px 12px;
+            padding: 8px 10px;
             text-align: left;
         }
 
-        .mapping-table th, .data-preview th {
-            background-color: #f0f4f1;
-            color: var(--petrobras-dark-green);
+        .mapping-table th, .data-preview th, .history-table th {
+            background-color: var(--bg-dark-blue);
+            color: white;
+            text-transform: uppercase;
+            font-size: 11px;
         }
 
         select.field-select {
@@ -214,31 +236,19 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Diagnostic & Feedback */
+        /* ALERTAS & PROGRESSO */
         .alert {
-            padding: 12px 15px;
+            padding: 12px;
             border-radius: 4px;
             margin-top: 15px;
             display: none;
+            font-size: 13px;
+            font-weight: 500;
         }
 
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
         .progress-bar-container {
             width: 100%;
@@ -251,273 +261,313 @@
         .progress-bar {
             width: 0%;
             height: 12px;
-            background-color: var(--petrobras-green);
+            background-color: var(--green-accent);
             border-radius: 4px;
             transition: width 0.2s;
         }
 
-        /* Historical Table */
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 0.85rem;
-        }
-
-        .history-table th, .history-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid var(--border-color);
-            text-align: left;
-        }
-
         .badge {
             padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: bold;
         }
-
         .badge-success { background-color: #d4edda; color: #155724; }
+
+        .direitos-box { max-width: 950px; text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; width: 100%; margin-top: auto; }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 5px; }
+            .nav-item { padding: 8px 12px; font-size: 11px; white-space: nowrap; margin-left: 0 !important; }
+            .main-content { padding: 10px; }
+            .top-header { justify-content: center; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div>
-            <div class="brand-container">
-                <h1>TRANSPETRO</h1>
-                <h2>WMS - Carga SAP</h2>
+    <!-- BARRA SUPERIOR -->
+    <header class="top-header">
+        <div class="brand-logo">
+            <i class="fa-solid fa-warehouse"></i>
+            <span>TRANSPETRO</span>
+        </div>
+        <div class="header-user-info">
+            <span class="user-badge"><i class="fa-solid fa-location-dot"></i> Escopo Alvo: 423</span>
+            <span class="user-badge"><i class="fa-solid fa-user"></i> <span id="lblUsuario">Carregando...</span></span>
+            <button class="btn-logout" onclick="encerrarSessaoManualmente()"><i class="fa-solid fa-power-off"></i> Sair</button>
+        </div>
+    </header>
+
+    <!-- CORPO PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- MENU LATERAL -->
+        <nav class="sidebar">
+            <a class="nav-item" onclick="irPara('contagem.html')">
+                <i class="fa-solid fa-clipboard-check"></i> Contagem / Início
+            </a>
+            <a class="nav-item" onclick="irPara('consulta.html')">
+                <i class="fa-solid fa-magnifying-glass"></i> Consulta Material
+            </a>
+            <a class="nav-item" onclick="irPara('auditoria.html')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard / Auditoria
+            </a>
+            <a class="nav-item active" onclick="irPara('Carga.html')">
+                <i class="fa-solid fa-file-import"></i> Alimentar Sistema (SAP)
+            </a>
+        </nav>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="main-content">
+            <div class="main-container">
+                
+                <div style="margin-bottom: 15px; color: var(--bg-dark-blue);">
+                    <h2 style="font-size: 18px; text-transform: uppercase;"><i class="fa-solid fa-file-excel"></i> Módulo de Carga e Integração SAP</h2>
+                </div>
+
+                <!-- ABAS DA CARGA -->
+                <div class="tabs-container">
+                    <button class="tab-btn active" onclick="alternarAba('MB51')">1. Movimentações MB51</button>
+                    <button class="tab-btn" onclick="alternarAba('MB25')">2. Reservas MB25</button>
+                    <button class="tab-btn" onclick="alternarAba('ZQMM')">3. Saldo ZQMM_026A</button>
+                    <button class="tab-btn" onclick="alternarAba('HISTORICO')">📜 Histórico de Cargas</button>
+                </div>
+
+                <!-- CONTEÚDO ABA MB51 -->
+                <div id="tabMB51" class="tab-content active">
+                    <div class="card">
+                        <h3><i class="fa-solid fa-arrow-right-left"></i> Extrato de Movimentações (MB51)</h3>
+                        <p style="font-size: 11px; color: #666; margin-bottom: 15px;">Coleção Alvo: <code>movimentacoes_mb51</code></p>
+                        
+                        <div class="drop-zone" onclick="document.getElementById('fileMB51').click()">
+                            <i class="fa-solid fa-cloud-arrow-up fa-2x"></i><br><br>
+                            Clique aqui ou arraste a planilha XLSX / CSV do MB51
+                            <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" style="display:none;" onchange="processarArquivo('MB51', this)">
+                        </div>
+
+                        <div id="diagMB51" class="alert alert-warning"></div>
+
+                        <div id="mapAreaMB51" style="display:none;">
+                            <h4>Mapeamento de Colunas Detectado</h4>
+                            <table class="mapping-table" id="tableMapMB51">
+                                <thead>
+                                    <tr>
+                                        <th>Campo WMS Esperado</th>
+                                        <th>Coluna na Planilha</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                            <h4 style="margin-top:20px;">Prévia dos Dados (Primeiras 5 Linhas)</h4>
+                            <div style="overflow-x:auto;">
+                                <table class="data-preview" id="previewMB51"><thead></thead><tbody></tbody></table>
+                            </div>
+
+                            <div class="progress-bar-container" id="progContainerMB51">
+                                <div class="progress-bar" id="progBarMB51"></div>
+                            </div>
+
+                            <div id="msgSucessoMB51" class="alert alert-success"></div>
+                            <div id="msgErroMB51" class="alert alert-danger"></div>
+
+                            <button class="btn btn-success" id="btnEnviarMB51" style="margin-top: 15px;" onclick="executarIntegracaoFirebase('MB51')">Confirmar Carga MB51</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTEÚDO ABA MB25 -->
+                <div id="tabMB25" class="tab-content">
+                    <div class="card">
+                        <h3><i class="fa-solid fa-list-check"></i> Carga de Reservas (MB25)</h3>
+                        <p style="font-size: 11px; color: #666; margin-bottom: 15px;">Coleção Alvo: <code>reservas_mb25</code></p>
+                        
+                        <div class="drop-zone" onclick="document.getElementById('fileMB25').click()">
+                            <i class="fa-solid fa-cloud-arrow-up fa-2x"></i><br><br>
+                            Clique aqui ou arraste a planilha XLSX / CSV do MB25
+                            <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" style="display:none;" onchange="processarArquivo('MB25', this)">
+                        </div>
+
+                        <div id="diagMB25" class="alert alert-warning"></div>
+
+                        <div id="mapAreaMB25" style="display:none;">
+                            <h4>Mapeamento de Colunas Detectado</h4>
+                            <table class="mapping-table" id="tableMapMB25">
+                                <thead>
+                                    <tr>
+                                        <th>Campo WMS Esperado</th>
+                                        <th>Coluna na Planilha</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                            <h4 style="margin-top:20px;">Prévia dos Dados (Primeiras 5 Linhas)</h4>
+                            <div style="overflow-x:auto;">
+                                <table class="data-preview" id="previewMB25"><thead></thead><tbody></tbody></table>
+                            </div>
+
+                            <div class="progress-bar-container" id="progContainerMB25">
+                                <div class="progress-bar" id="progBarMB25"></div>
+                            </div>
+
+                            <div id="msgSucessoMB25" class="alert alert-success"></div>
+                            <div id="msgErroMB25" class="alert alert-danger"></div>
+
+                            <button class="btn btn-success" id="btnEnviarMB25" style="margin-top: 15px;" onclick="executarIntegracaoFirebase('MB25')">Confirmar Carga MB25</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTEÚDO ABA ZQMM_026A -->
+                <div id="tabZQMM" class="tab-content">
+                    <div class="card">
+                        <h3><i class="fa-solid fa-boxes-stacked"></i> Saldo de Estoque (ZQMM_026A)</h3>
+                        <p style="font-size: 11px; color: #666; margin-bottom: 15px;">Coleção Alvo: <code>estoque_zqmm026a</code></p>
+                        
+                        <div class="drop-zone" onclick="document.getElementById('fileZQMM').click()">
+                            <i class="fa-solid fa-cloud-arrow-up fa-2x"></i><br><br>
+                            Clique aqui ou arraste a planilha XLSX / CSV do ZQMM_026A
+                            <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" style="display:none;" onchange="processarArquivo('ZQMM', this)">
+                        </div>
+
+                        <div id="diagZQMM" class="alert alert-warning"></div>
+
+                        <div id="mapAreaZQMM" style="display:none;">
+                            <h4>Mapeamento de Colunas Detectado</h4>
+                            <table class="mapping-table" id="tableMapZQMM">
+                                <thead>
+                                    <tr>
+                                        <th>Campo WMS Esperado</th>
+                                        <th>Coluna na Planilha</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                            <h4 style="margin-top:20px;">Prévia dos Dados (Primeiras 5 Linhas)</h4>
+                            <div style="overflow-x:auto;">
+                                <table class="data-preview" id="previewZQMM"><thead></thead><tbody></tbody></table>
+                            </div>
+
+                            <div class="progress-bar-container" id="progContainerZQMM">
+                                <div class="progress-bar" id="progBarZQMM"></div>
+                            </div>
+
+                            <div id="msgSucessoZQMM" class="alert alert-success"></div>
+                            <div id="msgErroZQMM" class="alert alert-danger"></div>
+
+                            <button class="btn btn-success" id="btnEnviarZQMM" style="margin-top: 15px;" onclick="executarIntegracaoFirebase('ZQMM')">Confirmar Carga ZQMM_026A</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA DE HISTÓRICO -->
+                <div id="tabHISTORICO" class="tab-content">
+                    <div class="card">
+                        <h3>Histórico de Cargas Realizadas</h3>
+                        <table class="history-table" id="tableHistorico">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Relatório</th>
+                                    <th>Nome do Arquivo</th>
+                                    <th>Tamanho</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color:#888;">Nenhuma carga efetuada nesta sessão.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="contagem.html">📊 Menu Principal</a></li>
-                <li class="nav-item active"><a href="Carga.html">📥 Carga de Planilhas</a></li>
-                <li class="nav-item"><a href="consulta.html">🔍 Consultar Estoque</a></li>
-                <li class="nav-item"><a href="auditoria.html">📋 Auditoria</a></li>
-            </ul>
-        </div>
-        <div class="user-info">
-            <strong>Operador:</strong> <span id="userEmailDisplay">carregando...</span><br>
-            <small>Base: Sistema WMS Core</small>
-        </div>
+
+            <!-- 🛡️ RODAPÉ DE PROTEÇÃO INTELECTUAL DO DÁRIO -->
+            <div class="direitos-box">
+                <p style="font-size: 11px; line-height: 1.6; color: #666;">
+                    &copy; 2026 WMS Inteligente. Todos os direitos reservados.<br>
+                    Projeto independente desenvolvido e de propriedade exclusiva de <strong>Dário João Torres</strong>.
+                </p>
+            </div>
+        </main>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="main-content">
-        <div class="header-title">
-            <h2>Módulo de Integração de Cargas SAP</h2>
-            <button class="btn btn-success" id="btnSalvarGeral" style="display:none;" onclick="processarTodasCargas()">Executar Carga Completa</button>
-        </div>
-
-        <!-- ABA DE NAVEGAÇÃO ENTRE TIPOS DE RELATÓRIOS -->
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="alternarAba('MB51')">1. Extrato MB51</button>
-            <button class="tab-btn" onclick="alternarAba('MB25')">2. Reservas MB25</button>
-            <button class="tab-btn" onclick="alternarAba('ZQMM')">3. Saldo ZQMM_026A</button>
-            <button class="tab-btn" onclick="alternarAba('HISTORICO')">📜 Histórico de Cargas</button>
-        </div>
-
-        <!-- CONTEÚDO ABA MB51 -->
-        <div id="tabMB51" class="tab-content active">
-            <div class="card">
-                <h3>Carga de Movimentações (MB51)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Coleção Firestore Alvo: <code>movimentacoes_mb51</code></p>
-                <div class="drop-zone" onclick="document.getElementById('fileMB51').click()">
-                    📄 Clique aqui ou arraste o arquivo XLSX / CSV do MB51
-                    <input type="file" id="fileMB51" accept=".xlsx, .xls, .csv" style="display:none;" onchange="processarArquivo('MB51', this)">
-                </div>
-
-                <div id="diagMB51" class="alert alert-warning"></div>
-
-                <div id="mapAreaMB51" style="display:none;">
-                    <h4>Mapeamento de Colunas Detectado</h4>
-                    <table class="mapping-table" id="tableMapMB51">
-                        <thead>
-                            <tr>
-                                <th>Campo WMS Esperado</th>
-                                <th>Coluna na Planilha</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-
-                    <h4 style="margin-top:20px;">Prévia dos Dados (Primeiras 5 Linhas)</h4>
-                    <div style="overflow-x:auto;">
-                        <table class="data-preview" id="previewMB51"><thead></thead><tbody></tbody></table>
-                    </div>
-
-                    <div class="progress-bar-container" id="progContainerMB51">
-                        <div class="progress-bar" id="progBarMB51"></div>
-                    </div>
-
-                    <div id="msgSucessoMB51" class="alert alert-success"></div>
-                    <div id="msgErroMB51" class="alert alert-danger"></div>
-
-                    <button class="btn btn-success" id="btnEnviarMB51" style="margin-top: 15px;" onclick="executarIntegracaoFirebase('MB51')">Confirmar Carga MB51</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTEÚDO ABA MB25 -->
-        <div id="tabMB25" class="tab-content">
-            <div class="card">
-                <h3>Carga de Reservas (MB25)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Coleção Firestore Alvo: <code>reservas_mb25</code></p>
-                <div class="drop-zone" onclick="document.getElementById('fileMB25').click()">
-                    📄 Clique aqui ou arraste o arquivo XLSX / CSV do MB25
-                    <input type="file" id="fileMB25" accept=".xlsx, .xls, .csv" style="display:none;" onchange="processarArquivo('MB25', this)">
-                </div>
-
-                <div id="diagMB25" class="alert alert-warning"></div>
-
-                <div id="mapAreaMB25" style="display:none;">
-                    <h4>Mapeamento de Colunas Detectado</h4>
-                    <table class="mapping-table" id="tableMapMB25">
-                        <thead>
-                            <tr>
-                                <th>Campo WMS Esperado</th>
-                                <th>Coluna na Planilha</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-
-                    <h4 style="margin-top:20px;">Prévia dos Dados (Primeiras 5 Linhas)</h4>
-                    <div style="overflow-x:auto;">
-                        <table class="data-preview" id="previewMB25"><thead></thead><tbody></tbody></table>
-                    </div>
-
-                    <div class="progress-bar-container" id="progContainerMB25">
-                        <div class="progress-bar" id="progBarMB25"></div>
-                    </div>
-
-                    <div id="msgSucessoMB25" class="alert alert-success"></div>
-                    <div id="msgErroMB25" class="alert alert-danger"></div>
-
-                    <button class="btn btn-success" id="btnEnviarMB25" style="margin-top: 15px;" onclick="executarIntegracaoFirebase('MB25')">Confirmar Carga MB25</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTEÚDO ABA ZQMM_026A -->
-        <div id="tabZQMM" class="tab-content">
-            <div class="card">
-                <h3>Carga de Saldo de Estoque (ZQMM_026A)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Coleção Firestore Alvo: <code>estoque_zqmm026a</code></p>
-                <div class="drop-zone" onclick="document.getElementById('fileZQMM').click()">
-                    📄 Clique aqui ou arraste o arquivo XLSX / CSV do ZQMM_026A
-                    <input type="file" id="fileZQMM" accept=".xlsx, .xls, .csv" style="display:none;" onchange="processarArquivo('ZQMM', this)">
-                </div>
-
-                <div id="diagZQMM" class="alert alert-warning"></div>
-
-                <div id="mapAreaZQMM" style="display:none;">
-                    <h4>Mapeamento de Colunas Detectado</h4>
-                    <table class="mapping-table" id="tableMapZQMM">
-                        <thead>
-                            <tr>
-                                <th>Campo WMS Esperado</th>
-                                <th>Coluna na Planilha</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-
-                    <h4 style="margin-top:20px;">Prévia dos Dados (Primeiras 5 Linhas)</h4>
-                    <div style="overflow-x:auto;">
-                        <table class="data-preview" id="previewZQMM"><thead></thead><tbody></tbody></table>
-                    </div>
-
-                    <div class="progress-bar-container" id="progContainerZQMM">
-                        <div class="progress-bar" id="progBarZQMM"></div>
-                    </div>
-
-                    <div id="msgSucessoZQMM" class="alert alert-success"></div>
-                    <div id="msgErroZQMM" class="alert alert-danger"></div>
-
-                    <button class="btn btn-success" id="btnEnviarZQMM" style="margin-top: 15px;" onclick="executarIntegracaoFirebase('ZQMM')">Confirmar Carga ZQMM_026A</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ABA DE HISTÓRICO -->
-        <div id="tabHISTORICO" class="tab-content">
-            <div class="card">
-                <h3>Histórico de Cargas Realizadas</h3>
-                <table class="history-table" id="tableHistorico">
-                    <thead>
-                        <tr>
-                            <th>Data/Hora</th>
-                            <th>Relatório</th>
-                            <th>Nome do Arquivo</th>
-                            <th>Tamanho</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5" style="text-align:center; color:#888;">Nenhuma carga efetuada nesta sessão.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- SCRIPT DE LÓGICA E INTEGRAÇÃO FIREBASE -->
     <script>
         // Configuração Padrão Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKey_For_WMS_Transpetro_Config",
-            authDomain: "wms-transpetro.firebaseapp.com",
-            projectId: "wms-transpetro",
-            storageBucket: "wms-transpetro.appspot.com",
-            messagingSenderId: "102938475610",
-            appId: "1:102938475610:web:a1b2c3d4e5f67890"
+            apiKey: "AIzaSyCI5iG3O0IRdrOiFR50WsCi1L0Werlfcnw",
+            authDomain: "bolao-copa-2026-d264f.firebaseapp.com",
+            projectId: "bolao-copa-2026-d264f",
+            storageBucket: "bolao-copa-2026-d264f.firebasestorage.app",
+            messagingSenderId: "802924891915",
+            appId: "1:802924891915:web:d9c641161733b510559c0e"
         };
 
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        // Estado Global em Memória
-        let usuarioAtual = "operador.wms@transpetro.com.br";
+        // VALIDAÇÃO DE USUÁRIO
+        let usuarioAtual = localStorage.getItem('wms_usuario');
+        if (!usuarioAtual) {
+            window.location.replace('index.html');
+        } else {
+            document.getElementById('lblUsuario').innerText = usuarioAtual;
+        }
+
+        function irPara(pagina) { window.location.href = pagina; }
+
+        function encerrarSessaoManualmente() {
+            localStorage.clear();
+            auth.signOut().finally(() => window.location.replace('index.html'));
+        }
+
+        // Estado Global de Memória
         const dadosLidosEmMemoria = {
             MB51: { json: [], map: {}, nome: '' },
             MB25: { json: [], map: {}, nome: '' },
             ZQMM: { json: [], map: {}, nome: '' }
         };
 
-        // Estrutura Mapeada Esperada
+        // Aliases SAP Ajustados e Mapeamentos Tolerantes
         const camposObrigatoriosWMS = {
             MB51: [
-                { id: 'nm', rotulo: 'Material / Código', aliases: ['Material', 'material', 'código', 'codigo'] },
-                { id: 'descricao', rotulo: 'Texto Breve', aliases: ['Texto breve do material', 'texto_breve_material', 'Descrição'] },
-                { id: 'deposito', rotulo: 'Depósito', aliases: ['Depósito', 'deposito', 'dep'] },
-                { id: 'quantidade', rotulo: 'Quantidade', aliases: ['Qtde. em UM de entrada', 'quantidade', 'qtd'] },
-                { id: 'unidade_medida', rotulo: 'Unidade de Medida Básica', aliases: ['Unidade de medida básica', 'um_basica', 'UM', 'UMB'] },
-                { id: 'valor_total', rotulo: 'Montante em Moeda Interna', aliases: ['Montante em moeda interna', 'montante_em_mi', 'Valor total'] },
-                { id: 'tipo_movimento', rotulo: 'Tipo de Movimento', aliases: ['Tipo de movimento', 'tipo_movimento', 'Mov.'] },
-                { id: 'endereco', rotulo: 'Lote / Posição', aliases: ['Lote', 'lote', 'Endereço', 'endereco'] }
+                { id: 'nm', rotulo: 'Material / Código', aliases: ['Material', 'material', 'código', 'codigo', 'Nº material'] },
+                { id: 'descricao', rotulo: 'Texto Breve Material', aliases: ['Texto breve do material', 'texto_breve_material', 'Descrição', 'Texto Breve', 'Texto breve material'] },
+                { id: 'deposito', rotulo: 'Depósito', aliases: ['Depósito', 'deposito', 'dep', 'Dep.'] },
+                { id: 'quantidade', rotulo: 'Quantidade', aliases: ['Qtde. em UM de entrada', 'quantidade', 'qtd', 'Qtd. em UM de entrada', 'Quantidade em UM'] },
+                { id: 'unidade_medida', rotulo: 'Unidade Medida', aliases: ['Unidade de medida básica', 'um_basica', 'UM', 'UMB', 'Unidade de medida de entrada'] },
+                { id: 'valor_total', rotulo: 'Montante em MI', aliases: ['Montante em moeda interna', 'montante_em_mi', 'Valor total', 'Montante'] },
+                { id: 'tipo_movimento', rotulo: 'Tipo Movimento', aliases: ['Tipo de movimento', 'tipo_movimento', 'Mov.', 'Tp.mov.'] },
+                { id: 'endereco', rotulo: 'Lote / Endereço', aliases: ['Lote', 'lote', 'Endereço', 'endereco', 'Posição'] }
             ],
             MB25: [
-                { id: 'numero_reserva', rotulo: 'Nº Reserva', aliases: ['Reserva', 'Nº Reserva', 'numero_reserva'] },
-                { id: 'nm', rotulo: 'Material / Código', aliases: ['Material', 'material', 'código', 'codigo'] },
-                { id: 'descricao', rotulo: 'Texto Breve', aliases: ['Texto breve do material', 'texto_breve_material', 'Descrição'] },
-                { id: 'quantidade', rotulo: 'Quantidade Necessária', aliases: ['Quantidade necessária', 'qtd_necessaria', 'quantidade'] },
-                { id: 'unidade_medida', rotulo: 'Unidade de Medida Básica', aliases: ['Unidade de medida básica', 'um_basica', 'UM', 'UMB'] },
-                { id: 'nome_usuario', rotulo: 'Nome do Usuário', aliases: ['Nome do usuário', 'nome_usuario', 'Usuário'] }
+                { id: 'numero_reserva', rotulo: 'Nº Reserva', aliases: ['Reserva', 'Nº Reserva', 'numero_reserva', 'Nº da reserva'] },
+                { id: 'item_reserva', rotulo: 'Item Reserva', aliases: ['Item', 'Nº item', 'Item reserva', 'Posição'] },
+                { id: 'nm', rotulo: 'Material / Código', aliases: ['Material', 'material', 'código', 'codigo', 'Nº material'] },
+                { id: 'descricao', rotulo: 'Texto Breve Material', aliases: ['Texto breve do material', 'texto_breve_material', 'Descrição', 'Texto Breve'] },
+                { id: 'quantidade', rotulo: 'Qtd Necessária', aliases: ['Quantidade necessária', 'qtd_necessaria', 'quantidade', 'Qtd.necessária'] },
+                { id: 'unidade_medida', rotulo: 'Unidade Medida', aliases: ['Unidade de medida básica', 'um_basica', 'UM', 'UMB'] },
+                { id: 'nome_usuario', rotulo: 'Usuário', aliases: ['Nome do usuário', 'nome_usuario', 'Usuário', 'Criador'] }
             ],
             ZQMM: [
                 { id: 'nm', rotulo: 'Material / Código', aliases: ['Material', 'material', 'código', 'codigo'] },
-                { id: 'descricao', rotulo: 'Texto Breve', aliases: ['Texto Breve Material', 'descricao_breve', 'Texto breve do material'] },
-                { id: 'endereco', rotulo: 'Localização / Posição', aliases: ['Posição', 'Localização', 'localizacao', 'Endereço', 'Lote'] },
-                { id: 'quantidade', rotulo: 'Utilização Livre', aliases: ['Utilização livre', 'qtd_estoque', 'Quantidade', 'saldo'] },
+                { id: 'descricao', rotulo: 'Texto Breve Material', aliases: ['Texto Breve Material', 'descricao_breve', 'Texto breve do material', 'Descrição'] },
+                { id: 'endereco', rotulo: 'Endereço / Posição', aliases: ['Posição', 'Localização', 'localizacao', 'Endereço', 'Lote'] },
+                { id: 'quantidade', rotulo: 'Saldo Utilização Livre', aliases: ['Utilização livre', 'qtd_estoque', 'Quantidade', 'saldo', 'Livre utilização'] },
                 { id: 'unidade_medida', rotulo: 'UMB', aliases: ['UMB', 'umb', 'Unidade Medida', 'UM'] },
                 { id: 'deposito', rotulo: 'Depósito', aliases: ['Depósito', 'deposito', 'dep'] },
                 { id: 'valor_total', rotulo: 'Valor Total', aliases: ['Valor total', 'valor_total', 'Montante'] },
@@ -525,17 +575,6 @@
             ]
         };
 
-        // Identificar Usuário Logado
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user && user.email) {
-                usuarioAtual = user.email;
-                document.getElementById('userEmailDisplay').innerText = usuarioAtual;
-            } else {
-                document.getElementById('userEmailDisplay').innerText = "operador.wms@transpetro.com.br";
-            }
-        });
-
-        // Troca de Abas
         function alternarAba(tipo) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -547,7 +586,7 @@
             if (eventBtn) eventBtn.classList.add('active');
         }
 
-        // Leitura de Arquivo Excel/CSV com Identificação de Cabeçalho SAP
+        // Leitura com Inteligência para Cabeçalhos Deslocados do SAP
         function processarArquivo(tipo, input) {
             const file = input.files[0];
             if (!file) return;
@@ -556,36 +595,38 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                // Converter primeiro para matriz bruta para localizar o cabeçalho real
-                const rawRows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                let rangeOffset = 0;
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rawRows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                    let rangeOffset = 0;
 
-                // Localizar automaticamente a linha de cabeçalho do SAP
-                for (let i = 0; i < Math.min(rawRows.length, 25); i++) {
-                    const rowStr = rawRows[i].map(c => String(c).toLowerCase()).join(' ');
-                    if (rowStr.includes('material') && (rowStr.includes('texto breve') || rowStr.includes('depósito') || rowStr.includes('deposito'))) {
-                        rangeOffset = i;
-                        break;
+                    // Busca inteligente pelo cabeçalho real na planilha SAP
+                    for (let i = 0; i < Math.min(rawRows.length, 30); i++) {
+                        const rowStr = rawRows[i].map(c => String(c).toLowerCase()).join(' ');
+                        if (rowStr.includes('material') || rowStr.includes('reserva') || rowStr.includes('texto breve')) {
+                            rangeOffset = i;
+                            break;
+                        }
                     }
+
+                    const json = XLSX.utils.sheet_to_json(worksheet, { range: rangeOffset, defval: '' });
+
+                    if (!json || json.length === 0) {
+                        exibirDiagnostico(tipo, "❌ Planilha sem dados válidos ou não reconhecida.", "danger");
+                        return;
+                    }
+
+                    dadosLidosEmMemoria[tipo].json = json;
+                    exibirDiagnostico(tipo, `✅ Planilha lida com sucesso! ${json.length} linhas encontradas.`, "success");
+                    gerarInterfaceMapeamento(tipo, Object.keys(json[0]));
+                    gerarPreviaTabela(tipo, json);
+                } catch (err) {
+                    exibirDiagnostico(tipo, "❌ Erro ao ler o arquivo Excel: " + err.message, "danger");
                 }
-
-                // Extrair o JSON iniciando da linha do cabeçalho identificada
-                const json = XLSX.utils.sheet_to_json(worksheet, { range: rangeOffset, defval: '' });
-
-                if (!json || json.length === 0) {
-                    exibirDiagnostico(tipo, "❌ Arquivo vazio ou sem linhas de dados válidas.", "danger");
-                    return;
-                }
-
-                dadosLidosEmMemoria[tipo].json = json;
-                exibirDiagnostico(tipo, `✅ Arquivo lido com sucesso! ${json.length} linhas encontradas.`, "success");
-                gerarInterfaceMapeamento(tipo, Object.keys(json[0]));
-                gerarPreviaTabela(tipo, json);
             };
 
             reader.readAsArrayBuffer(file);
@@ -599,7 +640,6 @@
             diag.innerHTML = mensagem;
         }
 
-        // Montar Tabela de Mapeamento
         function gerarInterfaceMapeamento(tipo, colunasPlanilha) {
             const mapArea = document.getElementById(`mapArea${tipo}`);
             const tbody = document.querySelector(`#tableMap${tipo} tbody`);
@@ -612,12 +652,12 @@
                 const tr = document.createElement('tr');
                 
                 let colunaEncontrada = colunasPlanilha.find(c => 
-                    campo.aliases.some(a => a.toLowerCase() === c.trim().toLowerCase())
+                    campo.aliases.some(a => a.toLowerCase() === String(c).trim().toLowerCase())
                 ) || '';
 
                 if (!colunaEncontrada) {
                     colunaEncontrada = colunasPlanilha.find(c => 
-                        campo.aliases.some(a => c.trim().toLowerCase().includes(a.toLowerCase()))
+                        campo.aliases.some(a => String(c).trim().toLowerCase().includes(a.toLowerCase()))
                     ) || '';
                 }
 
@@ -630,7 +670,7 @@
                 });
 
                 const statusBadge = colunaEncontrada 
-                    ? `<span class="badge badge-success">Mapeado</span>` 
+                    ? `<span class="badge badge-success">OK</span>` 
                     : `<span class="badge" style="background:#f8d7da; color:#721c24;">Pendente</span>`;
 
                 tr.innerHTML = `
@@ -652,15 +692,12 @@
             dadosLidosEmMemoria[tipo].map[campoId] = novaColuna;
             const badge = document.getElementById(`statusMap_${tipo}_${campoId}`);
             if (badge) {
-                if (novaColuna) {
-                    badge.innerHTML = `<span class="badge badge-success">Mapeado</span>`;
-                } else {
-                    badge.innerHTML = `<span class="badge" style="background:#f8d7da; color:#721c24;">Pendente</span>`;
-                }
+                badge.innerHTML = novaColuna 
+                    ? `<span class="badge badge-success">OK</span>` 
+                    : `<span class="badge" style="background:#f8d7da; color:#721c24;">Pendente</span>`;
             }
         }
 
-        // Gerar Prévia Visual
         function gerarPreviaTabela(tipo, json) {
             const thead = document.querySelector(`#preview${tipo} thead`);
             const tbody = document.querySelector(`#preview${tipo} tbody`);
@@ -684,69 +721,52 @@
             });
         }
 
-        // Auxiliar Tratamento Numérico
+        // Tratamento de Números Padrão SAP (Ex: "1.500,00" ou "-50,00")
         function parseNumero(val) {
             if (val === null || val === undefined || val === '') return 0;
             if (typeof val === 'number') return val;
             let str = String(val).trim();
+            
+            // Caso seja formato SAP negativo sufixado ex: 10,00-
+            let ehNegativo = false;
+            if (str.endsWith('-')) {
+                ehNegativo = true;
+                str = str.replace('-', '');
+            }
+
             str = str.replace(/\./g, '').replace(',', '.');
-            const num = parseFloat(str);
-            return isNaN(num) ? 0 : num;
+            let num = parseFloat(str);
+            if (isNaN(num)) return 0;
+            return ehNegativo ? -num : num;
         }
 
-        // =========================================================================
-        // PERSISTÊNCIA REAL NO FIRESTORE COM LIMPEZA DE MEMÓRIA SELETIVA
-        // =========================================================================
-
-        async function executarIntegracaoIndividual(tipo) {
-            return await executarIntegracaoFirebase(tipo);
-        }
-
+        // GRAVAÇÃO CORRIGIDA NO FIRESTORE
         async function executarIntegracaoFirebase(tipo) {
-            const suf = (tipo === 'ZQMM_026A' || tipo === 'ZQMM') ? 'ZQMM' : tipo;
-            const tipoNormalizado = String(tipo).toUpperCase().replace(/[^A-Z0-9]/g, "");
-
+            const suf = tipo;
             const mapa = dadosLidosEmMemoria[suf] ? dadosLidosEmMemoria[suf].map : {};
             const json = dadosLidosEmMemoria[suf] ? dadosLidosEmMemoria[suf].json : null;
 
             if (!json || json.length === 0) {
-                exibirDiagnostico(suf, "⚠️ Nenhum dado encontrado em memória para processar.", "warning");
+                exibirDiagnostico(suf, "⚠️ Nenhum dado encontrado na memória.", "warning");
                 return;
             }
 
             let nomeColecao = "";
-            let usarIdAutomatico = false;
-
-            if (tipoNormalizado.includes("MB51")) {
-                nomeColecao = "movimentacoes_mb51";
-                usarIdAutomatico = true;
-            } else if (tipoNormalizado.includes("MB25")) {
-                nomeColecao = "reservas_mb25";
-                usarIdAutomatico = false;
-            } else if (tipoNormalizado.includes("ZQMM")) {
-                nomeColecao = "estoque_zqmm026a";
-                usarIdAutomatico = false;
-            } else {
-                exibirDiagnostico(suf, `⚠️ Tipo de relatório não mapeado: ${tipo}`, "danger");
-                return;
-            }
+            if (tipo === "MB51") nomeColecao = "movimentacoes_mb51";
+            else if (tipo === "MB25") nomeColecao = "reservas_mb25";
+            else if (tipo === "ZQMM") nomeColecao = "estoque_zqmm026a";
 
             const btn = document.getElementById(`btnEnviar${suf}`);
             const progContainer = document.getElementById(`progContainer${suf}`);
             const progBar = document.getElementById(`progBar${suf}`);
 
-            if (btn) {
-                btn.disabled = true;
-                btn.innerText = "Gravando no Firestore...";
-            }
+            if (btn) { btn.disabled = true; btn.innerText = "Processando no Firestore..."; }
             if (progContainer) progContainer.style.display = 'block';
-            if (progBar) progBar.style.width = '10%';
 
             try {
                 const totalLinhas = json.length;
                 const batchSize = 400;
                 let lotesExecutados = 0;
-
                 const timestampCarga = firebase.firestore.Timestamp.now();
                 let batch = db.batch();
                 let contadorNoLote = 0;
@@ -756,69 +776,69 @@
                     let documentoPayload = {};
                     let refDoc;
 
-                    const obterValor = (campoId, aliasesPadrao) => {
+                    const obterValor = (campoId) => {
                         const colMapeada = mapa[campoId];
-                        if (colMapeada && row[colMapeada] !== undefined) {
-                            return row[colMapeada];
-                        }
-                        for (const alias of aliasesPadrao) {
-                            if (row[alias] !== undefined) return row[alias];
-                        }
+                        if (colMapeada && row[colMapeada] !== undefined) return row[colMapeada];
                         return '';
                     };
 
-                    if (tipoNormalizado.includes("MB51")) {
-                        const material = String(obterValor('nm', ['Material', 'material', 'código', 'codigo'])).trim();
+                    if (tipo === "MB51") {
+                        const material = String(obterValor('nm')).trim();
                         if (!material) continue;
 
                         documentoPayload = {
                             material: material,
-                            texto_breve_material: String(obterValor('descricao', ['Texto breve do material', 'texto_breve_material', 'Descrição', 'descricao'])).trim(),
-                            deposito: String(obterValor('deposito', ['Depósito', 'deposito', 'dep'])).trim(),
-                            quantidade: parseNumero(obterValor('quantidade', ['Qtde. em UM de entrada', 'quantidade', 'qtd'])),
-                            um_basica: String(obterValor('unidade_medida', ['Unidade de medida básica', 'um_basica', 'UM', 'UMB'])).trim(),
-                            montante_em_mi: parseNumero(obterValor('valor_total', ['Montante em moeda interna', 'montante_em_mi', 'Valor total', 'montante'])),
-                            tipo_movimento: String(obterValor('tipo_movimento', ['Tipo de movimento', 'tipo_movimento', 'Mov.'])).trim(),
-                            lote: String(obterValor('endereco', ['Lote', 'lote', 'Endereço', 'endereco'])).trim(),
+                            texto_breve_material: String(obterValor('descricao')).trim(),
+                            deposito: String(obterValor('deposito')).trim(),
+                            quantidade: parseNumero(obterValor('quantidade')),
+                            um_basica: String(obterValor('unidade_medida')).trim(),
+                            montante_em_mi: parseNumero(obterValor('valor_total')),
+                            tipo_movimento: String(obterValor('tipo_movimento')).trim(),
+                            lote: String(obterValor('endereco')).trim(),
                             usuario_carga: usuarioAtual,
                             data_carga: timestampCarga
                         };
 
+                        // MB51 utiliza ID Automático para evitar sobravia de extratos passados
                         refDoc = db.collection(nomeColecao).doc();
 
-                    } else if (tipoNormalizado.includes("MB25")) {
-                        const numReserva = String(obterValor('numero_reserva', ['Reserva', 'Nº Reserva', 'numero_reserva'])).trim();
-                        const material = String(obterValor('nm', ['Material', 'material', 'código', 'codigo'])).trim();
+                    } else if (tipo === "MB25") {
+                        const numReserva = String(obterValor('numero_reserva')).trim();
+                        const itemReserva = String(obterValor('item_reserva')).trim() || (i + 1);
+                        const material = String(obterValor('nm')).trim();
+
                         if (!material && !numReserva) continue;
 
                         documentoPayload = {
                             numero_reserva: numReserva,
+                            item_reserva: itemReserva,
                             material: material,
-                            texto_breve_material: String(obterValor('descricao', ['Texto breve do material', 'texto_breve_material', 'Descrição', 'descricao'])).trim(),
-                            qtd_necessaria: parseNumero(obterValor('quantidade', ['Quantidade necessária', 'qtd_necessaria', 'quantidade', 'qtd'])),
-                            um_basica: String(obterValor('unidade_medida', ['Unidade de medida básica', 'um_basica', 'UM', 'UMB'])).trim(),
-                            nome_usuario: String(obterValor('nome_usuario', ['Nome do usuário', 'nome_usuario', 'Usuário'])).trim(),
+                            texto_breve_material: String(obterValor('descricao')).trim(),
+                            qtd_necessaria: parseNumero(obterValor('quantidade')),
+                            um_basica: String(obterValor('unidade_medida')).trim(),
+                            nome_usuario: String(obterValor('nome_usuario')).trim(),
                             usuario_carga: usuarioAtual,
                             data_carga: timestampCarga
                         };
 
-                        const chaveId = `${numReserva}_${material}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-                        refDoc = db.collection(nomeColecao).doc(chaveId !== '_' ? chaveId : db.collection(nomeColecao).doc().id);
+                        // CORREÇÃO DE DUPLICAÇÃO: A Chave Única inclui Reserva + Item + Material
+                        const chaveId = `${numReserva}_${itemReserva}_${material}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+                        refDoc = db.collection(nomeColecao).doc(chaveId !== '__' ? chaveId : db.collection(nomeColecao).doc().id);
 
-                    } else if (tipoNormalizado.includes("ZQMM")) {
-                        const material = String(obterValor('nm', ['Material', 'material', 'código', 'codigo'])).trim();
-                        const deposito = String(obterValor('deposito', ['Depósito', 'deposito', 'dep'])).trim();
+                    } else if (tipo === "ZQMM") {
+                        const material = String(obterValor('nm')).trim();
+                        const deposito = String(obterValor('deposito')).trim();
                         if (!material) continue;
 
                         documentoPayload = {
                             material: material,
-                            descricao_breve: String(obterValor('descricao', ['Texto Breve Material', 'descricao_breve', 'Texto breve do material', 'Descrição'])).trim(),
-                            localizacao: String(obterValor('endereco', ['Posição', 'Localização', 'localizacao', 'Endereço', 'Lote'])).trim(),
-                            qtd_estoque: parseNumero(obterValor('quantidade', ['Utilização livre', 'qtd_estoque', 'Quantidade', 'saldo'])),
-                            umb: String(obterValor('unidade_medida', ['UMB', 'umb', 'Unidade Medida', 'UM'])).trim(),
+                            descricao_breve: String(obterValor('descricao')).trim(),
+                            localizacao: String(obterValor('endereco')).trim(),
+                            qtd_estoque: parseNumero(obterValor('quantidade')),
+                            umb: String(obterValor('unidade_medida')).trim(),
                             deposito: deposito,
-                            valor_total: parseNumero(obterValor('valor_total', ['Valor total', 'valor_total', 'Montante'])),
-                            moeda: String(obterValor('moeda', ['Moeda', 'moeda', 'Moeda int.']) || 'BRL').trim(),
+                            valor_total: parseNumero(obterValor('valor_total')),
+                            moeda: String(obterValor('moeda') || 'BRL').trim(),
                             usuario_carga: usuarioAtual,
                             data_carga: timestampCarga
                         };
@@ -827,12 +847,8 @@
                         refDoc = db.collection(nomeColecao).doc(chaveId !== '_' ? chaveId : db.collection(nomeColecao).doc().id);
                     }
 
-                    if (usarIdAutomatico) {
-                        batch.set(refDoc, documentoPayload);
-                    } else {
-                        batch.set(refDoc, documentoPayload, { merge: true });
-                    }
-
+                    // Gravação segura no Firestore
+                    batch.set(refDoc, documentoPayload, { merge: true });
                     contadorNoLote++;
 
                     if (contadorNoLote === batchSize || i === totalLinhas - 1) {
@@ -840,8 +856,8 @@
                         lotesExecutados += contadorNoLote;
 
                         if (progBar) {
-                            const pct = Math.round((lotesExecutados / totalLinhas) * 90);
-                            progBar.style.width = `${10 + pct}%`;
+                            const pct = Math.round((lotesExecutados / totalLinhas) * 100);
+                            progBar.style.width = `${pct}%`;
                         }
 
                         batch = db.batch();
@@ -849,49 +865,42 @@
                     }
                 }
 
-                if (progBar) progBar.style.width = '100%';
-
                 setTimeout(() => {
                     if (progContainer) progContainer.style.display = 'none';
 
                     const msgElement = document.getElementById(`msgSucesso${suf}`);
                     if (msgElement) {
-                        msgElement.innerText = `✅ Carga ${tipo} realizada com sucesso! ${totalLinhas} registros salvos em ${nomeColecao}.`;
+                        msgElement.innerText = `✅ Carga ${tipo} concluída! ${totalLinhas} registros salvos no banco.`;
                         msgElement.style.display = 'block';
                     }
 
-                    if (btn) btn.style.display = 'none';
+                    if (btn) { btn.disabled = false; btn.innerText = `Confirmar Carga ${tipo}`; }
 
                     adicionarAoHistorico(
                         new Date().toLocaleString('pt-BR'),
                         tipo,
                         dadosLidosEmMemoria[suf].nome || 'Arquivo_SAP.xlsx',
                         `${totalLinhas} Linhas`,
-                        `Gravado em ${nomeColecao}`
+                        `Concluído`
                     );
 
-                    // Limpa exclusivamente a memória do tipo recém-processado
                     dadosLidosEmMemoria[suf] = { json: [], map: {}, nome: '' };
                 }, 300);
 
             } catch (err) {
-                console.error("Erro na gravação Firebase:", err);
+                console.error("Erro no Firebase:", err);
                 if (progContainer) progContainer.style.display = 'none';
 
                 const msgErroElement = document.getElementById(`msgErro${suf}`);
                 if (msgErroElement) {
-                    msgErroElement.innerText = "❌ Erro ao gravar dados no Firebase: " + err.message;
+                    msgErroElement.innerText = "❌ Erro ao gravar dados: " + err.message;
                     msgErroElement.style.display = 'block';
                 }
 
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = `Confirmar Carga ${tipo}`;
-                }
+                if (btn) { btn.disabled = false; btn.innerText = `Confirmar Carga ${tipo}`; }
             }
         }
 
-        // Atualização do Histórico Local
         function adicionarAoHistorico(dataHora, relatorio, arquivo, tamanho, status) {
             const tbody = document.querySelector('#tableHistorico tbody');
             if (!tbody) return;
@@ -910,6 +919,35 @@
             `;
             tbody.insertBefore(tr, tbody.firstChild);
         }
+
+        // ⏱️ TRAVA CORPORATIVA DE INATIVIDADE (5 MINUTOS)
+        let cronometroInatividade;
+
+        function resetarCronometroSessao() {
+            clearTimeout(cronometroInatividade);
+            cronometroInatividade = setTimeout(executarBloqueioPorInatividade, 300000); 
+        }
+
+        function executarBloqueioPorInatividade() {
+            localStorage.clear();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sessão Expirada!',
+                text: 'Por diretrizes de segurança, o sistema foi bloqueado devido a 5 minutos de inatividade.',
+                confirmButtonColor: '#d9534f',
+                confirmButtonText: 'Efetuar Login Novamente',
+                allowOutsideClick: false
+            }).then(() => {
+                window.location.href = "index.html";
+            });
+        }
+
+        window.onload = resetarCronometroSessao;
+        document.onmousemove = resetarCronometroSessao;
+        document.onkeypress = resetarCronometroSessao;
+        document.onclick = resetarCronometroSessao;
+        document.onscroll = resetarCronometroSessao;
+        document.ontouchstart = resetarCronometroSessao;
     </script>
 </body>
 </html>
