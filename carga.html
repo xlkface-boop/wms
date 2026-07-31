@@ -386,10 +386,10 @@
 
                         if (tipo === 'ZTMM') {
                             const nm = extrairValor(row, ['Material', 'NM', 'Código Material', 'Nº material']) || `SEM_NM_${Date.now()}`;
-                            const descricao = extrairValor(row, ['Texto breve material', 'Descrição', 'Texto Breve']) || 'Sem Descrição';
-                            const saldo = parseFloat(extrairValor(row, ['Utilização livre', 'Saldo', 'Qtd', 'Quantidade']) || 0);
-                            const posicao = extrairValor(row, ['Depósito', 'Posição', 'Endereço', 'Tipo de depósito']) || 'GERAL';
-                            const valorUnit = parseFloat(extrairValor(row, ['Valor', 'Preço Unitário', 'Montante']) || 0);
+                            const descricao = extrairValor(row, ['Texto breve material', 'Descrição', 'Descrição Breve do Material']) || 'Sem Descrição';
+                            const saldo = parseFloat(extrairValor(row, ['Utilização livre', 'Saldo', 'Qtd', 'QTD em Estoque']) || 0);
+                            const posicao = extrairValor(row, ['Depósito', 'Localização', 'Endereço', 'Tipo de depósito']) || 'GERAL';
+                            const valorUnit = parseFloat(extrairValor(row, ['Valor', 'Preço Unitário', 'Valor total']) || 0);
 
                             docRef = db.collection('materiais_ztmm').doc(String(nm));
                             batch.set(docRef, {
