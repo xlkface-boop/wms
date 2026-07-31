@@ -386,19 +386,19 @@
 
                         if (tipo === 'ZTMM') {
                             const nm = extrairValor(row, ['Material', 'NM', 'Código Material', 'Nº material']) || `SEM_NM_${Date.now()}`;
-                            const descricao = extrairValor(row, ['Texto breve material', 'Descrição', 'Descrição Breve do Material']) || 'Sem Descrição';
-                            const saldo = parseFloat(extrairValor(row, ['Utilização livre', 'Saldo', 'Qtd', 'QTD em Estoque']) || 0);
+                            const descricao = extrairValor(row, ['Descrição Breve do Material', 'Descrição', 'Descrição Breve do Material']) || 'Sem Descrição';
+                            const saldo = parseFloat(extrairValor(row, ['QTD em Estoque', 'Saldo', 'Qtd', 'QTD em Estoque']) || 0);
                             const posicao = extrairValor(row, ['Depósito', 'Localização', 'Endereço', 'Tipo de depósito']) || 'GERAL';
-                            const valorUnit = parseFloat(extrairValor(row, ['Valor', 'Preço Unitário', 'Valor total']) || 0);
+                            const valorUnit = parseFloat(extrairValor(row, ['Valor total', 'Preço Unitário', 'Valor total']) || 0);
 
                             docRef = db.collection('materiais_ztmm').doc(String(nm));
                             batch.set(docRef, {
                                 nm: String(nm),
                                 descricao: String(descricao),
-                                saldoSap: saldo,
-                                posicao: String(posicao),
-                                valorUnitario: valorUnit,
-                                valorTotal: saldo * valorUnit,
+                                saldoSap: QTD em Estoque,
+                                posicao: String(Localização),
+                                valorUnitario: Valor total,
+                                valorTotal: saldo * Valor total,
                                 ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
                             }, { merge: true });
 
