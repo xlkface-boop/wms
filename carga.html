@@ -323,8 +323,8 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        const usuarioAtual = localStorage.getItem('wms_usuario');
-        if (!usuarioAtual) {
+        const usuarioAtual = localStorage.getItem('wms_usuario') || 'Usuario_Desconhecido';
+        if (!localStorage.getItem('wms_usuario')) {
             window.location.replace('index.html');
         } else {
             document.getElementById('lblUsuario').innerText = usuarioAtual;
@@ -347,6 +347,10 @@
             return null;
         }
 
+        function sanitizarChaveDoc(chave) {
+            return String(chave || '').trim().replace(/[\/\\#?%]/g, '_');
+        }
+
         async function processarPlanilha(tipo) {
             const fileInput = document.getElementById(`file${tipo}`);
             const btn = document.getElementById(`btn${tipo}`);
@@ -364,6 +368,12 @@
             const reader = new FileReader();
 
             reader.onload = async function(e) {
+                let linhasLidas = 0;
+                let novosCount = 0;
+                let atualizadosCount = 0;
+                let ignoradosCount = 0;
+                let statusImportacao = 'Sucesso';
+
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
@@ -371,98 +381,253 @@
                     const worksheet = workbook.Sheets[firstSheetName];
                     const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-                    if (!json.length) {
+                    linhasLidas = json.length;
+
+                    if (!linhasLidas) {
                         throw new Error("Planilha vazia ou sem dados válidos.");
                     }
 
-                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Salvando...`;
-                    
-                    let batch = db.batch();
-                    let contador = 0;
-                    let totalSalvo = 0;
+                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analisando dados...`;
 
-                    for (let row of json) {
-                        let docRef;
+                    let collectionName = '';
+                    if (tipo === 'ZTMM') collectionName = 'materiais_ztmm';
+                    else if (tipo === 'MB51') collectionName = 'movimentacoes_mb51';
+                    else if (tipo === 'MB25') collectionName = 'reservas_mb25';
+
+                    // 1. Preparar e extrair dados formatados de cada linha
+                    const itensProcessados = [];
+                    for (let i = 0; i < json.length; i++) {
+                        const row = json[i];
+                        let docId = '';
+                        let dados = {};
 
                         if (tipo === 'ZTMM') {
-                            const nm = extrairValor(row, ['Material', 'NM', 'Código Material', 'Nº material']) || `SEM_NM_${Date.now()}`;
-                            const descricao = extrairValor(row, ['Descrição Breve do Material', 'Descrição', 'Descrição Breve do Material']) || 'Sem Descrição';
-                            const saldo = parseFloat(extrairValor(row, ['QTD em Estoque', 'Saldo', 'Qtd', 'QTD em Estoque']) || 0);
-                            const posicao = extrairValor(row, ['Depósito', 'Localização', 'Endereço', 'Tipo de depósito']) || 'GERAL';
-                            const valorUnit = parseFloat(extrairValor(row, ['Valor total', 'Preço Unitário', 'Valor total']) || 0);
+                            const nm = extrairValor(row, ['Material', 'NM', 'Código Material', 'Nº material']) || `SEM_NM_${Date.now()}_${i}`;
+                            const descricao = extrairValor(row, ['Descrição Breve do Material', 'Texto breve material', 'Descrição', 'Texto Breve']) || 'Sem Descrição';
+                            const saldo = parseFloat(extrairValor(row, ['QTD em Estoque', 'Utilização livre', 'Saldo', 'Qtd', 'Quantidade']) || 0);
+                            const posicao = extrairValor(row, ['Localização', 'Depósito', 'Posição', 'Endereço', 'Tipo de depósito']) || 'GERAL';
+                            const valorTotal = parseFloat(extrairValor(row, ['Valor total', 'Valor', 'Montante']) || 0);
+                            const valorUnit = saldo > 0 ? (valorTotal / saldo) : parseFloat(extrairValor(row, ['Preço Unitário']) || 0);
 
-                            docRef = db.collection('materiais_ztmm').doc(String(nm));
-                            batch.set(docRef, {
+                            docId = sanitizarChaveDoc(nm);
+                            dados = {
                                 nm: String(nm),
                                 descricao: String(descricao),
-                                saldoSap: QTD em Estoque,
-                                posicao: String(Localização),
-                                valorUnitario: Valor total,
-                                valorTotal: saldo * Valor total,
-                                ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
-                            }, { merge: true });
+                                saldoSap: saldo,
+                                posicao: String(posicao),
+                                valorUnitario: valorUnit,
+                                valorTotal: valorTotal
+                            };
 
                         } else if (tipo === 'MB51') {
                             const nm = extrairValor(row, ['Material', 'NM', 'Nº material']) || 'SEM_NM';
-                            const descricao = extrairValor(row, ['Texto breve material', 'Descrição']) || '';
-                            const qtd = parseFloat(extrairValor(row, ['Qtd. na UM de entrada', 'Quantidade', 'Qtd']) || 1);
+                            const descricao = extrairValor(row, ['Texto breve de material', 'Texto breve material', 'Descrição']) || '';
+                            const qtd = parseFloat(extrairValor(row, ['Qtd. em UM de entrada', 'Qtd. na UM de entrada', 'Quantidade', 'Qtd']) || 1);
                             const mvt = extrairValor(row, ['Tipo de movimento', 'Mvt', 'Tipo Mvt']) || '';
                             const dataMov = extrairValor(row, ['Data de lançamento', 'Data doc.']) || '';
+                            const docMat = extrairValor(row, ['Doc.material', 'Documento material', 'Doc. material', 'Doc.Mat.']) || '';
+                            const itemMat = extrairValor(row, ['Item', 'Item do documento de material', 'Item Doc.']) || '';
 
-                            docRef = db.collection('movimentacoes_mb51').doc();
-                            batch.set(docRef, {
+                            // Chave única para evitar duplicidades no reprocessamento do MB51
+                            let rawKey = `${nm}_${docMat}_${itemMat}_${dataMov}_${mvt}_${qtd}`;
+                            docId = sanitizarChaveDoc(rawKey);
+
+                            dados = {
                                 nm: String(nm),
                                 descricao: String(descricao),
                                 quantidade: Math.abs(qtd),
                                 tipoMovimento: String(mvt),
                                 dataLancamento: String(dataMov),
-                                dataCarga: firebase.firestore.FieldValue.serverTimestamp()
-                            });
+                                docMaterial: String(docMat),
+                                itemDoc: String(itemMat)
+                            };
 
                         } else if (tipo === 'MB25') {
-                            const reserva = extrairValor(row, ['Reserva', 'Nº reserva']) || `RES_${Date.now()}`;
+                            const reserva = extrairValor(row, ['Nº reserva', 'Reserva']) || `RES_${Date.now()}_${i}`;
+                            const itemReserva = extrairValor(row, ['Nº item reserva/reserva', 'Item da reserva', 'Item']) || '';
                             const nm = extrairValor(row, ['Material', 'NM']) || '';
-                            const qtdReservada = parseFloat(extrairValor(row, ['Quantidade necessária', 'Qtd.reservada']) || 0);
+                            const descricao = extrairValor(row, ['Texto breve do material', 'Texto breve material', 'Descrição']) || '';
+                            const qtdReservada = parseFloat(extrairValor(row, ['Necessária', 'Quantidade necessária', 'Qtd.reservada']) || 0);
                             const ordem = extrairValor(row, ['Ordem', 'Ordem Manutenção']) || '';
 
-                            docRef = db.collection('reservas_mb25').doc(String(reserva));
-                            batch.set(docRef, {
+                            // Chave combinada de Reserva + Item (se houver) ou Reserva
+                            let rawKey = itemReserva ? `${reserva}_${itemReserva}` : `${reserva}`;
+                            docId = sanitizarChaveDoc(rawKey);
+
+                            dados = {
                                 reserva: String(reserva),
+                                itemReserva: String(itemReserva),
                                 nm: String(nm),
+                                descricao: String(descricao),
                                 qtdReservada: qtdReservada,
-                                ordem: String(ordem),
-                                dataCarga: firebase.firestore.FieldValue.serverTimestamp()
-                            }, { merge: true });
+                                ordem: String(ordem)
+                            };
                         }
 
-                        contador++;
-                        totalSalvo++;
+                        itensProcessados.push({ docId, dados, nmMaterial: dados.nm || '' });
+                    }
 
-                        if (contador === 400) {
+                    // 2. Buscar no Firestore os documentos existentes em lotes de até 30 IDs
+                    const idsUnicos = [...new Set(itensProcessados.map(item => item.docId))];
+                    const docsExistentes = new Map();
+
+                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verificando duplicidades...`;
+
+                    const TAMANHO_LOTE_BUSCA = 30;
+                    for (let i = 0; i < idsUnicos.length; i += TAMANHO_LOTE_BUSCA) {
+                        const loteIds = idsUnicos.slice(i, i + TAMANHO_LOTE_BUSCA);
+                        const snapshot = await db.collection(collectionName)
+                            .where(firebase.firestore.FieldPath.documentId(), 'in', loteIds)
+                            .get();
+
+                        snapshot.forEach(doc => {
+                            docsExistentes.set(doc.id, doc.data());
+                        });
+                    }
+
+                    // 3. Processar gravações com comparação prévia e auditoria
+                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Gravando alterações...`;
+
+                    let batch = db.batch();
+                    let alteracoesAuditoria = [];
+                    let operacoesNoBatch = 0;
+
+                    for (let item of itensProcessados) {
+                        const { docId, dados, nmMaterial } = item;
+                        const docRef = db.collection(collectionName).doc(docId);
+                        const dadosExistentes = docsExistentes.get(docId);
+
+                        if (!dadosExistentes) {
+                            // REGISTRO NOVO
+                            novosCount++;
+                            const novoDocData = {
+                                ...dados,
+                                [tipo === 'ZTMM' ? 'ultimaAtualizacao' : 'dataCarga']: firebase.firestore.FieldValue.serverTimestamp()
+                            };
+                            batch.set(docRef, novoDocData);
+                            operacoesNoBatch++;
+                            // Atualizar cache local para tratar itens duplicados na própria planilha
+                            docsExistentes.set(docId, dados);
+
+                        } else {
+                            // REGISTRO EXISTE -> Comparar campos
+                            const mudancas = [];
+                            for (let campo in dados) {
+                                let valAntigo = dadosExistentes[campo];
+                                let valNovo = dados[campo];
+
+                                if (valAntigo === undefined) valAntigo = '';
+
+                                if (String(valAntigo) !== String(valNovo)) {
+                                    mudancas.push({
+                                        campo: campo,
+                                        valorAnterior: valAntigo,
+                                        valorNovo: valNovo
+                                    });
+                                }
+                            }
+
+                            if (mudancas.length > 0) {
+                                // REGISTRO ALTERADO -> Atualizar
+                                atualizadosCount++;
+                                const docAtualizadoData = {
+                                    ...dados,
+                                    [tipo === 'ZTMM' ? 'ultimaAtualizacao' : 'dataCarga']: firebase.firestore.FieldValue.serverTimestamp()
+                                };
+                                batch.set(docRef, docAtualizadoData, { merge: true });
+                                operacoesNoBatch++;
+                                docsExistentes.set(docId, { ...dadosExistentes, ...dados });
+
+                                // Registrar alterações para a coleção auditoria_alteracoes
+                                mudancas.forEach(m => {
+                                    alteracoesAuditoria.push({
+                                        material: String(nmMaterial || docId),
+                                        campoAlterado: m.campo,
+                                        valorAnterior: m.valorAnterior,
+                                        valorNovo: m.valorNovo,
+                                        usuario: usuarioAtual,
+                                        dataHora: firebase.firestore.FieldValue.serverTimestamp()
+                                    });
+                                });
+
+                            } else {
+                                // REGISTRO IGUAL -> Ignorar
+                                ignoradosCount++;
+                            }
+                        }
+
+                        // Commit do lote principal (limite do Firestore: 500 operações)
+                        if (operacoesNoBatch >= 400) {
                             await batch.commit();
                             batch = db.batch();
-                            contador = 0;
+                            operacoesNoBatch = 0;
                         }
                     }
 
-                    if (contador > 0) {
+                    if (operacoesNoBatch > 0) {
                         await batch.commit();
                     }
 
+                    // 4. Salvar Registros de Auditoria em Lote
+                    if (alteracoesAuditoria.length > 0) {
+                        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Registrando auditoria...`;
+                        let auditBatch = db.batch();
+                        let auditOps = 0;
+
+                        for (let auditLog of alteracoesAuditoria) {
+                            const auditRef = db.collection('auditoria_alteracoes').doc();
+                            auditBatch.set(auditRef, auditLog);
+                            auditOps++;
+
+                            if (auditOps >= 400) {
+                                await auditBatch.commit();
+                                auditBatch = db.batch();
+                                auditOps = 0;
+                            }
+                        }
+
+                        if (auditOps > 0) {
+                            await auditBatch.commit();
+                        }
+                    }
+
                     statusBox.style.display = 'block';
-                    statusBox.innerText = `✓ ${totalSalvo} linhas importadas!`;
+                    statusBox.innerText = `✓ Processado: ${novosCount} novos, ${atualizadosCount} atualizados, ${ignoradosCount} ignorados.`;
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Carga Concluída!',
-                        text: `${totalSalvo} registros da planilha ${tipo} salvos com sucesso.`,
+                        html: `<b>Planilha:</b> ${tipo}<br>` +
+                              `<b>Total Lido:</b> ${linhasLidas}<br>` +
+                              `<b>Novos:</b> ${novosCount}<br>` +
+                              `<b>Atualizados:</b> ${atualizadosCount}<br>` +
+                              `<b>Ignorados:</b> ${ignoradosCount}`,
                         confirmButtonColor: '#003B5C'
                     });
 
                 } catch (error) {
                     console.error("Erro na carga:", error);
+                    statusImportacao = `Erro: ${error.message}`;
+
                     Swal.fire('Erro no Processamento', `Erro ao ler arquivo: ${error.message}`, 'error');
                 } finally {
+                    // 5. Salvar Log de Importação na coleção logs_importacao
+                    try {
+                        await db.collection('logs_importacao').add({
+                            usuario: usuarioAtual,
+                            nomeArquivo: file.name,
+                            tipoCarga: tipo,
+                            dataHora: firebase.firestore.FieldValue.serverTimestamp(),
+                            quantidadeLinhasLidas: linhasLidas,
+                            quantidadeRegistrosNovos: novosCount,
+                            quantidadeRegistrosAtualizados: atualizadosCount,
+                            quantidadeRegistrosIgnorados: ignoradosCount,
+                            statusImportacao: statusImportacao
+                        });
+                    } catch (logErr) {
+                        console.error("Erro ao gravar log de importação:", logErr);
+                    }
+
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fa-solid fa-upload"></i> Processar ${tipo}`;
                 }
