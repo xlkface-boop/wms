@@ -340,15 +340,72 @@
             const chaves = Object.keys(row);
             for (let nome of possiveisNomes) {
                 const chaveEncontrada = chaves.find(k => k.trim().toLowerCase() === nome.trim().toLowerCase());
-                if (chaveEncontrada && row[chaveEncontrada] !== undefined) {
+                if (chaveEncontrada && row[chaveEncontrada] !== undefined && row[chaveEncontrada] !== null) {
                     return row[chaveEncontrada];
                 }
             }
             return null;
         }
 
+        function converterParaNumero(val) {
+            if (val === null || val === undefined || val === '') return 0;
+            if (typeof val === 'number') return val;
+            let str = String(val).trim().replace(/\./g, '').replace(',', '.');
+            let num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
+        }
+
         function sanitizarChaveDoc(chave) {
             return String(chave || '').trim().replace(/[\/\\#?%]/g, '_');
+        }
+
+        // Função para converter SheetJS Worksheet em JSON inteligente procurando a linha real do cabeçalho
+        function converterWorksheetParaJson(worksheet) {
+            let matrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+            if (!matrix || !matrix.length) return [];
+
+            let headerIndex = -1;
+            let palavrasChaveHeader = ['material', 'nº material', 'nº reserva', 'reserva', 'texto breve'];
+
+            for (let i = 0; i < Math.min(matrix.length, 25); i++) {
+                let linha = matrix[i];
+                if (Array.isArray(linha)) {
+                    let linhaTexto = linha.map(c => String(c).toLowerCase()).join(' ');
+                    if (palavrasChaveHeader.some(p => linhaTexto.includes(p))) {
+                        headerIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (headerIndex === -1) {
+                return XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+            }
+
+            let headers = matrix[headerIndex].map(h => String(h).trim());
+            let result = [];
+
+            for (let i = headerIndex + 1; i < matrix.length; i++) {
+                let row = matrix[i];
+                if (!row || row.every(c => String(c).trim() === "")) continue;
+
+                let rowObj = {};
+                let temDadoValido = false;
+
+                headers.forEach((h, colIdx) => {
+                    if (h) {
+                        let val = row[colIdx] !== undefined ? row[colIdx] : "";
+                        rowObj[h] = val;
+                        if (val !== "") temDadoValido = true;
+                    }
+                });
+
+                if (temDadoValido) {
+                    result.push(rowObj);
+                }
+            }
+
+            return result;
         }
 
         async function processarPlanilha(tipo) {
@@ -376,15 +433,16 @@
 
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = XLSX.read(data, { type: 'array', raw: false });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    
+                    const json = converterWorksheetParaJson(worksheet);
 
                     linhasLidas = json.length;
 
                     if (!linhasLidas) {
-                        throw new Error("Planilha vazia ou sem dados válidos.");
+                        throw new Error("Planilha vazia ou sem cabeçalhos válidos do SAP.");
                     }
 
                     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analisando dados...`;
@@ -404,10 +462,10 @@
                         if (tipo === 'ZTMM') {
                             const nm = extrairValor(row, ['Material', 'NM', 'Código Material', 'Nº material']) || `SEM_NM_${Date.now()}_${i}`;
                             const descricao = extrairValor(row, ['Descrição Breve do Material', 'Texto breve material', 'Descrição', 'Texto Breve']) || 'Sem Descrição';
-                            const saldo = parseFloat(extrairValor(row, ['QTD em Estoque', 'Utilização livre', 'Saldo', 'Qtd', 'Quantidade']) || 0);
+                            const saldo = converterParaNumero(extrairValor(row, ['QTD em Estoque', 'Utilização livre', 'Saldo', 'Qtd', 'Quantidade']));
                             const posicao = extrairValor(row, ['Localização', 'Depósito', 'Posição', 'Endereço', 'Tipo de depósito']) || 'GERAL';
-                            const valorTotal = parseFloat(extrairValor(row, ['Valor total', 'Valor', 'Montante']) || 0);
-                            const valorUnit = saldo > 0 ? (valorTotal / saldo) : parseFloat(extrairValor(row, ['Preço Unitário']) || 0);
+                            const valorTotal = converterParaNumero(extrairValor(row, ['Valor total', 'Valor', 'Montante']));
+                            const valorUnit = saldo > 0 ? (valorTotal / saldo) : converterParaNumero(extrairValor(row, ['Preço Unitário']));
 
                             docId = sanitizarChaveDoc(nm);
                             dados = {
@@ -422,7 +480,7 @@
                         } else if (tipo === 'MB51') {
                             const nm = extrairValor(row, ['Material', 'NM', 'Nº material']) || 'SEM_NM';
                             const descricao = extrairValor(row, ['Texto breve de material', 'Texto breve material', 'Descrição']) || '';
-                            const qtd = parseFloat(extrairValor(row, ['Qtd. em UM de entrada', 'Qtd. na UM de entrada', 'Quantidade', 'Qtd']) || 1);
+                            const qtd = converterParaNumero(extrairValor(row, ['Qtd. em UM de entrada', 'Qtd. na UM de entrada', 'Quantidade', 'Qtd']) || 1);
                             const mvt = extrairValor(row, ['Tipo de movimento', 'Mvt', 'Tipo Mvt']) || '';
                             const dataMov = extrairValor(row, ['Data de lançamento', 'Data doc.']) || '';
                             const docMat = extrairValor(row, ['Doc.material', 'Documento material', 'Doc. material', 'Doc.Mat.']) || '';
@@ -447,10 +505,10 @@
                             const itemReserva = extrairValor(row, ['Nº item reserva/reserva', 'Item da reserva', 'Item']) || '';
                             const nm = extrairValor(row, ['Material', 'NM']) || '';
                             const descricao = extrairValor(row, ['Texto breve do material', 'Texto breve material', 'Descrição']) || '';
-                            const qtdReservada = parseFloat(extrairValor(row, ['Necessária', 'Quantidade necessária', 'Qtd.reservada']) || 0);
+                            const qtdReservada = converterParaNumero(extrairValor(row, ['Necessária', 'Quantidade necessária', 'Qtd.reservada']));
                             const ordem = extrairValor(row, ['Ordem', 'Ordem Manutenção']) || '';
 
-                            // Chave combinada de Reserva + Item (se houver) ou Reserva
+                            // Chave combinada de Reserva + Item
                             let rawKey = itemReserva ? `${reserva}_${itemReserva}` : `${reserva}`;
                             docId = sanitizarChaveDoc(rawKey);
 
@@ -506,7 +564,6 @@
                             };
                             batch.set(docRef, novoDocData);
                             operacoesNoBatch++;
-                            // Atualizar cache local para tratar itens duplicados na própria planilha
                             docsExistentes.set(docId, dados);
 
                         } else {
@@ -556,7 +613,6 @@
                             }
                         }
 
-                        // Commit do lote principal (limite do Firestore: 500 operações)
                         if (operacoesNoBatch >= 400) {
                             await batch.commit();
                             batch = db.batch();
